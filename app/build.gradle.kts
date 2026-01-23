@@ -57,6 +57,8 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     implementation(libs.glide)
+    implementation(libs.koin.android)
+    implementation(libs.navigation.compose)
     ksp(libs.compiler)
     ksp(libs.room.compiler)
 
