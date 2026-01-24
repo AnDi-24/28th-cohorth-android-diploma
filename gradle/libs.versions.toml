@@ -5,13 +5,26 @@ java = "VERSION_1_8"
 # Build constants
 material = "1.7.1"
 minSdk = "26"
-compileSdk = "34"
-navigationCompose = "2.7.6"
+compileSdk = "36"
 targetSdk = "33"
 
 # Detekt
 detekt = "1.23.3"
 detektTwitterComposeRules ="0.0.26"
+lifecycleViewmodelKtx = "2.10.0"
+activityKtx = "1.12.2"
+retrofit = "2.11.0"
+converterGson = "2.9.0"
+roomRuntime = "2.6.1"
+roomKtx = "2.6.1"
+roomCompiler = "2.6.1"
+ui = "1.6.1"
+glide = "4.16.0"
+compiler = "4.16.0"
+material = "1.6.1"
+activityCompose = "1.8.2"
+koinAndroid = "3.3.0"
+navigationCompose = "2.7.7"
 
 [libraries]
 
@@ -40,5 +53,19 @@ unitTests-junit = "junit:junit:4.13.2"
 # UI tests
 uiTests-junitExt = "androidx.test.ext:junit:1.1.5"
 uiTests-espressoCore = "androidx.test.espresso:espresso-core:3.5.1"
+lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
+activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "activityKtx" }
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "converterGson" }
+room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "roomRuntime" }
+room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomKtx" }
+ui = { group = "androidx.compose.ui", name = "ui", version.ref = "ui" }
+glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
+material = { group = "androidx.compose.material", name = "material", version.ref = "material" }
+activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
+compiler = { group = "com.github.bumptech.glide", name = "compiler", version.ref = "compiler" }
+room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomCompiler" }
+koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koinAndroid" }
+navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 
 [bundles]
