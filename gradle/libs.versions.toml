@@ -7,6 +7,7 @@ material = "1.7.1"
 minSdk = "26"
 compileSdk = "34"
 navigationCompose = "2.7.6"
+converterGson = "2.9.0"
 targetSdk = "33"
 
 # Detekt
@@ -17,6 +18,7 @@ detektTwitterComposeRules ="0.0.26"
 
 # Detekt
 material = { module = "androidx.compose.material:material", version.ref = "material" }
+converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "converterGson" }
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 staticAnalysis-detektPlugin = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
 staticAnalysis-detektCli = { module = "io.gitlab.arturbosch.detekt:detekt-cli", version.ref = "detekt" }
