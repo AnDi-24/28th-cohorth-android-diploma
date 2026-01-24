@@ -29,6 +29,7 @@ const val MAIN = "main"
 const val FAVORITE = "favorite"
 const val TEAM = "team"
 const val FILTER = "filter"
+const val OPTION = "option"
 const val VACANCY = "vacancy"
 
 @Composable
@@ -66,6 +67,9 @@ fun NavGraph() {
             }
             composable(VACANCY) {
                 VacancyScreen(navController)
+            }
+            composable(OPTION) {
+                FilterOptionScreen(navController)
             }
         }
     }

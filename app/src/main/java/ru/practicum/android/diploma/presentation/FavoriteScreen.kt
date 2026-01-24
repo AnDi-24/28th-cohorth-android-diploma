@@ -21,9 +21,9 @@ fun FavoriteScreen(navController: NavController) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Экран 1 — Избранное")
+        Text(text = "Экран 2 — Избранное")
         Button(onClick = {
-            navController.navigate("vacancy")
+            navController.navigate(VACANCY)
         }) {
             Text("Вакансия")
         }

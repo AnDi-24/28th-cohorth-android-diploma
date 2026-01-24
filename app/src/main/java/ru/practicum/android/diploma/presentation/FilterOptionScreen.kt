@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
 @Composable
-fun FilterScreen(navController: NavController) {
+fun FilterOptionScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -21,12 +21,9 @@ fun FilterScreen(navController: NavController) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Экран фильтров")
+        Text("Фильтр по Отрасли или Месту работы")
         Button(onClick = { navController.popBackStack() }) {
             Text("Назад")
-        }
-        Button(onClick = { navController.navigate(OPTION) }) {
-            Text("Выбрать опцию")
         }
     }
 }

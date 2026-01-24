@@ -23,12 +23,12 @@ fun MainScreen(navController: NavController) {
     ) {
         Text(text = "Экран 1 — Главная",)
         Button(onClick = {
-            navController.navigate("vacancy")
+            navController.navigate(VACANCY)
         }) {
             Text("Вакансия")
         }
         Button(onClick = {
-            navController.navigate("filter")
+            navController.navigate(FILTER)
         }) {
             Text("Фильтры")
         }
