@@ -62,12 +62,13 @@ fun BottomNavigationBar(navController: NavController) {
                         )
                     )
                 },
-                label = { Text(
-                    item.label,
-                    fontSize = 12.sp,
-                    color = if (currentRoute == item.route) selectedColor else unselectedColor
-                )
-                        },
+                label = {
+                    Text(
+                        item.label,
+                        fontSize = 12.sp,
+                        color = if (currentRoute == item.route) selectedColor else unselectedColor
+                    )
+                },
                 selected = currentRoute == item.route,
                 onClick = {
                     navController.navigate(item.route) {
