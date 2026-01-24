@@ -32,24 +32,24 @@ const val FILTER = "filter"
 const val VACANCY = "vacancy"
 
 @Composable
-fun NavGraph(){
+fun NavGraph() {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
     val showBottomBar = when (currentRoute) {
-        "main", "favorite", "team" -> true
+        MAIN, FAVORITE, TEAM -> true
         else -> false
     }
     Scaffold(
         bottomBar = {
-            if (showBottomBar){
+            if (showBottomBar) {
                 BottomNavigationBar(navController, currentRoute)
             }
         }
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = "main",
+            startDestination = MAIN,
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(MAIN) {
@@ -75,17 +75,17 @@ fun NavGraph(){
 fun BottomNavigationBar(navController: NavController, currentRoute: String?) {
     val items = listOf(
         BottomNavigationItem(
-            "main",
+            MAIN,
             stringResource(R.string.main_screen),
             R.drawable.search
         ),
         BottomNavigationItem(
-            "favorite",
+            FAVORITE,
             stringResource(R.string.favorite_screen),
             R.drawable.favorite
         ),
         BottomNavigationItem(
-            "team",
+            TEAM,
             stringResource(R.string.team_screen),
             R.drawable.team
         )
