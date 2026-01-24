@@ -48,6 +48,8 @@ android {
 }
 
 dependencies {
+    implementation(libs.material)
+    implementation(libs.navigation.compose)
     implementation(libs.androidX.core)
     implementation(libs.androidX.appCompat)
     implementation(libs.lifecycle.viewmodel.ktx)
