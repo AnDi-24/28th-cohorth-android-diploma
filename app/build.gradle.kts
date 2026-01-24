@@ -36,10 +36,17 @@ android {
 
     buildFeatures {
         buildConfig = true
+        compose = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.10"
     }
 }
 
 dependencies {
+    implementation(libs.material)
+    implementation(libs.navigation.compose)
     implementation(libs.androidX.core)
     implementation(libs.androidX.appCompat)
 
