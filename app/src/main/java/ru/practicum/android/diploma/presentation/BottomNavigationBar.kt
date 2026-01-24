@@ -27,15 +27,18 @@ fun BottomNavigationBar(navController: NavController) {
         BottomNavigationItem(
             "main",
             stringResource(R.string.main_screen),
-            R.drawable.search),
+            R.drawable.search
+        ),
         BottomNavigationItem(
             "favorite",
             stringResource(R.string.favorite_screen),
-            R.drawable.favorite),
+            R.drawable.favorite
+        ),
         BottomNavigationItem(
             "team",
             stringResource(R.string.team_screen),
-            R.drawable.team)
+            R.drawable.team
+        )
     )
 
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -47,7 +50,6 @@ fun BottomNavigationBar(navController: NavController) {
     BottomNavigation(
         backgroundColor = Color.White,
     ) {
-
         items.forEach { item ->
             BottomNavigationItem(
                 icon = {
@@ -63,7 +65,9 @@ fun BottomNavigationBar(navController: NavController) {
                 label = { Text(
                     item.label,
                     fontSize = 12.sp,
-                    color = if (currentRoute == item.route) selectedColor else unselectedColor) },
+                    color = if (currentRoute == item.route) selectedColor else unselectedColor
+                )
+                        },
                 selected = currentRoute == item.route,
                 onClick = {
                     navController.navigate(item.route) {
@@ -78,5 +82,3 @@ fun BottomNavigationBar(navController: NavController) {
         }
     }
 }
-
-
