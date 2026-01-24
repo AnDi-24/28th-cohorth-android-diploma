@@ -48,6 +48,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.converter.gson)
     implementation(libs.material)
     implementation(libs.navigation.compose)
     implementation(libs.androidX.core)
