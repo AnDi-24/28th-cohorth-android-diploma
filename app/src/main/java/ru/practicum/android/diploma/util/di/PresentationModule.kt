@@ -5,5 +5,8 @@ import org.koin.dsl.module
 import ru.practicum.android.diploma.presentation.FavoriteViewModel
 
 val presentationModule = module {
-    viewModel { FavoriteViewModel(roomInteractor = get()) }
+    viewModel { FavoriteViewModel(
+        roomInteractor = get(),
+        retrofitInteractor = get()
+    ) }
 }

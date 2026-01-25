@@ -1,7 +1,7 @@
 package ru.practicum.android.diploma.domain.local.api
 
 import kotlinx.coroutines.flow.Flow
-import ru.practicum.android.diploma.domain.VacancyModel
+import ru.practicum.android.diploma.domain.local.model.VacancyModel
 
 interface FavoriteVacancyInteractor {
     suspend fun addVacancyToFavorite(vacancy: VacancyModel)
