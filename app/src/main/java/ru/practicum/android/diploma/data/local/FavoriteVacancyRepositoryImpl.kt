@@ -5,13 +5,13 @@ import ru.practicum.android.diploma.domain.local.api.FavoriteVacancyRepository
 
 class FavoriteVacancyRepositoryImpl(
     val roomDataBase: AppDatabase
-): FavoriteVacancyRepository {
+) : FavoriteVacancyRepository {
     override suspend fun addVacancyToFavorite(vacancy: VacancyEntity) {
-        roomDataBase.favoriteVacancyDao().addVacancyToFavorite(vacancy=vacancy)
+        roomDataBase.favoriteVacancyDao().addVacancyToFavorite(vacancy = vacancy)
     }
 
     override suspend fun deleteVacancyFromFavorite(id: Long) {
-        roomDataBase.favoriteVacancyDao().deleteVacancyFromFavorite(id=id)
+        roomDataBase.favoriteVacancyDao().deleteVacancyFromFavorite(id = id)
     }
 
     override fun getAllFavoriteVacancy(): Flow<List<VacancyEntity>> {

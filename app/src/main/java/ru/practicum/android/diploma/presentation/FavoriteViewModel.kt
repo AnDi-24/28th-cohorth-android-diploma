@@ -11,7 +11,7 @@ import ru.practicum.android.diploma.domain.local.api.FavoriteVacancyInteractor
 
 class FavoriteViewModel(
     private val roomInteractor: FavoriteVacancyInteractor
-): ViewModel() {
+) : ViewModel() {
 
     init {
         getAllFavoriteVacancy()
@@ -19,7 +19,6 @@ class FavoriteViewModel(
 
     private val _vacanciesFlow = MutableStateFlow<List<VacancyModel>>(emptyList())
     val vacanciesFlow: StateFlow<List<VacancyModel>> = _vacanciesFlow.asStateFlow()
-
 
     private fun getAllFavoriteVacancy() {
         viewModelScope.launch {
@@ -32,14 +31,13 @@ class FavoriteViewModel(
 
     fun addVacancy(vacancy: VacancyModel) {
         viewModelScope.launch {
-            roomInteractor.addVacancyToFavorite(vacancy=vacancy)
+            roomInteractor.addVacancyToFavorite(vacancy = vacancy)
         }
     }
 
-
     fun deleteVacancy(id: Long) {
         viewModelScope.launch {
-            roomInteractor.deleteVacancyFromFavorite(id=id)
+            roomInteractor.deleteVacancyFromFavorite(id = id)
         }
     }
 

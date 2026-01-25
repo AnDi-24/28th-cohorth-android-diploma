@@ -14,7 +14,6 @@ import androidx.navigation.NavController
 
 @Composable
 fun VacancyScreen(navController: NavController) {
-
     Column(
         modifier = Modifier
             .fillMaxSize()

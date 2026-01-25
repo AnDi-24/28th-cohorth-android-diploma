@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,12 +19,9 @@ import ru.practicum.android.diploma.presentation.FavoriteViewModel
 
 @Composable
 fun MainScreen(navController: NavController) {
-
-
     val viewModel: FavoriteViewModel = koinViewModel()
     val vacancies by viewModel.vacanciesFlow.collectAsStateWithLifecycle()
     Log.d("VacancyScreen ROOM LOGIC", "Количество вакансий: ${vacancies.size}")
-
 
     Column(
         modifier = Modifier

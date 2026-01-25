@@ -20,7 +20,4 @@ val dataModule = module {
     single<FavoriteVacancyRepository> {
         FavoriteVacancyRepositoryImpl(roomDataBase = get())
     }
-
-
-
 }

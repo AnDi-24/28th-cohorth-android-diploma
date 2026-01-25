@@ -9,7 +9,7 @@ import ru.practicum.android.diploma.domain.local.api.FavoriteVacancyRepository
 
 class FavoriteVacancyInteractorImpl(
     val repository: FavoriteVacancyRepository
-): FavoriteVacancyInteractor {
+) : FavoriteVacancyInteractor {
 
     override suspend fun addVacancyToFavorite(vacancy: VacancyModel) {
         repository.addVacancyToFavorite(
@@ -22,13 +22,12 @@ class FavoriteVacancyInteractorImpl(
     }
 
     override fun getAllFavoriteVacancy(): Flow<List<VacancyModel>> {
-       return repository.getAllFavoriteVacancy().map { listEntity ->
-           listEntity.map { vacancyEntity ->
-               mapperToModel(vacancyEntity = vacancyEntity)
-           }
-       }
+        return repository.getAllFavoriteVacancy().map { listEntity ->
+            listEntity.map { vacancyEntity ->
+                mapperToModel(vacancyEntity = vacancyEntity)
+            }
+        }
     }
-
 
     // функции - мапперы
     private fun mapperToEntity(vacancyModel: VacancyModel): VacancyEntity {
