@@ -61,6 +61,8 @@ dependencies {
     implementation(libs.room.ktx)
     implementation(libs.glide)
     implementation(libs.koin.android)
+    implementation("io.insert-koin:koin-androidx-compose:3.5.0")
+    
     implementation(libs.navigation.compose)
     ksp(libs.compiler)
     ksp(libs.room.compiler)
