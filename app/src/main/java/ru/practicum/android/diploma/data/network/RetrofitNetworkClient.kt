@@ -1,39 +1,42 @@
 package ru.practicum.android.diploma.data.network
 
 import android.util.Log
+import retrofit2.HttpException
 import ru.practicum.android.diploma.data.network.api.FindJobApi
 import ru.practicum.android.diploma.data.network.api.NetworkClient
 import ru.practicum.android.diploma.data.network.models.Response
 import ru.practicum.android.diploma.data.network.models.VacancyDetailsRequest
 import ru.practicum.android.diploma.data.network.models.VacancyDetailsResponse
 
-private const val TOKEN = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJwcmFjdGljdW0ucnUiLCJhdWQiOiJwcmFjdGljdW0ucnUiLCJ1c2VybmFtZSI6InBvcGthIn0.VsTHOxBepYX9fZCbzWNIieL3ypqTULOI_T5WV5Ed8wY"
+private const val TOKEN = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVC" +
+    "J9.eyJpc3MiOiJwcmFjdGljdW0ucnUiLCJhdWQiOiJwcmFjdGljdW0ucnUiLCJ1c" +
+    "2VybmFtZSI6InBvcGthIn0.VsTHOxBepYX9fZCbzWNIieL3ypqTULOI_T5WV5Ed8wY"
+
+private const val SUCCESS = 200
+private const val ERROR = -1
 
 class RetrofitNetworkClient(
     private val findJobApi: FindJobApi
 ) : NetworkClient {
-
     override suspend fun doRequest(dto: Any): Response {
-
         if (dto !is VacancyDetailsRequest) {
             return Response().apply { resultCode = -1 }
         }
         return try {
             val vacancy = findJobApi.getVacancyById(dto.expression, TOKEN)
-            Log.d("NetworkClient", "Received vacancy: ${vacancy.name}")
-            Log.d("NetworkClient", "Vacancy ID: ${vacancy.id}")
+
             VacancyDetailsResponse(result = vacancy).apply {
-                resultCode = 200
+                resultCode = SUCCESS
             }
-        } catch (e: Exception) {
+        } catch (e: HttpException) {
             Log.e("NetworkClient", "ERROR: ${e.message}", e)
             VacancyDetailsResponse(result = null).apply {
-                resultCode = -2
+                resultCode = ERROR
             }
         }
     }
 
-    private fun isConnected(): Boolean {
-        TODO()
-    }
+//    private fun isConnected(): Boolean {
+//
+//    }
 }

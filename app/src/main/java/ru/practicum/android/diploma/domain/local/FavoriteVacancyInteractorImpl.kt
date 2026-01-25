@@ -2,9 +2,9 @@ package ru.practicum.android.diploma.domain.local
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import ru.practicum.android.diploma.domain.local.model.VacancyModel
 import ru.practicum.android.diploma.domain.local.api.FavoriteVacancyInteractor
 import ru.practicum.android.diploma.domain.local.api.FavoriteVacancyRepository
+import ru.practicum.android.diploma.domain.local.model.VacancyModel
 import ru.practicum.android.diploma.util.VacancyMapper
 
 class FavoriteVacancyInteractorImpl(

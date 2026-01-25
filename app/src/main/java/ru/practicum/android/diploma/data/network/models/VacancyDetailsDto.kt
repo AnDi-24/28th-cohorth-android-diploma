@@ -18,9 +18,7 @@ data class VacancyDto(
     @SerializedName("url") val url: String?,
     @SerializedName("industry") val industry: Industry?,
 
-): Response()
-
-
+) : Response()
 data class Industry(
     @SerializedName("id") val id: String?,
     @SerializedName("name") val name: String?

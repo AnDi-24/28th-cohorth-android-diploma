@@ -9,34 +9,35 @@ import ru.practicum.android.diploma.data.network.models.VacancyDetailsResponse
 import ru.practicum.android.diploma.data.network.models.VacancyDto
 import ru.practicum.android.diploma.domain.network.api.FindVacancyRepository
 
+private const val SUCCESS = 200
+private const val NULL = "Vacancy data is null"
+private const val INVALID_RESP_TYPE = "Invalid response type"
+private const val EXCEPTION = "Exception"
+
 class FindVacancyRepositoryImpl(
     private val retrofitClient: NetworkClient
 ) : FindVacancyRepository {
 
     override fun getVacancyDetails(expression: String): Flow<VacancyDto> = flow {
         val response = retrofitClient.doRequest(VacancyDetailsRequest(expression))
-        Log.d("Repository", "Response code: ${response.resultCode}")
-        Log.d("Repository", "Response type: ${response::class.simpleName}")
 
         when (response.resultCode) {
-            200 -> {
+            SUCCESS -> {
                 if (response is VacancyDetailsResponse) {
                     val result = response.result
                     if (result != null) {
                         Log.d("Repository", "Emitting vacancy: ${result.name}")
                         emit(result)
                     } else {
-                        throw Exception("Vacancy data is null")
+                        Log.d(EXCEPTION, NULL)
+
                     }
                 } else {
-                    throw Exception("Invalid response type")
+                    Log.d(EXCEPTION, INVALID_RESP_TYPE)
                 }
             }
-            -1 -> {
-                throw Exception("Network error")
-            }
             else -> {
-                throw Exception("Request failed: ${response.resultCode}")
+                Log.d(EXCEPTION, "Request failed: ${response.resultCode}")
             }
         }
     }
