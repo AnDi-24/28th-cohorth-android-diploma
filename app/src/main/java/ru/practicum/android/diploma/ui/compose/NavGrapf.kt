@@ -1,4 +1,4 @@
-package ru.practicum.android.diploma.presentation
+package ru.practicum.android.diploma.ui.compose
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.padding

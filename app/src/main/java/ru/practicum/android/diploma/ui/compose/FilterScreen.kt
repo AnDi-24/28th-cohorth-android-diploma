@@ -1,4 +1,4 @@
-package ru.practicum.android.diploma.presentation
+package ru.practicum.android.diploma.ui.compose
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
 @Composable
-fun FavoriteScreen(navController: NavController) {
+fun FilterScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -21,11 +21,12 @@ fun FavoriteScreen(navController: NavController) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Экран 2 — Избранное")
-        Button(onClick = {
-            navController.navigate(VACANCY)
-        }) {
-            Text("Вакансия")
+        Text("Экран фильтров")
+        Button(onClick = { navController.popBackStack() }) {
+            Text("Назад")
+        }
+        Button(onClick = { navController.navigate(OPTION) }) {
+            Text("Выбрать опцию")
         }
     }
 }

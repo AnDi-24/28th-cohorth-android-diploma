@@ -1,5 +1,5 @@
 [versions]
-
+kotlin = "1.9.22"
 java = "VERSION_1_8"
 
 # Build constants

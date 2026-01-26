@@ -1,4 +1,4 @@
-package ru.practicum.android.diploma.presentation
+package ru.practicum.android.diploma.ui.compose
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
 @Composable
-fun VacancyScreen(navController: NavController) {
+fun FavoriteScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -21,9 +21,11 @@ fun VacancyScreen(navController: NavController) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Здесь могла быть ваша вакансия")
-        Button(onClick = { navController.popBackStack() }) {
-            Text("Назад")
+        Text(text = "Экран 2 — Избранное")
+        Button(onClick = {
+            navController.navigate(VACANCY)
+        }) {
+            Text("Вакансия")
         }
     }
 }
