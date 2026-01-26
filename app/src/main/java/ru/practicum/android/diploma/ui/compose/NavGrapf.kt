@@ -2,16 +2,19 @@ package ru.practicum.android.diploma.ui.compose
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -23,7 +26,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import ru.practicum.android.diploma.R
-import ru.practicum.android.diploma.presentation.models.BottomNavigationItem
+import ru.practicum.android.diploma.presentation.models.NavItem
+import ru.practicum.android.diploma.ui.theme.LightGray
+import ru.practicum.android.diploma.ui.theme.Typography
 
 const val MAIN = "main"
 const val FAVORITE = "favorite"
@@ -77,50 +82,63 @@ fun NavGraph() {
 
 @Composable
 fun BottomNavigationBar(navController: NavController, currentRoute: String?) {
+    val colors = MaterialTheme.colorScheme
+
     val items = listOf(
-        BottomNavigationItem(
+        NavItem(
             MAIN,
             stringResource(R.string.main_screen),
             R.drawable.search
         ),
-        BottomNavigationItem(
+        NavItem(
             FAVORITE,
             stringResource(R.string.favorite_screen),
             R.drawable.favorite
         ),
-        BottomNavigationItem(
+        NavItem(
             TEAM,
             stringResource(R.string.team_screen),
             R.drawable.team
         )
     )
 
-    val selectedColor = colorResource(R.color.blue)
-    val unselectedColor = colorResource(R.color.gray)
+    val selectedColor = colors.primary
+    val unselectedColor = colors.onSurfaceVariant
 
-    BottomNavigation(
-        backgroundColor = Color.White,
+    NavigationBar(
+        containerColor = colors.background,
+        modifier = Modifier
+            .drawWithContent {
+                drawContent()
+                drawLine(
+                    color = LightGray,
+                    start = Offset(0f, 0f),
+                    end = Offset(size.width, 0f),
+                    strokeWidth = 1.dp.toPx()
+                )
+            }
     ) {
         items.forEach { item ->
-            BottomNavigationItem(
+            val isSelected = currentRoute == item.route
+            NavigationBarItem(
                 icon = {
                     Image(
                         modifier = Modifier.padding(bottom = 2.dp),
                         painter = painterResource(id = item.icon),
                         contentDescription = item.label,
                         colorFilter = ColorFilter.tint(
-                            if (currentRoute == item.route) selectedColor else unselectedColor
+                            if (isSelected) selectedColor else unselectedColor
                         )
                     )
                 },
                 label = {
                     Text(
                         item.label,
-                        fontSize = 12.sp,
-                        color = if (currentRoute == item.route) selectedColor else unselectedColor
+                        color = if (isSelected) selectedColor else unselectedColor,
+                        style = Typography.labelSmall
                     )
                 },
-                selected = currentRoute == item.route,
+                selected = isSelected,
                 onClick = {
                     navController.navigate(item.route) {
                         popUpTo(navController.graph.findStartDestination().id) {
@@ -129,7 +147,14 @@ fun BottomNavigationBar(navController: NavController, currentRoute: String?) {
                         launchSingleTop = true
                         restoreState = true
                     }
-                }
+                },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = colors.primary,
+                    selectedTextColor = colors.primary,
+                    unselectedIconColor = colors.onSurfaceVariant,
+                    unselectedTextColor = colors.onSurfaceVariant,
+                    indicatorColor = Color.Transparent
+                )
             )
         }
     }
