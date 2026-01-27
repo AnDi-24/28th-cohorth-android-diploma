@@ -1,29 +1,149 @@
 package ru.practicum.android.diploma.ui.compose
 
+import android.util.Log
+import android.widget.ImageView
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.bumptech.glide.Glide
+import org.koin.androidx.compose.koinViewModel
+import ru.practicum.android.diploma.R
+import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
+import ru.practicum.android.diploma.presentation.VacancyDetailsViewModel
 
 @Composable
 fun VacancyScreen(navController: NavController) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("Здесь могла быть ваша вакансия")
-        Button(onClick = { navController.popBackStack() }) {
-            Text("Назад")
+
+    val viewModel: VacancyDetailsViewModel = koinViewModel()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    // Создаем локальную копию для smart cast
+    val currentState = uiState
+
+
+
+    val vacancyData: VacancyDetailsModel = when (currentState) {
+        is VacancyDetailsViewModel.VacancyUiState.Success -> {
+            val vacancy = currentState.vacancy
+            VacancyDetailsModel(
+                id = vacancy.id,
+                name = vacancy.name,
+                salary = vacancy.salary,
+                address = vacancy.address,
+                experience = vacancy.experience ,
+                schedule = vacancy.schedule,
+                employment = vacancy.employment,
+                description = vacancy.description,
+                employer = vacancy.employer,
+                skills = vacancy.skills,
+                logo = vacancy.logo
+            )
+        }
+
+        else -> {
+            VacancyDetailsModel()
         }
     }
+
+
+
+    Log.d("--", vacancyData.logo)
+
+
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(3.dp)
+    ) {
+        item {
+            Text(
+                text = vacancyData.logo,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        item {
+            Text(
+                text = vacancyData.salary + " --IN WORK",
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        item {
+            Surface(
+                modifier = Modifier.fillMaxWidth()
+                    .height(100.dp),
+                shape = MaterialTheme.shapes.medium,
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+
+                    EmployerLogoGlide(
+                        logoUrl = vacancyData.logo, // Используем URL логотипа
+                        modifier = Modifier
+                            .size(80.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                    )
+                }
+            }
+        }
+    }
+
+
+
+}
+
+@Composable
+fun EmployerLogoGlide(
+    logoUrl: String?,
+    modifier: Modifier = Modifier
+) {
+    AndroidView(
+        factory = { context ->
+            ImageView(context).apply {
+                scaleType = ImageView.ScaleType.CENTER_CROP
+                adjustViewBounds = true
+            }
+        },
+        update = { imageView ->
+            // Определяем что загружать
+            logoUrl?.let { url ->
+                Glide.with(imageView.context)
+                    .load(url)
+                    .placeholder(R.drawable.team)
+                    .into(imageView)
+            }
+        },
+        modifier = modifier
+    )
 }

@@ -2,11 +2,11 @@ package ru.practicum.android.diploma.util.di
 
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
-import ru.practicum.android.diploma.presentation.FavoriteViewModel
+import ru.practicum.android.diploma.presentation.VacancyDetailsViewModel
 
 val presentationModule = module {
-    viewModel { FavoriteViewModel(
-        roomInteractor = get(),
+    viewModel { VacancyDetailsViewModel(
         retrofitInteractor = get()
     ) }
+
 }

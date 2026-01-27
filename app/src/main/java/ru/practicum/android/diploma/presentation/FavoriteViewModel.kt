@@ -1,6 +1,5 @@
 package ru.practicum.android.diploma.presentation
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,17 +9,15 @@ import kotlinx.coroutines.launch
 import ru.practicum.android.diploma.domain.local.api.FavoriteVacancyInteractor
 import ru.practicum.android.diploma.domain.local.model.VacancyModel
 import ru.practicum.android.diploma.domain.network.api.FindVacancyInteractor
+import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
+import ru.practicum.android.diploma.util.Resource
+import ru.practicum.android.diploma.util.ResponseState
 
-private const val MOK_VACANCY_ID = "0001266a-3da9-4af8-b384-2377f0ea5453"
+
 class FavoriteViewModel(
-    private val roomInteractor: FavoriteVacancyInteractor,
-    private val retrofitInteractor: FindVacancyInteractor
+    private val roomInteractor: FavoriteVacancyInteractor
 ) : ViewModel() {
 
-    init {
-        getAllFavoriteVacancy()
-        searchVacancyDetails()
-    }
 
     private val _vacanciesFlow = MutableStateFlow<List<VacancyModel>>(emptyList())
     val vacanciesFlow: StateFlow<List<VacancyModel>> = _vacanciesFlow.asStateFlow()
@@ -45,15 +42,4 @@ class FavoriteViewModel(
             roomInteractor.deleteVacancyFromFavorite(id = id)
         }
     }
-
-    fun searchVacancyDetails() {
-        viewModelScope.launch {
-            retrofitInteractor
-                .getVacancyDetails(MOK_VACANCY_ID)
-                .collect { vacancyDto ->
-                    Log.d("searchVacancyDetails in ViewModel", vacancyDto.name ?: " --- ")
-                }
-        }
-    }
-
 }
