@@ -63,6 +63,7 @@ dependencies {
     implementation(libs.koin.android)
     implementation("io.insert-koin:koin-androidx-compose:3.5.0")
     implementation(libs.navigation.compose)
+    implementation(libs.material3)
     ksp(libs.compiler)
     ksp(libs.room.compiler)
 
