@@ -1,6 +1,5 @@
 package ru.practicum.android.diploma.ui.compose
 
-import android.util.Log
 import android.widget.ImageView
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -34,14 +33,10 @@ import ru.practicum.android.diploma.presentation.VacancyDetailsViewModel
 
 @Composable
 fun VacancyScreen(navController: NavController) {
-
     val viewModel: VacancyDetailsViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
     // Создаем локальную копию для smart cast
     val currentState = uiState
-
-
 
     val vacancyData: VacancyDetailsModel = when (currentState) {
         is VacancyDetailsViewModel.VacancyUiState.Success -> {
@@ -51,7 +46,7 @@ fun VacancyScreen(navController: NavController) {
                 name = vacancy.name,
                 salary = vacancy.salary,
                 address = vacancy.address,
-                experience = vacancy.experience ,
+                experience = vacancy.experience,
                 schedule = vacancy.schedule,
                 employment = vacancy.employment,
                 description = vacancy.description,
@@ -65,11 +60,6 @@ fun VacancyScreen(navController: NavController) {
             VacancyDetailsModel()
         }
     }
-
-
-
-    Log.d("--", vacancyData.logo)
-
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -118,11 +108,7 @@ fun VacancyScreen(navController: NavController) {
             }
         }
     }
-
-
-
 }
-
 @Composable
 fun EmployerLogoGlide(
     logoUrl: String?,

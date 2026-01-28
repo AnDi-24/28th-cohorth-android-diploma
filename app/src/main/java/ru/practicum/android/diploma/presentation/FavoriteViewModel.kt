@@ -8,11 +8,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import ru.practicum.android.diploma.domain.local.api.FavoriteVacancyInteractor
 import ru.practicum.android.diploma.domain.local.model.VacancyModel
-import ru.practicum.android.diploma.domain.network.api.FindVacancyInteractor
-import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
-import ru.practicum.android.diploma.util.Resource
-import ru.practicum.android.diploma.util.ResponseState
-
 
 class FavoriteViewModel(
     private val roomInteractor: FavoriteVacancyInteractor

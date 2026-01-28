@@ -14,7 +14,7 @@ private const val MOK_VACANCY_ID = "0001266a-3da9-4af8-b384-2377f0ea5453"
 
 class VacancyDetailsViewModel(
     val retrofitInteractor: FindVacancyInteractor
-): ViewModel() {
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow<VacancyUiState>(VacancyUiState.Idle)
     val uiState: StateFlow<VacancyUiState> = _uiState
