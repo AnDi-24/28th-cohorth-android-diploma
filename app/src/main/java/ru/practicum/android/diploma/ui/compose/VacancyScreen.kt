@@ -97,7 +97,6 @@ fun VacancyScreen(navController: NavController) {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-
                     EmployerLogoGlide(
                         logoUrl = vacancyData.logo, // Используем URL логотипа
                         modifier = Modifier

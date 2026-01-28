@@ -8,6 +8,7 @@ import ru.practicum.android.diploma.domain.network.api.FindVacancyRepository
 import ru.practicum.android.diploma.util.ResponseState
 import ru.practicum.android.diploma.util.Resource
 import java.io.IOException
+
 class FindVacancyRepositoryImpl(
     private val retrofitClient: NetworkClient
 ) : FindVacancyRepository {

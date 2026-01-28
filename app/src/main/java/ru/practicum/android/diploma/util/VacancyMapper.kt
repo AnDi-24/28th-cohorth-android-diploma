@@ -21,17 +21,17 @@ object VacancyMapper {
 
     fun mapperFromDto(vacancyDto: VacancyDto): VacancyDetailsModel {
         return VacancyDetailsModel(
-            id = vacancyDto.id ?: "",
-            name = vacancyDto.name ?: "",
-            salary = vacancyDto.salary?.currency ?: "",
-            address = vacancyDto.address?.city ?: "",
-            experience = vacancyDto.experience?.name ?: "",
-            schedule = vacancyDto.schedule?.name ?: "",
-            employment = vacancyDto.employment?.name ?: "",
-            description = vacancyDto.description ?: "",
-            employer = vacancyDto.employer?.name ?: "",
-            skills = vacancyDto.skills ?: emptyList(),
-            logo = vacancyDto.employer?.logo ?: ""
+            id = vacancyDto.id.orEmpty(),
+            name = vacancyDto.name.orEmpty(),
+            salary = vacancyDto.salary?.currency.orEmpty(),
+            address = vacancyDto.address?.city.orEmpty(),
+            experience = vacancyDto.experience?.name.orEmpty(),
+            schedule = vacancyDto.schedule?.name.orEmpty(),
+            employment = vacancyDto.employment?.name.orEmpty(),
+            description = vacancyDto.description.orEmpty(),
+            employer = vacancyDto.employer?.name.orEmpty(),
+            skills = vacancyDto.skills.orEmpty(),
+            logo = vacancyDto.employer?.logo.orEmpty()
         )
     }
 

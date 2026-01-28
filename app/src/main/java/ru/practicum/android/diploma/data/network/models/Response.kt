@@ -4,7 +4,4 @@ import ru.practicum.android.diploma.util.ResponseState
 
 open class Response {
     var resultCode: ResponseState = ResponseState.UNKNOWN
-
 }
-
-

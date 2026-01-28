@@ -13,6 +13,3 @@ data class VacancyDetailsModel(
     val skills: List<String> = emptyList(),
     val logo: String = "Лого не указано"
 )
-
-
-

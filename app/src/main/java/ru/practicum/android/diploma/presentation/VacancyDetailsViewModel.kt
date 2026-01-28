@@ -9,9 +9,9 @@ import ru.practicum.android.diploma.domain.network.api.FindVacancyInteractor
 import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
 import ru.practicum.android.diploma.util.Resource
 import ru.practicum.android.diploma.util.ResponseState
+import java.io.IOException
 
 private const val MOK_VACANCY_ID = "0001266a-3da9-4af8-b384-2377f0ea5453"
-
 class VacancyDetailsViewModel(
     val retrofitInteractor: FindVacancyInteractor
 ) : ViewModel() {
@@ -45,7 +45,7 @@ class VacancyDetailsViewModel(
                     }
                 }
 
-            } catch (e: Exception) {
+            } catch (e: IOException) {
                 _uiState.value = VacancyUiState.Error(
                     "{${ResponseState.UNKNOWN.errorMessage}}: ${e.message}"
                 )
