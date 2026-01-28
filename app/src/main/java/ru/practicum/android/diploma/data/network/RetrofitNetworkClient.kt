@@ -7,31 +7,43 @@ import ru.practicum.android.diploma.data.network.api.NetworkClient
 import ru.practicum.android.diploma.data.network.models.Response
 import ru.practicum.android.diploma.data.network.models.VacancyDetailsRequest
 import ru.practicum.android.diploma.data.network.models.VacancyDetailsResponse
+import ru.practicum.android.diploma.util.Resource
+import ru.practicum.android.diploma.util.ResponseState
 
 private const val TOKEN = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVC" +
     "J9.eyJpc3MiOiJwcmFjdGljdW0ucnUiLCJhdWQiOiJwcmFjdGljdW0ucnUiLCJ1c" +
     "2VybmFtZSI6InBvcGthIn0.VsTHOxBepYX9fZCbzWNIieL3ypqTULOI_T5WV5Ed8wY"
 
-private const val SUCCESS = 200
-private const val ERROR = -1
-
 class RetrofitNetworkClient(
     private val findJobApi: FindJobApi
 ) : NetworkClient {
-    override suspend fun doRequest(dto: Any): Response {
+
+    override suspend fun doRequestVacancyDetails(dto: Any): Response {
+        // Проверка типа DTO
         if (dto !is VacancyDetailsRequest) {
-            return Response().apply { resultCode = -1 }
+            return Response().apply {
+                resultCode = ResponseState.INVALID_DTO_TYPE
+            }
         }
+
         return try {
+            // Выполнение запроса
             val vacancy = findJobApi.getVacancyById(dto.expression, TOKEN)
 
-            VacancyDetailsResponse(result = vacancy).apply {
-                resultCode = SUCCESS
+            if (vacancy == null) {
+                Response().apply {
+                    resultCode = ResponseState.NULL_DATA
+                }
+            } else {
+                VacancyDetailsResponse(
+                    vacancyDto = Resource.Success(data = vacancy)
+                ).apply {
+                    resultCode = ResponseState.SUCCESS
+                }
             }
         } catch (e: HttpException) {
-            Log.e("NetworkClient", "ERROR: ${e.message}", e)
-            VacancyDetailsResponse(result = null).apply {
-                resultCode = ERROR
+            Response().apply {
+                resultCode = ResponseState.HTTP_EXCEPTION
             }
         }
     }

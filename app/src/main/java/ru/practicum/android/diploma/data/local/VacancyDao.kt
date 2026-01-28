@@ -15,6 +15,7 @@ interface VacancyDao {
     @Query("DELETE FROM favorite_vacancy WHERE vacancyId = :id")
     suspend fun deleteVacancyFromFavorite(id: Long)
 
+    // используем поток для подписки на данные
     @Query("SELECT * FROM favorite_vacancy")
     fun getAllFavoriteVacancy(): Flow<List<VacancyEntity>>
 

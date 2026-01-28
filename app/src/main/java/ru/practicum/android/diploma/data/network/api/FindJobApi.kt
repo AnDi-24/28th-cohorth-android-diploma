@@ -10,6 +10,6 @@ interface FindJobApi {
     suspend fun getVacancyById(
         @Path("id") id: String,
         @Header("Authorization") token: String
-    ): VacancyDto
+    ): VacancyDto?
 
 }
