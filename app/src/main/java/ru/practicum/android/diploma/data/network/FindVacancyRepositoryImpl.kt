@@ -1,6 +1,5 @@
 package ru.practicum.android.diploma.data.network
 
-import android.util.Log
 import ru.practicum.android.diploma.data.network.api.NetworkClient
 import ru.practicum.android.diploma.data.network.models.VacancyDetailsRequest
 import ru.practicum.android.diploma.data.network.models.VacancyDetailsResponse
@@ -9,8 +8,6 @@ import ru.practicum.android.diploma.domain.network.api.FindVacancyRepository
 import ru.practicum.android.diploma.util.ResponseState
 import ru.practicum.android.diploma.util.Resource
 import java.io.IOException
-
-
 class FindVacancyRepositoryImpl(
     private val retrofitClient: NetworkClient
 ) : FindVacancyRepository {
@@ -20,7 +17,7 @@ class FindVacancyRepositoryImpl(
             val response = retrofitClient.doRequestVacancyDetails(
                 VacancyDetailsRequest(expression)
             )
-            when(response.resultCode) {
+            when (response.resultCode) {
 
                 ResponseState.SUCCESS -> {
                     val vacancyResponse = response as? VacancyDetailsResponse
@@ -34,11 +31,11 @@ class FindVacancyRepositoryImpl(
                     }
                 }
                 else -> {
-                    Resource.Error(message = response.resultCode.errorMessage )
+                    Resource.Error(message = response.resultCode.errorMessage)
                 }
             }
         } catch (e: IOException) {
-            Resource.Error(ResponseState.HTTP_EXCEPTION.errorMessage)
+            Resource.Error(e.message.toString())
 
         }
     }

@@ -13,7 +13,7 @@ class FindVacancyInteractorImpl(
 ) : FindVacancyInteractor {
     override suspend fun getVacancyDetails(expression: String): Resource<VacancyDetailsModel> {
         val resource = repository.getVacancyDetails(expression)
-        return when(resource) {
+        return when (resource) {
             is Resource.Success -> {
                 val vacancyDto = resource.data
                 if (vacancyDto != null) {
@@ -24,7 +24,7 @@ class FindVacancyInteractorImpl(
                 }
             }
             is Resource.Error -> {
-                Resource.Error(resource.message?: "")
+                Resource.Error(resource.message ?: "")
             }
         }
     }

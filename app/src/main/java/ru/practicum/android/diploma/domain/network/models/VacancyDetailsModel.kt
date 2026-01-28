@@ -14,15 +14,5 @@ data class VacancyDetailsModel(
     val logo: String = "Лого не указано"
 )
 
-//data class SalaryModel(
-//    val from: Int?,
-//    val to: Int?,
-//    val currency: String?
-//)
-//
-//data class AddressModel(
-//    val city: String?,
-//    val raw: String?
-//)
 
 

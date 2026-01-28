@@ -19,26 +19,32 @@ class RetrofitNetworkClient(
 ) : NetworkClient {
 
     override suspend fun doRequestVacancyDetails(dto: Any): Response {
-
+        // Проверка типа DTO
         if (dto !is VacancyDetailsRequest) {
-            return Response().apply { resultCode = ResponseState.INVALID_DTO_TYPE }
+            return Response().apply {
+                resultCode = ResponseState.INVALID_DTO_TYPE
+            }
         }
+
         return try {
+            // Выполнение запроса
+            val vacancy = findJobApi.getVacancyById(dto.expression, TOKEN)
 
-            val vacancy =
-                findJobApi.getVacancyById(dto.expression, TOKEN) ?:
-                return Response().apply { resultCode =  ResponseState.NULL_DATA }
-
-
-            VacancyDetailsResponse(
-                vacancyDto =
-                    Resource.Success(
-                        data = vacancy
-                    )
-            ).apply { resultCode = ResponseState.SUCCESS }
-
+            if (vacancy == null) {
+                Response().apply {
+                    resultCode = ResponseState.NULL_DATA
+                }
+            } else {
+                VacancyDetailsResponse(
+                    vacancyDto = Resource.Success(data = vacancy)
+                ).apply {
+                    resultCode = ResponseState.SUCCESS
+                }
+            }
         } catch (e: HttpException) {
-            return Response().apply { resultCode = ResponseState.HTTP_EXCEPTION }
+            Response().apply {
+                resultCode = ResponseState.HTTP_EXCEPTION
+            }
         }
     }
 
