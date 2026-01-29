@@ -1,4 +1,4 @@
-package ru.practicum.android.diploma.ui.compose
+package ru.practicum.android.diploma.ui.compose.components
 
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.ExperimentalMaterial3Api

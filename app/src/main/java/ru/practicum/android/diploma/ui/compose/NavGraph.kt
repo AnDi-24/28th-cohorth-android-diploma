@@ -28,6 +28,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.presentation.models.NavItem
+import ru.practicum.android.diploma.ui.compose.components.TopBar
 import ru.practicum.android.diploma.ui.theme.LightGray
 import ru.practicum.android.diploma.ui.theme.Typography
 
@@ -47,55 +48,67 @@ fun NavGraph() {
         MAIN, FAVORITE, TEAM -> true
         else -> false
     }
+
     val topBar: @Composable () -> Unit = {
         when (currentRoute) {
-        MAIN -> {TopBar(
-            title = stringResource(R.string.main_screen),
-            null,
-            {
-                IconButton(onClick = {navController.navigate(FILTER)}) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_filters),
-                        contentDescription = null
-                    )
-                }
+            MAIN -> {
+                TopBar(
+                    title = stringResource(R.string.main_screen),
+                    null,
+                    {
+                        IconButton(onClick = {
+                            navController.navigate(FILTER)
+                        }
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_filters),
+                                contentDescription = null
+                            )
+                        }
+                    }
+                )
             }
-        ) }
-        TEAM -> { TopBar(
-            title = stringResource(R.string.team_screen),
-        ) }
-        FILTER -> { TopBar(
-            title = stringResource(R.string.filter),
-            { navController.popBackStack() }
-        ) }
-        VACANCY -> {
-            TopBar(
-                title = stringResource(R.string.vacancy),
-                { navController.popBackStack() },
-                {
-                    IconButton(onClick = { /* логика поделиться */ }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_sharing),
-                            contentDescription = null
-                        )
+            TEAM -> {
+                TopBar(
+                    title = stringResource(R.string.team_screen),
+                )
+            }
+            FILTER -> {
+                TopBar(
+                    title = stringResource(R.string.filter),
+                    { navController.popBackStack() }
+                )
+            }
+            VACANCY -> {
+                TopBar(
+                    title = stringResource(R.string.vacancy),
+                    { navController.popBackStack() },
+                    {
+                        IconButton(onClick = { /* логика поделиться */ }) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_sharing),
+                                contentDescription = null
+                            )
+                        }
+                        IconButton(onClick = { /* логика избранное */ }) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_favorites_off),
+                                contentDescription = null
+                            )
+                        }
                     }
-                    IconButton(onClick = { /* логика избранное */ }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_favorites_off),
-                            contentDescription = null
-                        )
-                    }
-                }
-            ) }
-        OPTION -> {
-            TopBar(
-                title = stringResource(R.string.filter_option),
-                { navController.popBackStack() }
-            ) }
-        else ->
-            TopBar(
-                title = stringResource(R.string.favorite_screen)
-            )
+                )
+            }
+            OPTION -> {
+                TopBar(
+                    title = stringResource(R.string.filter_option),
+                    { navController.popBackStack() }
+                )
+            }
+            else ->
+                TopBar(
+                    title = stringResource(R.string.favorite_screen)
+                )
         }
     }
     Scaffold(
