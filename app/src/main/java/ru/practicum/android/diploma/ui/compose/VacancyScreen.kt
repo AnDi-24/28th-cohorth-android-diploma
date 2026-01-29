@@ -57,7 +57,6 @@ fun VacancyScreen(navController: NavController) {
         }
 
         else -> {
-
         }
     } as VacancyDetailsModel
 
