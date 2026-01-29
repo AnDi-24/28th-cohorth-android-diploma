@@ -2,6 +2,8 @@ package ru.practicum.android.diploma.ui.compose
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -45,7 +47,59 @@ fun NavGraph() {
         MAIN, FAVORITE, TEAM -> true
         else -> false
     }
+    val topBar: @Composable () -> Unit = {
+        when (currentRoute) {
+        MAIN -> {TopBar(
+            title = stringResource(R.string.main_screen),
+            null,
+            {
+                IconButton(onClick = {navController.navigate(FILTER)}) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_filters),
+                        contentDescription = null
+                    )
+                }
+            }
+        ) }
+        TEAM -> { TopBar(
+            title = stringResource(R.string.team_screen),
+        ) }
+        FILTER -> { TopBar(
+            title = stringResource(R.string.filter),
+            { navController.popBackStack() }
+        ) }
+        VACANCY -> {
+            TopBar(
+                title = stringResource(R.string.vacancy),
+                { navController.popBackStack() },
+                {
+                    IconButton(onClick = { /* логика поделиться */ }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_sharing),
+                            contentDescription = null
+                        )
+                    }
+                    IconButton(onClick = { /* логика избранное */ }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_favorites_off),
+                            contentDescription = null
+                        )
+                    }
+                }
+            ) }
+        OPTION -> {
+            TopBar(
+                title = stringResource(R.string.filter_option),
+                { navController.popBackStack() }
+            ) }
+        else ->
+            TopBar(
+                title = stringResource(R.string.favorite_screen)
+            )
+        }
+    }
     Scaffold(
+        topBar = topBar,
         bottomBar = {
             if (showBottomBar) {
                 BottomNavigationBar(navController, currentRoute)
@@ -73,7 +127,7 @@ fun NavGraph() {
                 VacancyScreen(navController)
             }
             composable(OPTION) {
-                FilterOptionScreen(navController)
+                FilterOptionScreen()
             }
         }
     }
