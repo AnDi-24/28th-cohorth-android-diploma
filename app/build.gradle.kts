@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("ru.practicum.android.diploma.plugins.developproperties")
+    id("kotlin-parcelize")
     id("com.google.devtools.ksp") version "1.9.22-1.0.17"
 }
 
@@ -64,6 +65,9 @@ dependencies {
     implementation("io.insert-koin:koin-androidx-compose:3.5.0")
     implementation(libs.navigation.compose)
     implementation(libs.material3)
+    implementation(libs.coil.compose)
+    implementation(libs.ui.tooling.preview)
+    debugImplementation(libs.ui.tooling)
     ksp(libs.compiler)
     ksp(libs.room.compiler)
 

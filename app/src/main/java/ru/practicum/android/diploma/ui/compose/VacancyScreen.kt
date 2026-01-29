@@ -52,14 +52,13 @@ fun VacancyScreen(navController: NavController) {
                 description = vacancy.description,
                 employer = vacancy.employer,
                 skills = vacancy.skills,
-                logo = vacancy.logo
+                url = vacancy.url
             )
         }
 
         else -> {
-            VacancyDetailsModel()
         }
-    }
+    } as VacancyDetailsModel
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -67,19 +66,21 @@ fun VacancyScreen(navController: NavController) {
         verticalArrangement = Arrangement.spacedBy(3.dp)
     ) {
         item {
-            Text(
-                text = vacancyData.logo,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.fillMaxWidth()
-            )
+            vacancyData.url?.let {
+                Text(
+                    text = it,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
 
         item {
-            Text(
-                text = vacancyData.salary + " --IN WORK",
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.fillMaxWidth()
-            )
+//            Text(
+//                text = vacancyData.salary,
+//                fontWeight = FontWeight.Bold,
+//                modifier = Modifier.fillMaxWidth()
+//            )
         }
 
         item {
@@ -98,7 +99,7 @@ fun VacancyScreen(navController: NavController) {
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     EmployerLogoGlide(
-                        logoUrl = vacancyData.logo, // Используем URL логотипа
+                        logoUrl = vacancyData.url, // Используем URL логотипа
                         modifier = Modifier
                             .size(80.dp)
                             .clip(RoundedCornerShape(8.dp))

@@ -17,17 +17,17 @@ val Typography = Typography(
         fontSize = 32.sp,
         lineHeight = 38.sp
     ),
-    titleLarge = TextStyle(
+    titleMedium = TextStyle(
         fontFamily = YsDisplayMedium,
         fontSize = 22.sp,
         lineHeight = 26.sp
     ),
-    titleMedium = TextStyle(
+    bodyLarge = TextStyle(
         fontFamily = YsDisplayMedium,
         fontSize = 16.sp,
         lineHeight = 19.sp
     ),
-    titleSmall = TextStyle(
+    bodyMedium = TextStyle(
         fontFamily = YsDisplayRegular,
         fontSize = 16.sp,
         lineHeight = 19.sp
