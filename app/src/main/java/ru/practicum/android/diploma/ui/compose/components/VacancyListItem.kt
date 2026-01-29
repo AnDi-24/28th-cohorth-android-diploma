@@ -77,7 +77,6 @@ fun VacancyListItem(
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-
                 val formattedVacancyName = formatVacancyName(
                     vacancyName = vacancy.name,
                     companyName = vacancy.employer?.name
