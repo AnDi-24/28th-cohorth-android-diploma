@@ -25,7 +25,7 @@ class FavoriteVacancyInteractorImpl(
     override fun getAllFavoriteVacancy(): Flow<List<VacancyModel>> {
         return repository.getAllFavoriteVacancy().map { listEntity ->
             listEntity.map { vacancyEntity ->
-                mapper.mapperToModel(vacancyEntity = vacancyEntity)
+                mapper.mapperToRoomModel(vacancyEntity = vacancyEntity)
             }
         }
     }

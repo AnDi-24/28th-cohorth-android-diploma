@@ -16,7 +16,7 @@ val domainModule = module {
     }
 
     single<FindVacancyInteractor> {
-        FindVacancyInteractorImpl(repository = get())
+        FindVacancyInteractorImpl(repository = get(), mapper = get())
     }
 
     single { VacancyMapper }
