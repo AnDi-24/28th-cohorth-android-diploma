@@ -22,9 +22,6 @@ fun FilterScreen(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text("Экран фильтров")
-        Button(onClick = { navController.popBackStack() }) {
-            Text("Назад")
-        }
         Button(onClick = { navController.navigate(OPTION) }) {
             Text("Выбрать опцию")
         }

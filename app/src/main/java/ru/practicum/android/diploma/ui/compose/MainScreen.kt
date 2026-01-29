@@ -21,16 +21,12 @@ fun MainScreen(navController: NavController) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
         Text(text = "Экран 1 — Главная")
         Button(onClick = {
             navController.navigate(VACANCY)
         }) {
             Text("Вакансия")
-        }
-        Button(onClick = {
-            navController.navigate(FILTER)
-        }) {
-            Text("Фильтры")
         }
     }
 }
