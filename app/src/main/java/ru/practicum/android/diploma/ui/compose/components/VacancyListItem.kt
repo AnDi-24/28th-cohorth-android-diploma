@@ -113,19 +113,20 @@ fun VacancyListItem(
 private fun formatVacancyName(vacancyName: String, companyName: String?): String {
     if (companyName.isNullOrBlank()) return vacancyName
 
+    var result = vacancyName
     val lowerVacancyName = vacancyName.lowercase()
     val lowerCompanyName = companyName.lowercase()
 
-    val patternWithPreposition = " в $lowerCompanyName"
-    if (lowerVacancyName.endsWith(patternWithPreposition)) {
-        return vacancyName.dropLast(patternWithPreposition.length).trim()
+    when {
+        lowerVacancyName.endsWith(" в $lowerCompanyName") -> {
+            result = vacancyName.removeSuffix(" в $companyName").trim()
+        }
+        lowerVacancyName.endsWith(lowerCompanyName) -> {
+            result = vacancyName.removeSuffix(companyName).trim()
+        }
     }
 
-    if (lowerVacancyName.endsWith(lowerCompanyName)) {
-        return vacancyName.dropLast(companyName.length).trim()
-    }
-
-    return vacancyName
+    return result
 }
 
 private fun formatSalary(salary: Salary?): String {
