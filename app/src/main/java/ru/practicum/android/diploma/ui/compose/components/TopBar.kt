@@ -23,10 +23,13 @@ fun TopBar(
 ) {
     val colors = MaterialTheme.colorScheme
     TopAppBar(
-        title = { Text(
-            text = title,
-            style = Typography.labelLarge,
-            textAlign = TextAlign.Start) },
+        title = {
+            Text(
+                text = title,
+                style = Typography.labelLarge,
+                textAlign = TextAlign.Start
+            )
+        },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = colors.background,
             titleContentColor = colors.onSurface,
@@ -35,13 +38,15 @@ fun TopBar(
         ),
         navigationIcon = {
             if (onBack != null) {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_back),
-                            contentDescription = null
-                        )
-                    }
-            } else null
+                IconButton(onClick = onBack) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_back),
+                        contentDescription = null
+                    )
+                }
+            } else {
+                null
+            }
         },
         actions = actions,
     )

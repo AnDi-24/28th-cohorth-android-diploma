@@ -31,13 +31,14 @@ fun SearchField(label: String) {
         value = inputValue,
         onValueChange = { newValue ->
             inputValue = newValue
-            query = newValue},
+            query = newValue
+        },
         shape = RoundedCornerShape(12.dp),
         modifier = Modifier
             .height(70.dp)
             .fillMaxWidth()
             .padding(vertical = 8.dp),
-        placeholder = { Text(label)},
+        placeholder = { Text(label) },
         trailingIcon = {
             if (inputValue.isNotEmpty()) {
                 IconButton(
@@ -53,7 +54,7 @@ fun SearchField(label: String) {
                         contentDescription = null
                     )
                 }
-            }else{
+            } else {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_search),
                     tint = colorResource(R.color.black_universal),

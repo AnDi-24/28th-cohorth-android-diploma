@@ -68,17 +68,20 @@ fun NavGraph() {
                     }
                 )
             }
+
             TEAM -> {
                 TopBar(
                     title = stringResource(R.string.team_screen),
                 )
             }
+
             FILTER -> {
                 TopBar(
                     title = stringResource(R.string.filter),
                     { navController.popBackStack() }
                 )
             }
+
             VACANCY -> {
                 TopBar(
                     title = stringResource(R.string.vacancy),
@@ -99,12 +102,14 @@ fun NavGraph() {
                     }
                 )
             }
+
             OPTION -> {
                 TopBar(
                     title = stringResource(R.string.filter_option),
                     { navController.popBackStack() }
                 )
             }
+
             else ->
                 TopBar(
                     title = stringResource(R.string.favorite_screen)
