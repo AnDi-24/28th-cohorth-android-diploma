@@ -6,4 +6,5 @@
     <string name="filter_option">Выбор отрасли</string>
     <string name="filter">Настройки фильтрации</string>
     <string name="vacancy">Вакансия</string>
+    <string name="request_placeholder">Введите запрос</string>
 </resources>
