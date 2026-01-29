@@ -3,20 +3,34 @@ package ru.practicum.android.diploma.data.network.models
 import com.google.gson.annotations.SerializedName
 
 data class VacancyDto(
-    @SerializedName("id") val id: String?,
-    @SerializedName("name") val name: String?,
-    @SerializedName("salary") val salary: Salary?,
-    @SerializedName("address") val address: Address?,
-    @SerializedName("experience") val experience: Experience?,
-    @SerializedName("schedule") val schedule: Schedule?,
-    @SerializedName("employment") val employment: Employment?,
-    @SerializedName("contacts") val contacts: Contacts?,
-    @SerializedName("description") val description: String?,
-    @SerializedName("employer") val employer: Employer?,
-    @SerializedName("area") val area: Area?,
-    @SerializedName("skills") val skills: List<String>?,
-    @SerializedName("url") val url: String?,
-    @SerializedName("industry") val industry: Industry?,
+    @SerializedName("id")
+    val id: String?,
+    @SerializedName("name")
+    val name: String?,
+    @SerializedName("salary")
+    val salary: Salary?,
+    @SerializedName("address")
+    val address: Address?,
+    @SerializedName("experience")
+    val experience: Experience?,
+    @SerializedName("schedule")
+    val schedule: Schedule?,
+    @SerializedName("employment")
+    val employment: Employment?,
+    @SerializedName("contacts")
+    val contacts: Contacts?,
+    @SerializedName("description")
+    val description: String?,
+    @SerializedName("employer")
+    val employer: Employer?,
+    @SerializedName("area")
+    val area: Area?,
+    @SerializedName("skills")
+    val skills: List<String>?,
+    @SerializedName("url")
+    val url: String?,
+    @SerializedName("industry")
+    val industry: Industry?,
 
 ) : Response()
 data class Industry(
