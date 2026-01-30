@@ -1,6 +1,9 @@
 package ru.practicum.android.diploma.data.network
 
 import ru.practicum.android.diploma.data.network.api.NetworkClient
+import ru.practicum.android.diploma.data.network.models.VacanciesRequest
+import ru.practicum.android.diploma.data.network.models.VacanciesResponse
+import ru.practicum.android.diploma.data.network.models.VacanciesResponseDto
 import ru.practicum.android.diploma.data.network.models.VacancyDetailsRequest
 import ru.practicum.android.diploma.data.network.models.VacancyDetailsResponse
 import ru.practicum.android.diploma.data.network.models.VacancyDto
@@ -23,6 +26,34 @@ class FindVacancyRepositoryImpl(
                 ResponseState.SUCCESS -> {
                     val vacancyResponse = response as? VacancyDetailsResponse
                     val vacancy = vacancyResponse?.vacancyDto?.data
+                    if (vacancy != null) {
+                        Resource.Success(vacancy)
+                    } else {
+                        Resource.Error(
+                            ResponseState.NULL_DATA.errorMessage
+                        )
+                    }
+                }
+                else -> {
+                    Resource.Error(message = response.resultCode.errorMessage)
+                }
+            }
+        } catch (e: IOException) {
+            Resource.Error(e.message.toString())
+
+        }
+    }
+
+    override suspend fun getVacancies(expression: String): Resource<List<VacancyDto>> {
+        return try {
+            val response = retrofitClient.doRequestVacancies(
+                VacanciesRequest(expression)
+            )
+            when (response.resultCode) {
+
+                ResponseState.SUCCESS -> {
+                    val vacancyResponse = response as? VacanciesResponse
+                    val vacancy = vacancyResponse?.vacanciesDto?.data?.vacancies
                     if (vacancy != null) {
                         Resource.Success(vacancy)
                     } else {

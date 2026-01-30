@@ -5,6 +5,8 @@ import retrofit2.HttpException
 import ru.practicum.android.diploma.data.network.api.FindJobApi
 import ru.practicum.android.diploma.data.network.api.NetworkClient
 import ru.practicum.android.diploma.data.network.models.Response
+import ru.practicum.android.diploma.data.network.models.VacanciesRequest
+import ru.practicum.android.diploma.data.network.models.VacanciesResponse
 import ru.practicum.android.diploma.data.network.models.VacancyDetailsRequest
 import ru.practicum.android.diploma.data.network.models.VacancyDetailsResponse
 import ru.practicum.android.diploma.util.Resource
@@ -37,6 +39,36 @@ class RetrofitNetworkClient(
             } else {
                 VacancyDetailsResponse(
                     vacancyDto = Resource.Success(data = vacancy)
+                ).apply {
+                    resultCode = ResponseState.SUCCESS
+                }
+            }
+        } catch (e: HttpException) {
+            Response().apply {
+                resultCode = ResponseState.HTTP_EXCEPTION
+            }
+        }
+    }
+
+    override suspend fun doRequestVacancies(dto: Any): Response {
+
+        if (dto !is VacanciesRequest) {
+            return Response().apply {
+                resultCode = ResponseState.INVALID_DTO_TYPE
+            }
+        }
+
+        return try {
+
+            val vacancies = findJobApi.getVacancies(1, null,dto.expression, null, 1, true, TOKEN)
+
+            if (vacancies == null) {
+                Response().apply {
+                    resultCode = ResponseState.NULL_DATA
+                }
+            } else {
+                VacanciesResponse(
+                    vacanciesDto = Resource.Success(data = vacancies)
                 ).apply {
                     resultCode = ResponseState.SUCCESS
                 }

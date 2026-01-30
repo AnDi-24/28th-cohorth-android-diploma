@@ -21,9 +21,13 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import ru.practicum.android.diploma.R
+import ru.practicum.android.diploma.presentation.SearchViewModel
 
 @Composable
-fun SearchField(label: String) {
+fun SearchField(
+    label: String,
+    viewModel: SearchViewModel,
+    onSearch: (() -> Unit)? = null) {
     var query by rememberSaveable { mutableStateOf("") }
     var inputValue by remember { mutableStateOf(query) }
 
