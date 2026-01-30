@@ -7,4 +7,6 @@ import ru.practicum.android.diploma.util.Resource
 
 interface FindVacancyInteractor {
     suspend fun getVacancyDetails(expression: String): Resource<VacancyDetailsModel>
+
+    suspend fun getVacancies(expression: String): Resource<List<VacancyDetailsModel>>
 }

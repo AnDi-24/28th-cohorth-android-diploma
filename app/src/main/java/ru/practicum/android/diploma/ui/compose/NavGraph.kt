@@ -20,13 +20,16 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import org.koin.androidx.compose.koinViewModel
 import ru.practicum.android.diploma.R
+import ru.practicum.android.diploma.presentation.SearchViewModel
 import ru.practicum.android.diploma.presentation.models.NavItem
 import ru.practicum.android.diploma.ui.compose.components.TopBar
 import ru.practicum.android.diploma.ui.theme.LightGray
@@ -48,6 +51,7 @@ fun NavGraph() {
         MAIN, FAVORITE, TEAM -> true
         else -> false
     }
+    val viewModel: SearchViewModel = koinViewModel()
 
     val topBar: @Composable () -> Unit = {
         when (currentRoute) {
@@ -130,7 +134,7 @@ fun NavGraph() {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(MAIN) {
-                MainScreen(navController)
+                MainScreen(viewModel, navController)
             }
             composable(FAVORITE) {
                 FavoriteScreen(navController)

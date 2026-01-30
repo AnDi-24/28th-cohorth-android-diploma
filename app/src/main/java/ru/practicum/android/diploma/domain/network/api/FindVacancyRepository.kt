@@ -7,4 +7,6 @@ import ru.practicum.android.diploma.util.Resource
 interface FindVacancyRepository {
     suspend fun getVacancyDetails(expression: String): Resource<VacancyDto>
 
+    suspend fun getVacancies(expression: String): Resource<List<VacancyDto>>
+
 }
