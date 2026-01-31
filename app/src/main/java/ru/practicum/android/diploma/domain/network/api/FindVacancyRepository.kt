@@ -8,12 +8,12 @@ interface FindVacancyRepository {
     suspend fun getVacancyDetails(expression: String): Resource<VacancyDto>
 
     fun getListVacancies(
-        area: Int,
+        area: Int?,
         industry: Int?,
         text: String,
         salary: Int?,
         page: Int,
         onlyWithSalary: Boolean
-    ): Flow<Resource<List<VacancyDto>>>
+    ): Flow<Resource<Pair<List<VacancyDto>, Int>>>
 
 }

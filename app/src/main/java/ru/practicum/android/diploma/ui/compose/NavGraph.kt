@@ -61,10 +61,7 @@ fun NavGraph() {
                     title = stringResource(R.string.main_screen),
                     null,
                     {
-                        IconButton(onClick = {
-                            navController.navigate(FILTER)
-                        }
-                        ) {
+                        IconButton(onClick = { navController.navigate(FILTER) }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_filters),
                                 contentDescription = null

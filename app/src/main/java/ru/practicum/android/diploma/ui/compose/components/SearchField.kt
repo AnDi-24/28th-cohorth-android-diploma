@@ -37,7 +37,7 @@ fun SearchField(
         if (inputValue != query) {
             delay(2000)
             query = inputValue
-            viewModel.performSearch(inputValue)
+            viewModel.searchVacancies(inputValue)
         }
     }
 

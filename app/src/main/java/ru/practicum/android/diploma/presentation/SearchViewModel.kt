@@ -1,7 +1,9 @@
 package ru.practicum.android.diploma.presentation
 
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
@@ -11,71 +13,19 @@ import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
 import ru.practicum.android.diploma.util.Resource
 import kotlin.coroutines.cancellation.CancellationException
 
-//class SearchViewModel(
-//    val interactor: FindVacancyInteractor
-//) : ViewModel() {
-//
-//    var query by mutableStateOf("")
-//
-//    private val _uiState = mutableStateOf<VacancySearchUiState>(VacancySearchUiState.Idle)
-//    val uiState: State<VacancySearchUiState> get() = _uiState
-//
-//
-//    fun searchVacancies() {
-//
-//        viewModelScope.launch {
-//            _uiState.value = VacancySearchUiState.Loading
-//
-//            interactor.getListVacancies(
-//                area = 1,
-//                industry = null,
-//                text = query,
-//                salary = null,
-//                page = 1,
-//                onlyWithSalary = false
-//            ).collect { resource ->
-//                _uiState.value = when (resource) {
-//                    is Resource.Success -> {
-//                        val data = resource.data
-//                        if (data == null || data.isEmpty()) {
-//                            VacancySearchUiState.Empty
-//                        } else {
-//                            // Преобразуем DTO в модель для UI
-//                            val vacancies = data.map { dto ->
-//                                VacancyDetailsModel(
-//                                    id = dto.id!!,
-//                                    name = dto.name!!,
-//                                    // другие поля по необходимости
-//                                )
-//                            }
-//                            VacancySearchUiState.Success(vacancies)
-//                        }
-//                    }
-//                    is Resource.Error -> {
-//                        VacancySearchUiState.Error(resource.message ?: "Ошибка загрузки")
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}
-
 class SearchViewModel(
     val interactor: FindVacancyInteractor
 ) : ViewModel() {
 
-    // Убираем публичную переменную query, так как теперь она управляется в Composable
     private var searchJob: Job? = null
 
     private val _uiState = mutableStateOf<VacancySearchUiState>(VacancySearchUiState.Idle)
     val uiState: State<VacancySearchUiState> get() = _uiState
+    var totalFound by mutableStateOf(0)
 
-    // Функция для выполнения поиска по запросу
-    fun performSearch(query: String) {
-        // Отменяем предыдущий поиск
+    fun searchVacancies(query: String) {
         searchJob?.cancel()
 
-        // Если запрос пустой - показываем Idle состояние
         if (query.isEmpty()) {
             _uiState.value = VacancySearchUiState.Idle
             return
@@ -86,44 +36,51 @@ class SearchViewModel(
 
             try {
                 interactor.getListVacancies(
-                    area = 1,
+                    area = null,
                     industry = null,
                     text = query,
                     salary = null,
-                    page = 1,
+                    page = 0,
                     onlyWithSalary = false
                 ).collect { resource ->
                     _uiState.value = when (resource) {
                         is Resource.Success -> {
                             val data = resource.data
-                            if (data == null || data.isEmpty()) {
+                            val vacancyList = data?.first ?: emptyList()
+                            totalFound = data?.second ?: 0
+                            if (vacancyList.isEmpty()) {
                                 VacancySearchUiState.Empty
                             } else {
-                                val vacancies = data.map { dto ->
+                                val vacancies = vacancyList.map { dto ->
                                     VacancyDetailsModel(
                                         id = dto.id!!,
                                         name = dto.name!!,
-                                        // другие поля по необходимости
                                     )
                                 }
-                                VacancySearchUiState.Success(vacancies)
+                                VacancySearchUiState.Success(vacancies, totalFound)
                             }
                         }
 
                         is Resource.Error -> {
-                            VacancySearchUiState.Error(resource.message ?: "Ошибка загрузки")
+                            when (resource.message) {
+                                "Данные не найдены" -> VacancySearchUiState.Empty
+                                "Ошибка сети" -> VacancySearchUiState.NetworkError
+                                "Неверный тип запроса" -> VacancySearchUiState.UnknownError
+                                "Неизвестная ошибка" -> VacancySearchUiState.UnknownError
+                                else -> {
+                                    return@collect
+                                }
+                            }
                         }
                     }
                 }
             } catch (e: CancellationException) {
-                // Поиск был отменен - ничего не делаем
             } catch (e: Exception) {
-                _uiState.value = VacancySearchUiState.Error("Ошибка: ${e.message}")
+                _uiState.value = VacancySearchUiState.NetworkError
             }
         }
     }
 
-    // Функция для очистки поиска
     fun clearSearch() {
         searchJob?.cancel()
         _uiState.value = VacancySearchUiState.Idle
@@ -138,7 +95,8 @@ class SearchViewModel(
 sealed interface VacancySearchUiState {
     object Idle : VacancySearchUiState
     object Loading : VacancySearchUiState
-    data class Success(val vacancies: List<VacancyDetailsModel>) : VacancySearchUiState
+    data class Success(val vacancies: List<VacancyDetailsModel>, val totalFound: Int) : VacancySearchUiState
     object Empty : VacancySearchUiState
-    data class Error(val message: String) : VacancySearchUiState
+    object NetworkError : VacancySearchUiState
+    object UnknownError : VacancySearchUiState
 }

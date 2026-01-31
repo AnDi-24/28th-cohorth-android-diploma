@@ -10,8 +10,8 @@ import ru.practicum.android.diploma.data.network.models.VacancyDto
 import ru.practicum.android.diploma.data.network.models.VacancyListRequest
 import ru.practicum.android.diploma.data.network.models.VacancyListResponse
 import ru.practicum.android.diploma.domain.network.api.FindVacancyRepository
-import ru.practicum.android.diploma.util.ResponseState
 import ru.practicum.android.diploma.util.Resource
+import ru.practicum.android.diploma.util.ResponseState
 import java.io.IOException
 
 class FindVacancyRepositoryImpl(
@@ -48,13 +48,13 @@ class FindVacancyRepositoryImpl(
     }
 
     override fun getListVacancies(
-        area: Int,
+        area: Int?,
         industry: Int?,
         text: String,
         salary: Int?,
         page: Int,
         onlyWithSalary: Boolean
-    ): Flow<Resource<List<VacancyDto>>> = flow {
+    ): Flow<Resource<Pair<List<VacancyDto>, Int>>> = flow {
         val response = retrofitClient.getVacanciesList(
             VacancyListRequest(
                 area = area,
@@ -67,15 +67,17 @@ class FindVacancyRepositoryImpl(
         )
         when (response.resultCode) {
             ResponseState.SUCCESS -> {
+                val found = (response as? VacancyListResponse)?.found ?: 0
                 val vacancyList = (response as? VacancyListResponse)?.items ?: emptyList()
                 Log.d("VacancyList - репозиторий", vacancyList.size.toString())
-                emit(Resource.Success(vacancyList))
+                emit(Resource.Success(Pair(vacancyList, found)))
             }
 
-            else -> {
-                Log.d("VacancyList - репозиторий", response.resultCode.toString())
-                emit(Resource.Error("ошибка"))
-            }
+            ResponseState.NULL_DATA -> emit(Resource.Error(ResponseState.NULL_DATA.errorMessage))
+            ResponseState.HTTP_EXCEPTION -> emit(Resource.Error(ResponseState.HTTP_EXCEPTION.errorMessage))
+            ResponseState.UNKNOWN -> emit(Resource.Error(ResponseState.UNKNOWN.errorMessage))
+            ResponseState.INVALID_DTO_TYPE -> emit(Resource.Error(ResponseState.INVALID_DTO_TYPE.errorMessage))
+
         }
     }
 }

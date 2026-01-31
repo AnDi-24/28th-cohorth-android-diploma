@@ -51,12 +51,34 @@ class RetrofitNetworkClient(
 
     override suspend fun getVacanciesList(dto: Any): Response {
         if (dto is VacancyListRequest) {
-            Log.d("VacancyListRequest - ретрофит", dto.text)
+            val options: HashMap<String, String> = HashMap()
+
+            if (dto.text.isNotEmpty()) {
+                options["text"] = dto.text
+            }
+
+            dto.page.let {
+                options["page"] = it.toString()
+            }
+
+            dto.area.let {
+                options["area"] = it.toString()
+            }
+
+            dto.salary?.let {
+                options["salary"] = it.toString()
+            }
+
+            dto.industry?.let {
+                options["industry"] = it.toString()
+            }
+
+            dto.onlyWithSalary.let {
+                options["only_with_salary"] = it.toString()
+            }
+
             return findJobApi.getVacanciesList(
-                page = dto.page,
-                area = null,
-                text = null,
-                salary = null,
+                options = options,
                 token = TOKEN
             ).apply { resultCode = ResponseState.SUCCESS }
         }
