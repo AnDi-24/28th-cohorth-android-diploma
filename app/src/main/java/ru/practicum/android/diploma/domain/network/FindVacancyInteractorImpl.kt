@@ -37,12 +37,14 @@ class FindVacancyInteractorImpl(
         params: SearchParams
     ): Flow<Resource<Pair<List<VacancyDetailsModel>, Int>>> {
         return repository.getListVacancies(
-            area = params.area,
-            industry = params.industry,
-            text = params.text,
-            salary = params.salary,
-            page = params.page,
-            onlyWithSalary = params.onlyWithSalary
+            SearchParams(
+                area = params.area,
+                industry = params.industry,
+                text = params.text,
+                salary = params.salary,
+                params.page,
+                params.onlyWithSalary
+            )
         )
             .map { resource ->
                 when (resource) {

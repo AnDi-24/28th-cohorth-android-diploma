@@ -49,39 +49,36 @@ class RetrofitNetworkClient(
     }
 
     override suspend fun getVacanciesList(dto: Any): Response {
-        if (dto is VacancyListRequest) {
-            val options: HashMap<String, String> = HashMap()
+        if (dto !is VacancyListRequest) {
+            return Response().apply { resultCode = ResponseState.UNKNOWN }
+        }
 
-            if (dto.text.isNotEmpty()) {
-                options["text"] = dto.text
-            }
-
-            dto.page.let {
-                options["page"] = it.toString()
-            }
-
-            dto.area.let {
-                options["area"] = it.toString()
-            }
-
-            dto.salary?.let {
-                options["salary"] = it.toString()
-            }
-
-            dto.industry?.let {
-                options["industry"] = it.toString()
-            }
-
-            dto.onlyWithSalary.let {
-                options["only_with_salary"] = it.toString()
-            }
-
-            return findJobApi.getVacanciesList(
+        return try {
+            val options = createVacancyOptions(dto)
+            findJobApi.getVacanciesList(
                 options = options,
                 token = TOKEN
             ).apply { resultCode = ResponseState.SUCCESS }
+        } catch (e: HttpException) {
+            Response().apply {
+                resultCode = ResponseState.UNKNOWN
+            }
         }
-        return Response().apply { resultCode = ResponseState.UNKNOWN }
+    }
+
+    private fun createVacancyOptions(request: VacancyListRequest): Map<String, String> {
+        return buildMap {
+            if (request.text.isNotEmpty()) {
+                put("text", request.text)
+            }
+
+            put("page", request.page.toString())
+            put("area", request.area.toString())
+
+            request.salary?.let { put("salary", it.toString()) }
+            request.industry?.let { put("industry", it.toString()) }
+            put("only_with_salary", request.onlyWithSalary.toString())
+        }
     }
 
 //    private fun isConnected(): Boolean {

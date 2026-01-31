@@ -33,19 +33,21 @@ class SearchViewModel(
             return
         }
 
+        val searchParams = SearchParams(
+            area = null,
+            industry = null,
+            text = query,
+            salary = null,
+            page = 0,
+            onlyWithSalary = false
+        )
+
         searchJob = viewModelScope.launch {
             _uiState.value = VacancySearchUiState.Loading
 
             try {
                 interactor.getListVacancies(
-                    SearchParams(
-                        area = null,
-                        industry = null,
-                        text = query,
-                        salary = null,
-                        page = 0,
-                        onlyWithSalary = false
-                    )
+                    searchParams
                 ).collect { resource ->
                     _uiState.value = when (resource) {
                         is Resource.Success -> {

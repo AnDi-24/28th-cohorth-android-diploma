@@ -10,6 +10,7 @@ import ru.practicum.android.diploma.data.network.models.VacancyDto
 import ru.practicum.android.diploma.data.network.models.VacancyListRequest
 import ru.practicum.android.diploma.data.network.models.VacancyListResponse
 import ru.practicum.android.diploma.domain.network.api.FindVacancyRepository
+import ru.practicum.android.diploma.domain.network.models.SearchParams
 import ru.practicum.android.diploma.util.Resource
 import ru.practicum.android.diploma.util.ResponseState
 import java.io.IOException
@@ -48,21 +49,16 @@ class FindVacancyRepositoryImpl(
     }
 
     override fun getListVacancies(
-        area: Int?,
-        industry: Int?,
-        text: String,
-        salary: Int?,
-        page: Int,
-        onlyWithSalary: Boolean
+        params: SearchParams
     ): Flow<Resource<Pair<List<VacancyDto>, Int>>> = flow {
         val response = retrofitClient.getVacanciesList(
             VacancyListRequest(
-                area = area,
-                industry = industry,
-                text = text,
-                salary = salary,
-                page = page,
-                onlyWithSalary = onlyWithSalary
+                area = params.area,
+                industry = params.industry,
+                text = params.text,
+                salary = params.salary,
+                page = params.page,
+                onlyWithSalary = params.onlyWithSalary
             )
         )
         when (response.resultCode) {
