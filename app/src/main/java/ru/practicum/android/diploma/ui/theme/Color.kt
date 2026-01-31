@@ -1,5 +1,6 @@
 package ru.practicum.android.diploma.ui.theme
 
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 
 const val BlackColor = 0xFF1A1B22
@@ -15,3 +16,21 @@ val Blue = Color(BlueColor)
 val Red = Color(RedColor)
 val Gray = Color(GrayColor)
 val LightGray = Color(LightGrayColor)
+
+val LightColorScheme = lightColorScheme(
+    primary = Blue,
+    onPrimary = White,
+
+    tertiary = Red,
+    onTertiary = White,
+
+    error = Red,
+    onError = White,
+
+    background = White,
+    onBackground = Black,
+
+    surface = LightGray,
+    onSurface = Black,
+    onSurfaceVariant = Gray
+)
