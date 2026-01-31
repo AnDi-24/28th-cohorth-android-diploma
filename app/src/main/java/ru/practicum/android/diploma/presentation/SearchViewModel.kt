@@ -1,6 +1,5 @@
 package ru.practicum.android.diploma.presentation
 
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -13,8 +12,6 @@ import ru.practicum.android.diploma.domain.network.api.FindVacancyInteractor
 import ru.practicum.android.diploma.domain.network.models.SearchParams
 import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
 import ru.practicum.android.diploma.util.Resource
-import java.io.IOException
-import kotlin.coroutines.cancellation.CancellationException
 
 class SearchViewModel(
     val interactor: FindVacancyInteractor
@@ -45,33 +42,25 @@ class SearchViewModel(
         searchJob = viewModelScope.launch {
             _uiState.value = VacancySearchUiState.Loading
 
-            try {
-                interactor.getListVacancies(
-                    searchParams
-                ).collect { resource ->
-                    _uiState.value = when (resource) {
-                        is Resource.Success -> {
-                            val data = resource.data
-                            val vacancyList = data?.first ?: emptyList()
-                            totalFound = data?.second ?: 0
-                            if (vacancyList.isEmpty()) {
-                                VacancySearchUiState.Empty
-                            } else {
-                                VacancySearchUiState.Success(vacancyList, totalFound)
-                            }
-                        }
-
-                        is Resource.Error -> {
-                            handleError(resource.message)
+            interactor.getListVacancies(
+                searchParams
+            ).collect { resource ->
+                _uiState.value = when (resource) {
+                    is Resource.Success -> {
+                        val data = resource.data
+                        val vacancyList = data?.first ?: emptyList()
+                        totalFound = data?.second ?: 0
+                        if (vacancyList.isEmpty()) {
+                            VacancySearchUiState.Empty
+                        } else {
+                            VacancySearchUiState.Success(vacancyList, totalFound)
                         }
                     }
+
+                    is Resource.Error -> {
+                        handleError(resource.message)
+                    }
                 }
-            } catch (e: CancellationException) {
-                Log.d("SearchViewModel", "$e - SearchJob cancelled")
-                _uiState.value = VacancySearchUiState.Empty
-            } catch (e: IOException) {
-                Log.d("SearchViewModel", "$e - SearchJob failed")
-                _uiState.value = VacancySearchUiState.NetworkError
             }
         }
     }
