@@ -7,6 +7,7 @@ import ru.practicum.android.diploma.data.network.api.NetworkClient
 import ru.practicum.android.diploma.data.network.models.Response
 import ru.practicum.android.diploma.data.network.models.VacancyDetailsRequest
 import ru.practicum.android.diploma.data.network.models.VacancyDetailsResponse
+import ru.practicum.android.diploma.data.network.models.VacancyListRequest
 import ru.practicum.android.diploma.util.Resource
 import ru.practicum.android.diploma.util.ResponseState
 
@@ -45,6 +46,40 @@ class RetrofitNetworkClient(
             Response().apply {
                 resultCode = ResponseState.HTTP_EXCEPTION
             }
+        }
+    }
+
+    override suspend fun getVacanciesList(dto: Any): Response {
+        if (dto !is VacancyListRequest) {
+            return Response().apply { resultCode = ResponseState.UNKNOWN }
+        }
+
+        return try {
+            val options = createVacancyOptions(dto)
+            findJobApi.getVacanciesList(
+                options = options,
+                token = TOKEN
+            ).apply { resultCode = ResponseState.SUCCESS }
+        } catch (e: HttpException) {
+            Log.d("RetrofitNetworkClient", "HttpException: ${e.message()}")
+            Response().apply {
+                resultCode = ResponseState.UNKNOWN
+            }
+        }
+    }
+
+    private fun createVacancyOptions(request: VacancyListRequest): Map<String, String> {
+        return buildMap {
+            if (request.text.isNotEmpty()) {
+                put("text", request.text)
+            }
+
+            put("page", request.page.toString())
+            put("area", request.area.toString())
+
+            request.salary?.let { put("salary", it.toString()) }
+            request.industry?.let { put("industry", it.toString()) }
+            put("only_with_salary", request.onlyWithSalary.toString())
         }
     }
 

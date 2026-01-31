@@ -12,6 +12,7 @@ import ru.practicum.android.diploma.util.ResponseState
 import java.io.IOException
 
 private const val MOK_VACANCY_ID = "0001266a-3da9-4af8-b384-2377f0ea5453"
+
 class VacancyDetailsViewModel(
     val retrofitInteractor: FindVacancyInteractor
 ) : ViewModel() {
@@ -19,16 +20,12 @@ class VacancyDetailsViewModel(
     private val _uiState = MutableStateFlow<VacancyUiState>(VacancyUiState.Idle)
     val uiState: StateFlow<VacancyUiState> = _uiState
 
-    init {
-        searchVacancyDetails()
-    }
-
-    fun searchVacancyDetails() {
+    fun searchVacancyDetails(id: String) {
         viewModelScope.launch {
             _uiState.value = VacancyUiState.Loading
 
             try {
-                val result = retrofitInteractor.getVacancyDetails(MOK_VACANCY_ID)
+                val result = retrofitInteractor.getVacancyDetails(id)
 
                 _uiState.value = when (result) {
                     is Resource.Success -> {
@@ -52,6 +49,7 @@ class VacancyDetailsViewModel(
             }
         }
     }
+
     sealed class VacancyUiState {
         object Idle : VacancyUiState()
         object Loading : VacancyUiState()
