@@ -1,5 +1,8 @@
 package ru.practicum.android.diploma.domain.network
 
+import android.util.Log
+import kotlinx.coroutines.flow.Flow
+import ru.practicum.android.diploma.data.network.models.VacancyDto
 import ru.practicum.android.diploma.domain.network.api.FindVacancyInteractor
 import ru.practicum.android.diploma.domain.network.api.FindVacancyRepository
 import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
@@ -23,29 +26,30 @@ class FindVacancyInteractorImpl(
                     Resource.Error(ResponseState.NULL_DATA.errorMessage)
                 }
             }
+
             is Resource.Error -> {
                 Resource.Error(resource.message ?: "")
             }
         }
     }
 
-    override suspend fun getVacancies(expression: String): Resource<List<VacancyDetailsModel>> {
-        val resource = repository.getVacancies(expression)
-        return when (resource) {
-            is Resource.Success -> {
-                val vacancyDto = resource.data
-                if (vacancyDto != null) {
-                    val vacancyList = vacancyDto.map { dto ->
-                        mapper.mapperFromDto(dto)
-                    }
-                    Resource.Success(vacancyList)
-                } else {
-                    Resource.Error(ResponseState.NULL_DATA.errorMessage)
-                }
-            }
-            is Resource.Error -> {
-                Resource.Error(resource.message ?: "")
-            }
-        }
+    override fun getListVacancies(
+        area: Int,
+        industry: Int?,
+        text: String,
+        salary: Int?,
+        page: Int,
+        onlyWithSalary: Boolean
+    ): Flow<Resource<List<VacancyDto>>> {
+
+        Log.d("VacancyList - интерактор", "мы тут")
+        return repository.getListVacancies(
+            area = area,
+            industry = industry,
+            text = text,
+            salary = salary,
+            page = page,
+            onlyWithSalary = onlyWithSalary
+        )
     }
 }

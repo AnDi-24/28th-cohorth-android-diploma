@@ -20,13 +20,14 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import org.koin.androidx.compose.koinViewModel
 import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.presentation.SearchViewModel
@@ -86,26 +87,26 @@ fun NavGraph() {
                 )
             }
 
-            VACANCY -> {
-                TopBar(
-                    title = stringResource(R.string.vacancy),
-                    { navController.popBackStack() },
-                    {
-                        IconButton(onClick = { /* логика поделиться */ }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_sharing),
-                                contentDescription = null
-                            )
-                        }
-                        IconButton(onClick = { /* логика избранное */ }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_favorites_off),
-                                contentDescription = null
-                            )
-                        }
-                    }
-                )
-            }
+//            VACANCY -> {
+//                TopBar(
+//                    title = stringResource(R.string.vacancy),
+//                    { navController.popBackStack() },
+//                    {
+//                        IconButton(onClick = { /* логика поделиться */ }) {
+//                            Icon(
+//                                painter = painterResource(id = R.drawable.ic_sharing),
+//                                contentDescription = null
+//                            )
+//                        }
+//                        IconButton(onClick = { /* логика избранное */ }) {
+//                            Icon(
+//                                painter = painterResource(id = R.drawable.ic_favorites_off),
+//                                contentDescription = null
+//                            )
+//                        }
+//                    }
+//                )
+//            }
 
             OPTION -> {
                 TopBar(
@@ -114,10 +115,34 @@ fun NavGraph() {
                 )
             }
 
-            else ->
+            FAVORITE -> {
                 TopBar(
                     title = stringResource(R.string.favorite_screen)
                 )
+            }
+
+            is String -> {
+                if (currentRoute.startsWith(VACANCY)) {
+                    TopBar(
+                        title = stringResource(R.string.vacancy),
+                        { navController.popBackStack() },
+                        {
+                            IconButton(onClick = { /* логика поделиться */ }) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_sharing),
+                                    contentDescription = null
+                                )
+                            }
+                            IconButton(onClick = { /* логика избранное */ }) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_favorites_off),
+                                    contentDescription = null
+                                )
+                            }
+                        }
+                    )
+                }
+            }
         }
     }
     Scaffold(
@@ -145,8 +170,12 @@ fun NavGraph() {
             composable(FILTER) {
                 FilterScreen(navController)
             }
-            composable(VACANCY) {
-                VacancyScreen(navController)
+            composable(
+                route = "$VACANCY/{id}",
+                arguments = listOf(navArgument("id") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val vacancyId = backStackEntry.arguments?.getString("id")
+                VacancyScreen(vacancyId)
             }
             composable(OPTION) {
                 FilterOptionScreen()

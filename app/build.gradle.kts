@@ -67,6 +67,7 @@ dependencies {
     implementation(libs.material3)
     implementation(libs.coil.compose)
     implementation(libs.ui.tooling.preview)
+    implementation(libs.foundation.layout)
     debugImplementation(libs.ui.tooling)
     ksp(libs.compiler)
     ksp(libs.room.compiler)
