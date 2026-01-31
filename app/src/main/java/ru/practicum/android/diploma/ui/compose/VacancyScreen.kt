@@ -117,8 +117,8 @@ private fun VacancyContent(vacancy: VacancyDetailsModel) {
     }
 }
 
-//@Composable
-//fun VacancyScreen(navController: NavController) {
+// @Composable
+// fun VacancyScreen(navController: NavController) {
 //    val viewModel: VacancyDetailsViewModel = koinViewModel()
 //    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 //    // Создаем локальную копию для smart cast
@@ -162,11 +162,11 @@ private fun VacancyContent(vacancy: VacancyDetailsModel) {
 //        }
 //
 //        item {
-////            Text(
-////                text = vacancyData.salary,
-////                fontWeight = FontWeight.Bold,
-////                modifier = Modifier.fillMaxWidth()
-////            )
+// //            Text(
+// //                text = vacancyData.salary,
+// //                fontWeight = FontWeight.Bold,
+// //                modifier = Modifier.fillMaxWidth()
+// //            )
 //        }
 //
 //        item {
@@ -194,12 +194,12 @@ private fun VacancyContent(vacancy: VacancyDetailsModel) {
 //            }
 //        }
 //    }
-//}
-//@Composable
-//fun EmployerLogoGlide(
+// }
+// @Composable
+// fun EmployerLogoGlide(
 //    logoUrl: String?,
 //    modifier: Modifier = Modifier
-//) {
+// ) {
 //    AndroidView(
 //        factory = { context ->
 //            ImageView(context).apply {
@@ -218,4 +218,4 @@ private fun VacancyContent(vacancy: VacancyDetailsModel) {
 //        },
 //        modifier = modifier
 //    )
-//}
+// }

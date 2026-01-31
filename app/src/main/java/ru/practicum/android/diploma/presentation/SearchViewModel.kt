@@ -1,5 +1,6 @@
 package ru.practicum.android.diploma.presentation
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -9,8 +10,10 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import ru.practicum.android.diploma.domain.network.api.FindVacancyInteractor
+import ru.practicum.android.diploma.domain.network.models.SearchParams
 import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
 import ru.practicum.android.diploma.util.Resource
+import java.io.IOException
 import kotlin.coroutines.cancellation.CancellationException
 
 class SearchViewModel(
@@ -18,7 +21,6 @@ class SearchViewModel(
 ) : ViewModel() {
 
     private var searchJob: Job? = null
-
     private val _uiState = mutableStateOf<VacancySearchUiState>(VacancySearchUiState.Idle)
     val uiState: State<VacancySearchUiState> get() = _uiState
     var totalFound by mutableStateOf(0)
@@ -36,12 +38,14 @@ class SearchViewModel(
 
             try {
                 interactor.getListVacancies(
-                    area = null,
-                    industry = null,
-                    text = query,
-                    salary = null,
-                    page = 0,
-                    onlyWithSalary = false
+                    SearchParams(
+                        area = null,
+                        industry = null,
+                        text = query,
+                        salary = null,
+                        page = 0,
+                        onlyWithSalary = false
+                    )
                 ).collect { resource ->
                     _uiState.value = when (resource) {
                         is Resource.Success -> {
@@ -51,31 +55,20 @@ class SearchViewModel(
                             if (vacancyList.isEmpty()) {
                                 VacancySearchUiState.Empty
                             } else {
-                                val vacancies = vacancyList.map { dto ->
-                                    VacancyDetailsModel(
-                                        id = dto.id!!,
-                                        name = dto.name!!,
-                                    )
-                                }
-                                VacancySearchUiState.Success(vacancies, totalFound)
+                                VacancySearchUiState.Success(vacancyList, totalFound)
                             }
                         }
 
                         is Resource.Error -> {
-                            when (resource.message) {
-                                "Данные не найдены" -> VacancySearchUiState.Empty
-                                "Ошибка сети" -> VacancySearchUiState.NetworkError
-                                "Неверный тип запроса" -> VacancySearchUiState.UnknownError
-                                "Неизвестная ошибка" -> VacancySearchUiState.UnknownError
-                                else -> {
-                                    return@collect
-                                }
-                            }
+                            handleError(resource.message)
                         }
                     }
                 }
             } catch (e: CancellationException) {
-            } catch (e: Exception) {
+                Log.d("SearchViewModel", "$e - SearchJob cancelled")
+                _uiState.value = VacancySearchUiState.Empty
+            } catch (e: IOException) {
+                Log.d("SearchViewModel", "$e - SearchJob failed")
                 _uiState.value = VacancySearchUiState.NetworkError
             }
         }
@@ -89,6 +82,16 @@ class SearchViewModel(
     override fun onCleared() {
         super.onCleared()
         searchJob?.cancel()
+    }
+
+    private fun handleError(errorMessage: String?): VacancySearchUiState {
+        return when (errorMessage) {
+            "Данные не найдены" -> VacancySearchUiState.Empty
+            "Ошибка сети" -> VacancySearchUiState.NetworkError
+            "Неверный тип запроса" -> VacancySearchUiState.UnknownError
+            "Неизвестная ошибка" -> VacancySearchUiState.UnknownError
+            else -> VacancySearchUiState.Empty
+        }
     }
 }
 

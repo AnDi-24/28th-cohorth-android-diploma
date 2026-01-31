@@ -25,6 +25,7 @@ import kotlinx.coroutines.delay
 import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.presentation.SearchViewModel
 
+private const val SEARCH_DEBOUNCE_DELAY = 2000L
 @Composable
 fun SearchField(
     label: String,
@@ -35,7 +36,7 @@ fun SearchField(
 
     LaunchedEffect(inputValue) {
         if (inputValue != query) {
-            delay(2000)
+            delay(SEARCH_DEBOUNCE_DELAY)
             query = inputValue
             viewModel.searchVacancies(inputValue)
         }

@@ -1,9 +1,10 @@
 package ru.practicum.android.diploma.domain.network
 
 import kotlinx.coroutines.flow.Flow
-import ru.practicum.android.diploma.data.network.models.VacancyDto
+import kotlinx.coroutines.flow.map
 import ru.practicum.android.diploma.domain.network.api.FindVacancyInteractor
 import ru.practicum.android.diploma.domain.network.api.FindVacancyRepository
+import ru.practicum.android.diploma.domain.network.models.SearchParams
 import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
 import ru.practicum.android.diploma.util.Resource
 import ru.practicum.android.diploma.util.ResponseState
@@ -32,21 +33,32 @@ class FindVacancyInteractorImpl(
         }
     }
 
-    override fun getListVacancies(
-        area: Int?,
-        industry: Int?,
-        text: String,
-        salary: Int?,
-        page: Int,
-        onlyWithSalary: Boolean
-    ): Flow<Resource<Pair<List<VacancyDto>, Int>>> {
+    override suspend fun getListVacancies(
+        params: SearchParams
+    ): Flow<Resource<Pair<List<VacancyDetailsModel>, Int>>> {
         return repository.getListVacancies(
-            area = area,
-            industry = industry,
-            text = text,
-            salary = salary,
-            page = page,
-            onlyWithSalary = onlyWithSalary
+            area = params.area,
+            industry = params.industry,
+            text = params.text,
+            salary = params.salary,
+            page = params.page,
+            onlyWithSalary = params.onlyWithSalary
         )
+            .map { resource ->
+                when (resource) {
+                    is Resource.Success -> {
+                        val vacancyDtoList = resource.data?.first ?: emptyList()
+                        val totalFound = resource.data?.second ?: 0
+                        val vacancyModels = vacancyDtoList.map { dto ->
+                            mapper.mapperFromDto(dto) // Используем маппер
+                        }
+                        Resource.Success(Pair(vacancyModels, totalFound))
+                    }
+
+                    is Resource.Error -> {
+                        Resource.Error(resource.message ?: "")
+                    }
+                }
+            }
     }
 }

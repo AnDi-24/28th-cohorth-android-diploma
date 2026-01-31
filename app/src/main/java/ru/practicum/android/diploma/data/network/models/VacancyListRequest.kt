@@ -7,5 +7,4 @@ class VacancyListRequest(
     val salary: Int?,
     val page: Int,
     val onlyWithSalary: Boolean
-) {
-}
+)

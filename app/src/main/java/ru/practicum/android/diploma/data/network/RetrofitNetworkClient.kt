@@ -1,6 +1,5 @@
 package ru.practicum.android.diploma.data.network
 
-import android.util.Log
 import retrofit2.HttpException
 import ru.practicum.android.diploma.data.network.api.FindJobApi
 import ru.practicum.android.diploma.data.network.api.NetworkClient
@@ -82,7 +81,6 @@ class RetrofitNetworkClient(
                 token = TOKEN
             ).apply { resultCode = ResponseState.SUCCESS }
         }
-        Log.d("VacancyListRequest - Retrofit", "error")
         return Response().apply { resultCode = ResponseState.UNKNOWN }
     }
 
