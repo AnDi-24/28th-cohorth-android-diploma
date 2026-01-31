@@ -2,5 +2,13 @@
     <string name="app_name">Practicum-Android-Diploma</string>
     <string name="main_screen">Главная</string>
     <string name="favorite_screen">Избранное</string>
+    <string name="empty_list">Список пуст</string>
+    <string name="get_vacancy_failed">Не удалось получить список вакансий</string>
+    <string name="get_list_failed">Не удалось получить список</string>
     <string name="team_screen">Команда</string>
+    <string name="empty">Пусто</string>
+    <string name="no_internet">Нет интернета</string>
+    <string name="no_region">Такого региона нет</string>
+    <string name="vacancy_not_found">Вакансия не найдена или удалена</string>
+    <string name="server_error">Ошибка сервера</string>
 </resources>
