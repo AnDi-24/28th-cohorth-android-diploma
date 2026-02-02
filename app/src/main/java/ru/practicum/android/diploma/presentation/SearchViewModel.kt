@@ -21,6 +21,8 @@ import ru.practicum.android.diploma.presentation.models.VacancySearchUiState
 import ru.practicum.android.diploma.util.Resource
 import java.io.IOException
 
+const val NETWORK_ERROR = "Ошибка сети"
+
 class SearchViewModel(
     val interactor: FindVacancyInteractor
 ) : ViewModel() {
@@ -75,9 +77,8 @@ class SearchViewModel(
                     }
                 }
             } catch (e: IOException) {
-                val message = "Ошибка сети"
                 Log.d("Exception Message", "Exception $e")
-                isError(message, isLoadMore)
+                isError(NETWORK_ERROR, isLoadMore)
             }
         }
     }
