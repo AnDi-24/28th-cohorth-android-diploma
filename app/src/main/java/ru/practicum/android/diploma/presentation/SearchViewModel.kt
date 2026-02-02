@@ -36,6 +36,7 @@ class SearchViewModel(
     private var isLoadingMore by mutableStateOf(false)
     private val vacanciesList = mutableStateListOf<VacancyDetailsModel>()
     private var totalFound by mutableIntStateOf(0)
+    private var lastShownToastMessage: String? = null
     private var currentQuery = ""
 
     fun searchVacancies(query: String, isLoadMore: Boolean = false) {
@@ -53,7 +54,6 @@ class SearchViewModel(
         )
 
         searchJob = viewModelScope.launch {
-
             if (!isLoadMore) {
                 _uiState.value = VacancySearchUiState.Loading
             } else {
@@ -75,7 +75,7 @@ class SearchViewModel(
                         }
                     }
                 }
-            } catch (e: Exception) {
+            } catch (e: IOException) {
                 Log.d("SearchException", "Description: $e")
                 isException(isLoadMore, e)
             }
@@ -102,8 +102,8 @@ class SearchViewModel(
                 isLastPage = isLastPage()
             )
         }
-
         isLoadingMore = false
+        lastShownToastMessage = null
     }
 
     private fun isError(resource: Resource<Triple<List<VacancyDetailsModel>, Int, Int>>, isLoadMore: Boolean) {
@@ -152,8 +152,11 @@ class SearchViewModel(
     }
 
     private fun showToastMessage(message: String) {
-        viewModelScope.launch {
-            _toastMessage.emit(message)
+        if (lastShownToastMessage != message) {
+            lastShownToastMessage = message
+            viewModelScope.launch {
+                _toastMessage.emit(message)
+            }
         }
     }
 
@@ -164,6 +167,7 @@ class SearchViewModel(
             maxPages = 0
             vacanciesList.clear()
             isLoadingMore = false
+            lastShownToastMessage = null
         }
 
         if (isLoadMore && isLastPage()) {
@@ -190,6 +194,7 @@ class SearchViewModel(
         maxPages = 0
         currentQuery = ""
         isLoadingMore = false
+        lastShownToastMessage = null
     }
 
     override fun onCleared() {
@@ -244,4 +249,3 @@ class SearchViewModel(
         }
     }
 }
-
