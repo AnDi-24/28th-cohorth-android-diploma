@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import ru.practicum.android.diploma.domain.local.api.FavoriteVacancyInteractor
 import ru.practicum.android.diploma.domain.local.api.FavoriteVacancyRepository
-import ru.practicum.android.diploma.domain.local.model.VacancyModel
+import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
 import ru.practicum.android.diploma.util.VacancyMapper
 
 class FavoriteVacancyInteractorImpl(
@@ -12,22 +12,30 @@ class FavoriteVacancyInteractorImpl(
     val mapper: VacancyMapper
 ) : FavoriteVacancyInteractor {
 
-    override suspend fun addVacancyToFavorite(vacancy: VacancyModel) {
-        repository.addVacancyToFavorite(
-            mapper.mapperToEntity(vacancyModel = vacancy)
-        )
+    override suspend fun toggleFavorite(vacancy: VacancyDetailsModel) {
+        val isFavorite = repository.isFavorite(vacancy.id)
+
+        if (isFavorite) {
+            repository.deleteById(vacancy.id)
+        } else {
+            val entity = mapper.mapToFavoriteVacancyEntity(vacancy)
+            repository.insert(entity)
+        }
     }
 
-    override suspend fun deleteVacancyFromFavorite(id: Long) {
-        repository.deleteVacancyFromFavorite(id = id)
+    override suspend fun isFavorite(id: String): Boolean {
+        return repository.isFavorite(id)
     }
 
-    override fun getAllFavoriteVacancy(): Flow<List<VacancyModel>> {
-        return repository.getAllFavoriteVacancy().map { listEntity ->
-            listEntity.map { vacancyEntity ->
-                mapper.mapperToRoomModel(vacancyEntity = vacancyEntity)
+    override fun getAllFavoritesForList(): Flow<List<VacancyDetailsModel>> {
+        return repository.getAll().map { entities ->
+            entities.map { entity ->
+                mapper.mapFromFavoriteVacancyEntityForList(entity)
             }
         }
     }
 
+    override suspend fun removeFromFavorites(id: String) {
+        repository.deleteById(id)
+    }
 }

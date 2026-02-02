@@ -1,5 +1,6 @@
 package ru.practicum.android.diploma.ui.compose
 
+import android.widget.ImageView
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,8 +22,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.bumptech.glide.Glide
 import org.koin.androidx.compose.koinViewModel
+import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
 import ru.practicum.android.diploma.presentation.VacancyDetailsViewModel
 
@@ -30,6 +34,7 @@ import ru.practicum.android.diploma.presentation.VacancyDetailsViewModel
 fun VacancyScreen(vacancyId: String?) {
     val viewModel: VacancyDetailsViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     val currentState = uiState
 
     LaunchedEffect(vacancyId) {
@@ -71,12 +76,15 @@ fun VacancyScreen(vacancyId: String?) {
 }
 
 @Composable
-private fun VacancyContent(vacancy: VacancyDetailsModel) {
+private fun VacancyContent(
+    vacancy: VacancyDetailsModel
+) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(3.dp)
     ) {
+
         item {
             vacancy.url?.let {
                 Text(
@@ -195,27 +203,4 @@ private fun VacancyContent(vacancy: VacancyDetailsModel) {
 //        }
 //    }
 // }
-// @Composable
-// fun EmployerLogoGlide(
-//    logoUrl: String?,
-//    modifier: Modifier = Modifier
-// ) {
-//    AndroidView(
-//        factory = { context ->
-//            ImageView(context).apply {
-//                scaleType = ImageView.ScaleType.CENTER_CROP
-//                adjustViewBounds = true
-//            }
-//        },
-//        update = { imageView ->
-//            // Определяем что загружать
-//            logoUrl?.let { url ->
-//                Glide.with(imageView.context)
-//                    .load(url)
-//                    .placeholder(R.drawable.team)
-//                    .into(imageView)
-//            }
-//        },
-//        modifier = modifier
-//    )
-// }
+

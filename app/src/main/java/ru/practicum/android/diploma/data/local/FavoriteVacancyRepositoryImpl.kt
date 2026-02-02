@@ -4,18 +4,22 @@ import kotlinx.coroutines.flow.Flow
 import ru.practicum.android.diploma.domain.local.api.FavoriteVacancyRepository
 
 class FavoriteVacancyRepositoryImpl(
-    val roomDataBase: AppDatabase
+    val database: AppDatabase
 ) : FavoriteVacancyRepository {
-    override suspend fun addVacancyToFavorite(vacancy: VacancyEntity) {
-        roomDataBase.favoriteVacancyDao().addVacancyToFavorite(vacancy = vacancy)
+
+    override suspend fun insert(vacancy: FavoriteVacancyEntity) {
+        database.favoriteVacancyDao().insert(vacancy)
     }
 
-    override suspend fun deleteVacancyFromFavorite(id: Long) {
-        roomDataBase.favoriteVacancyDao().deleteVacancyFromFavorite(id = id)
+    override suspend fun deleteById(id: String) {
+        database.favoriteVacancyDao().deleteById(id)
     }
 
-    override fun getAllFavoriteVacancy(): Flow<List<VacancyEntity>> {
-        return roomDataBase.favoriteVacancyDao()
-            .getAllFavoriteVacancy()
+    override fun getAll(): Flow<List<FavoriteVacancyEntity>> {
+        return database.favoriteVacancyDao().getAll()
+    }
+
+    override suspend fun isFavorite(id: String): Boolean {
+        return database.favoriteVacancyDao().isFavorite(id)
     }
 }
