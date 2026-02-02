@@ -58,7 +58,6 @@ fun MainScreen(
     val context = LocalContext.current
     val searchPerformed = remember { mutableStateOf(false) }
 
-
     LaunchedEffect(Unit) {
         viewModel.toastMessage.collect { message ->
             withContext(Dispatchers.Main) {

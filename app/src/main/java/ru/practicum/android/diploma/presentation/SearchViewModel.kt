@@ -75,11 +75,10 @@ class SearchViewModel(
                     }
                 }
             } catch (e: IOException) {
+                val message = "Ошибка сети"
                 Log.d("Exception Message", "Exception $e")
-                isError("Ошибка сети", isLoadMore)
+                isError(message, isLoadMore)
             }
-
-
         }
     }
 
