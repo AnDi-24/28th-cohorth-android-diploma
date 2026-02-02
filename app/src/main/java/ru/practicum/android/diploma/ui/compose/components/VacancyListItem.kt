@@ -29,7 +29,6 @@ fun VacancyListItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-
     Card(
         modifier = modifier
             .fillMaxWidth()

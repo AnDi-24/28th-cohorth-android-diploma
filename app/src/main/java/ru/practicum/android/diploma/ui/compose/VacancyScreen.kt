@@ -1,6 +1,5 @@
 package ru.practicum.android.diploma.ui.compose
 
-import android.widget.ImageView
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,11 +21,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.bumptech.glide.Glide
 import org.koin.androidx.compose.koinViewModel
-import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
 import ru.practicum.android.diploma.presentation.VacancyDetailsViewModel
 
@@ -84,7 +80,6 @@ private fun VacancyContent(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(3.dp)
     ) {
-
         item {
             vacancy.url?.let {
                 Text(
