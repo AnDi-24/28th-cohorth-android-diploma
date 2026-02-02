@@ -193,7 +193,7 @@ class SearchViewModel(
     private fun handleError(errorMessage: String?): VacancySearchUiState {
         return when (errorMessage) {
             "Данные не найдены" -> VacancySearchUiState.Empty
-            "Ошибка сети" -> VacancySearchUiState.NetworkError
+            NETWORK_ERROR -> VacancySearchUiState.NetworkError
             "Неверный тип запроса" -> VacancySearchUiState.UnknownError
             "Неизвестная ошибка" -> VacancySearchUiState.UnknownError
             else -> VacancySearchUiState.NetworkError
@@ -202,7 +202,7 @@ class SearchViewModel(
 
     private fun getErrorMessage(errorMessage: String?): String {
         return when (errorMessage) {
-            "Ошибка сети" -> "Проверьте подключение к интернету"
+            NETWORK_ERROR -> "Проверьте подключение к интернету"
             else -> "Произошла ошибка"
         }
     }
