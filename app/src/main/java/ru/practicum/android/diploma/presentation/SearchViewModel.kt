@@ -20,7 +20,6 @@ import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
 import ru.practicum.android.diploma.presentation.models.VacancySearchUiState
 import ru.practicum.android.diploma.util.Resource
 import java.io.IOException
-import java.net.SocketTimeoutException
 
 class SearchViewModel(
     val interactor: FindVacancyInteractor
@@ -71,14 +70,16 @@ class SearchViewModel(
                         }
 
                         is Resource.Error -> {
-                            isError(resource, isLoadMore)
+                            isError(resource.message ?: "", isLoadMore)
                         }
                     }
                 }
             } catch (e: IOException) {
-                Log.d("SearchException", "Description: $e")
-                isException(isLoadMore, e)
+                Log.d("Exception Message", "Exception $e")
+                isError("Ошибка сети", isLoadMore)
             }
+
+
         }
     }
 
@@ -106,10 +107,10 @@ class SearchViewModel(
         lastShownToastMessage = null
     }
 
-    private fun isError(resource: Resource<Triple<List<VacancyDetailsModel>, Int, Int>>, isLoadMore: Boolean) {
+    private fun isError(resourceMessage: String, isLoadMore: Boolean) {
         isLoadingMore = false
         if (isLoadMore) {
-            showToastMessage(getErrorMessage(resource.message))
+            showToastMessage(getErrorMessage(resourceMessage))
             if (vacanciesList.isNotEmpty()) {
                 _uiState.value = VacancySearchUiState.Success(
                     vacancies = vacanciesList.toList(),
@@ -119,24 +120,7 @@ class SearchViewModel(
                 )
             }
         } else {
-            _uiState.value = handleError(resource.message)
-        }
-    }
-
-    private fun isException(isLoadMore: Boolean, e: Exception) {
-        isLoadingMore = false
-        if (isLoadMore) {
-            showToastMessage(getExceptionMessage(e))
-            if (vacanciesList.isNotEmpty()) {
-                _uiState.value = VacancySearchUiState.Success(
-                    vacancies = vacanciesList.toList(),
-                    totalFound = totalFound,
-                    isLoadingMore = false,
-                    isLastPage = isLastPage()
-                )
-            }
-        } else {
-            _uiState.value = handleException(e)
+            _uiState.value = handleError(resourceMessage)
         }
     }
 
@@ -161,6 +145,10 @@ class SearchViewModel(
     }
 
     private fun loadLogic(query: String, isLoadMore: Boolean = false) {
+        if (query.isEmpty()) {
+            clearSearch()
+        }
+
         if (!isLoadMore || currentQuery != query) {
             currentQuery = query
             currentPage = 1
@@ -202,43 +190,13 @@ class SearchViewModel(
         searchJob?.cancel()
     }
 
-    private fun handleException(e: Exception): VacancySearchUiState {
-        return when (e) {
-            is SocketTimeoutException -> {
-                VacancySearchUiState.NetworkError
-            }
-
-            is java.net.UnknownHostException -> {
-                VacancySearchUiState.NetworkError
-            }
-
-            is IOException -> {
-                VacancySearchUiState.NetworkError
-            }
-
-            else -> {
-                VacancySearchUiState.UnknownError
-            }
-        }
-    }
-
     private fun handleError(errorMessage: String?): VacancySearchUiState {
         return when (errorMessage) {
             "Данные не найдены" -> VacancySearchUiState.Empty
             "Ошибка сети" -> VacancySearchUiState.NetworkError
             "Неверный тип запроса" -> VacancySearchUiState.UnknownError
             "Неизвестная ошибка" -> VacancySearchUiState.UnknownError
-            else -> VacancySearchUiState.Empty
-        }
-    }
-
-    private fun getExceptionMessage(e: Exception): String {
-        return when (e) {
-            is SocketTimeoutException,
-            is java.net.UnknownHostException,
-            is IOException -> "Проверьте подключение к интернету"
-
-            else -> "Произошла ошибка"
+            else -> VacancySearchUiState.NetworkError
         }
     }
 

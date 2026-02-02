@@ -47,7 +47,7 @@ fun VacancyListItem(
                 modifier = Modifier.size(48.dp),
                 shape = MaterialTheme.shapes.medium,
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface
+                    containerColor = MaterialTheme.colorScheme.background
                 ),
                 elevation = CardDefaults.cardElevation(0.dp),
                 border = BorderStroke(

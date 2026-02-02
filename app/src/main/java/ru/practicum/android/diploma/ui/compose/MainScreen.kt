@@ -22,6 +22,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,11 +56,35 @@ fun MainScreen(
     val resources = LocalResources.current
     val lazyListState = rememberLazyListState()
     val context = LocalContext.current
+    val searchPerformed = remember { mutableStateOf(false) }
+
 
     LaunchedEffect(Unit) {
         viewModel.toastMessage.collect { message ->
             withContext(Dispatchers.Main) {
                 Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    LaunchedEffect(uiState) {
+        when (uiState) {
+            is VacancySearchUiState.Success -> {
+                val successState = uiState as VacancySearchUiState.Success
+                if (successState.vacancies.isNotEmpty() && searchPerformed.value) {
+                    lazyListState.scrollToItem(0)
+                    searchPerformed.value = false
+                }
+            }
+
+            VacancySearchUiState.Loading -> {
+                if (uiState is VacancySearchUiState.Loading) {
+                    searchPerformed.value = true
+                }
+            }
+
+            else -> {
+                searchPerformed.value = false
             }
         }
     }
