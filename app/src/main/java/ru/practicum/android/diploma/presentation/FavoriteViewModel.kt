@@ -5,36 +5,47 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ru.practicum.android.diploma.domain.local.api.FavoriteVacancyInteractor
-import ru.practicum.android.diploma.domain.local.model.VacancyModel
+import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
 
 class FavoriteViewModel(
-    private val roomInteractor: FavoriteVacancyInteractor
+    private val favoriteInteractor: FavoriteVacancyInteractor
 ) : ViewModel() {
 
+    private val _uiState = MutableStateFlow<FavoriteUiState>(FavoriteUiState.Loading)
+    val uiState: StateFlow<FavoriteUiState> = _uiState.asStateFlow()
 
-    private val _vacanciesFlow = MutableStateFlow<List<VacancyModel>>(emptyList())
-    val vacanciesFlow: StateFlow<List<VacancyModel>> = _vacanciesFlow.asStateFlow()
+    init {
+        loadFavorites()
+    }
 
-    private fun getAllFavoriteVacancy() {
+    private fun loadFavorites() {
         viewModelScope.launch {
-            roomInteractor.getAllFavoriteVacancy()
-                .collect { listVacancies ->
-                    _vacanciesFlow.value = listVacancies
+            favoriteInteractor.getAllFavoritesForList().collectLatest { vacancies ->
+                _uiState.value = if (vacancies.isEmpty()) {
+                    FavoriteUiState.Empty
+                } else {
+                    FavoriteUiState.Success(vacancies)
                 }
+            }
         }
     }
 
-    fun addVacancy(vacancy: VacancyModel) {
+    fun removeFromFavorites(id: String) {
         viewModelScope.launch {
-            roomInteractor.addVacancyToFavorite(vacancy = vacancy)
+            favoriteInteractor.removeFromFavorites(id)
         }
     }
 
-    fun deleteVacancy(id: Long) {
-        viewModelScope.launch {
-            roomInteractor.deleteVacancyFromFavorite(id = id)
-        }
+    fun refresh() {
+        loadFavorites()
     }
+}
+
+sealed interface FavoriteUiState {
+    object Loading : FavoriteUiState
+    object Empty : FavoriteUiState
+    data class Success(val vacancies: List<VacancyDetailsModel>) : FavoriteUiState
 }

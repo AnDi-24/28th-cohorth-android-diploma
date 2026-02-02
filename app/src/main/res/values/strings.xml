@@ -24,4 +24,6 @@
     <string name="select">Выбрать</string>
     <string name="apply">Применить</string>
     <string name="reset">Сбросить</string>
+    <string name="delete_from_favorites">Удалить из избранного</string>
+    <string name="add_to_favorites">Добавить в избранное</string>
 </resources>

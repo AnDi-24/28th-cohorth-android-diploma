@@ -17,14 +17,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
-import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.domain.network.models.Salary
 import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
+import ru.practicum.android.diploma.util.EmployerLogoGlide
 
 @Composable
 fun VacancyListItem(
@@ -43,7 +40,7 @@ fun VacancyListItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 9.dp),
+                .padding(vertical = 9.dp),
             verticalAlignment = Alignment.Top
         ) {
             Card(
@@ -58,15 +55,11 @@ fun VacancyListItem(
                     color = MaterialTheme.colorScheme.outlineVariant
                 )
             ) {
-                AsyncImage(
-                    model = vacancy.employer?.logo,
-                    contentDescription = "Логотип компании",
+                EmployerLogoGlide(
+                    logoUrl = vacancy.employer?.logo,
                     modifier = Modifier
                         .size(48.dp)
-                        .padding(8.dp),
-                    contentScale = ContentScale.Fit,
-                    placeholder = painterResource(R.drawable.company_logo_placeholder),
-                    error = painterResource(R.drawable.company_logo_placeholder)
+                        .padding(8.dp)
                 )
             }
 
@@ -120,6 +113,7 @@ private fun formatVacancyName(vacancyName: String, companyName: String?): String
         lowerVacancyName.endsWith(" в $lowerCompanyName") -> {
             result = vacancyName.removeSuffix(" в $companyName").trim()
         }
+
         lowerVacancyName.endsWith(lowerCompanyName) -> {
             result = vacancyName.removeSuffix(companyName).trim()
         }

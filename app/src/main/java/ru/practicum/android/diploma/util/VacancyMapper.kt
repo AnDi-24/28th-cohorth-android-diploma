@@ -1,8 +1,7 @@
 package ru.practicum.android.diploma.util
 
-import ru.practicum.android.diploma.data.local.VacancyEntity
+import ru.practicum.android.diploma.data.local.FavoriteVacancyEntity
 import ru.practicum.android.diploma.data.network.models.VacancyDto
-import ru.practicum.android.diploma.domain.local.model.VacancyModel
 import ru.practicum.android.diploma.domain.network.models.Address
 import ru.practicum.android.diploma.domain.network.models.Area
 import ru.practicum.android.diploma.domain.network.models.Contacts
@@ -17,15 +16,57 @@ import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
 
 object VacancyMapper {
 
-    fun mapperToEntity(vacancyModel: VacancyModel): VacancyEntity {
-        return VacancyEntity(
-            vacancyId = vacancyModel.vacancyId
+    fun mapToFavoriteVacancyEntity(vacancy: VacancyDetailsModel): FavoriteVacancyEntity {
+        return FavoriteVacancyEntity(
+            id = vacancy.id,
+            name = vacancy.name,
+            employerName = vacancy.employer?.name,
+            salaryFrom = vacancy.salary?.from,
+            salaryTo = vacancy.salary?.to,
+            salaryCurrency = vacancy.salary?.currency,
+            employerLogoUrl = vacancy.employer?.logo,
+            areaName = vacancy.area?.name,
+            experience = vacancy.experience?.name,
+            employment = vacancy.employment?.name,
+            schedule = vacancy.schedule?.name,
+            description = vacancy.description,
+            skills = vacancy.skills.joinToString(", "),
+            vacancyUrl = vacancy.url,
+            addressCity = vacancy.address?.city,
+            addressStreet = vacancy.address?.street,
+            addressBuilding = vacancy.address?.building,
+            addressRaw = vacancy.address?.raw,
+            contactName = vacancy.contacts?.name,
+            contactEmail = vacancy.contacts?.email,
+            contactPhones = vacancy.contacts?.phones?.joinToString(";") { it.formatted }
         )
     }
 
-    fun mapperToRoomModel(vacancyEntity: VacancyEntity): VacancyModel {
-        return VacancyModel(
-            vacancyId = vacancyEntity.vacancyId
+    fun mapFromFavoriteVacancyEntityForList(entity: FavoriteVacancyEntity): VacancyDetailsModel {
+        return VacancyDetailsModel(
+            id = entity.id,
+            name = entity.name,
+            salary = entity.salaryCurrency?.let { currency ->
+                Salary(
+                    id = entity.id,
+                    currency = currency,
+                    from = entity.salaryFrom,
+                    to = entity.salaryTo
+                )
+            },
+            employer = entity.employerName?.let { employerName ->
+                Employer(
+                    id = entity.id,
+                    name = employerName,
+                    logo = entity.employerLogoUrl
+                )
+            },
+            area = entity.areaName?.let { areaName ->
+                Area(
+                    id = entity.id,
+                    name = areaName
+                )
+            }
         )
     }
 

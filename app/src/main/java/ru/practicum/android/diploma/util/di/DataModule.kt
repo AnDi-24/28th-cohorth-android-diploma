@@ -27,7 +27,9 @@ val dataModule = module {
     }
 
     single<FavoriteVacancyRepository> {
-        FavoriteVacancyRepositoryImpl(roomDataBase = get())
+        FavoriteVacancyRepositoryImpl(
+            database = get()
+        )
     }
 
     // Retrofit
