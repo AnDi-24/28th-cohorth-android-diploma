@@ -26,7 +26,7 @@ fun TopBar(
         title = {
             Text(
                 text = title,
-                style = Typography.labelLarge,
+                style = Typography.titleMedium,
                 textAlign = TextAlign.Start
             )
         },

@@ -26,6 +26,7 @@ import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.presentation.SearchViewModel
 
 private const val SEARCH_DEBOUNCE_DELAY = 2000L
+
 @Composable
 fun SearchField(
     label: String,
@@ -38,7 +39,11 @@ fun SearchField(
         if (inputValue != query) {
             delay(SEARCH_DEBOUNCE_DELAY)
             query = inputValue
-            viewModel.searchVacancies(inputValue)
+            if (inputValue.isNotEmpty()) {
+                viewModel.searchVacancies(inputValue)
+            } else {
+                viewModel.clearSearch()
+            }
         }
     }
 

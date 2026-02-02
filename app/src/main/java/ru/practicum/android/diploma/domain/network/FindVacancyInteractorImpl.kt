@@ -35,7 +35,7 @@ class FindVacancyInteractorImpl(
 
     override suspend fun getListVacancies(
         params: SearchParams
-    ): Flow<Resource<Pair<List<VacancyDetailsModel>, Int>>> {
+    ): Flow<Resource<Triple<List<VacancyDetailsModel>, Int, Int>>> {
         return repository.getListVacancies(
             SearchParams(
                 area = params.area,
@@ -51,10 +51,11 @@ class FindVacancyInteractorImpl(
                     is Resource.Success -> {
                         val vacancyDtoList = resource.data?.first ?: emptyList()
                         val totalFound = resource.data?.second ?: 0
+                        val totalPages = resource.data?.third ?: 0
                         val vacancyModels = vacancyDtoList.map { dto ->
-                            mapper.mapperFromDto(dto) // Используем маппер
+                            mapper.mapperFromDto(dto)
                         }
-                        Resource.Success(Pair(vacancyModels, totalFound))
+                        Resource.Success(Triple(vacancyModels, totalFound, totalPages))
                     }
 
                     is Resource.Error -> {

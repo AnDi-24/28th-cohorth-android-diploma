@@ -10,6 +10,6 @@ interface FindVacancyRepository {
 
     fun getListVacancies(
         params: SearchParams
-    ): Flow<Resource<Pair<List<VacancyDto>, Int>>>
+    ): Flow<Resource<Triple<List<VacancyDto>, Int, Int>>>
 
 }
