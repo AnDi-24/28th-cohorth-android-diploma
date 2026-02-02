@@ -50,7 +50,7 @@ class FindVacancyRepositoryImpl(
 
     override fun getListVacancies(
         params: SearchParams
-    ): Flow<Resource<Pair<List<VacancyDto>, Int>>> = flow {
+    ): Flow<Resource<Triple<List<VacancyDto>, Int, Int>>> = flow {
         val response = retrofitClient.getVacanciesList(
             VacancyListRequest(
                 area = params.area,
@@ -65,8 +65,9 @@ class FindVacancyRepositoryImpl(
             ResponseState.SUCCESS -> {
                 val found = (response as? VacancyListResponse)?.found ?: 0
                 val vacancyList = (response as? VacancyListResponse)?.items ?: emptyList()
+                val pages = (response as? VacancyListResponse)?.pages ?: 0
                 Log.d("VacancyList - репозиторий", vacancyList.size.toString())
-                emit(Resource.Success(Pair(vacancyList, found)))
+                emit(Resource.Success(Triple(vacancyList, found, pages)))
             }
 
             ResponseState.NULL_DATA -> emit(Resource.Error(ResponseState.NULL_DATA.errorMessage))

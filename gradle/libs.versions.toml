@@ -29,6 +29,7 @@ coilCompose = "2.6.0"
 uiToolingPreview = "1.10.1"
 uiTooling = "1.10.1"
 foundationLayout = "1.10.1"
+uiGraphics = "1.10.1"
 
 [libraries]
 
@@ -74,5 +75,6 @@ coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coi
 ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview", version.ref = "uiToolingPreview" }
 ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "uiTooling" }
 foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
+ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics", version.ref = "uiGraphics" }
 
 [bundles]

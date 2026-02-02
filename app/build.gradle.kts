@@ -49,6 +49,7 @@ android {
 }
 
 dependencies {
+    implementation("com.airbnb.android:lottie-compose:6.4.0")
     implementation(libs.converter.gson)
     implementation(libs.material)
     implementation(libs.navigation.compose)
@@ -68,6 +69,7 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.ui.tooling.preview)
     implementation(libs.foundation.layout)
+    implementation(libs.ui.graphics)
     debugImplementation(libs.ui.tooling)
     ksp(libs.compiler)
     ksp(libs.room.compiler)
