@@ -45,10 +45,13 @@ import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.ui.compose.components.PositiveButton
 
 private const val APPEAR_DELAY = 500L
+private const val ANIMATION_TWEEN1 = 1000
+private const val ANIMATION_TWEEN2 = 2000
+private const val ANIMATION_TWEEN3 = 3000
+private const val BUTTON_TWEEN = 1500
 
 @Composable
-fun TeamScreen(
-) {
+fun TeamScreen() {
     var showCelebration by remember { mutableStateOf(false) }
 
     Box(
@@ -74,7 +77,7 @@ fun CelebrationButton(
         initialValue = 2f,
         targetValue = 2.5f,
         animationSpec = infiniteRepeatable(
-            animation = tween(1500, easing = FastOutSlowInEasing),
+            animation = tween(BUTTON_TWEEN, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         )
     )
@@ -99,8 +102,7 @@ fun CelebrationButton(
 }
 
 @Composable
-fun FullScreenCelebration(
-) {
+fun FullScreenCelebration() {
     val composition by rememberLottieComposition(
         spec = LottieCompositionSpec.RawRes(R.raw.celebrations)
     )
@@ -126,7 +128,6 @@ fun FullScreenCelebration(
             .fillMaxSize(),
         contentAlignment = Alignment.TopCenter
     ) {
-
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth()
@@ -148,10 +149,10 @@ fun FullScreenCelebration(
             )
             AnimatedVisibility(
                 visible = visible,
-                enter = fadeIn(animationSpec = tween(3000)) +
+                enter = fadeIn(animationSpec = tween(ANIMATION_TWEEN3)) +
                     scaleIn(
                         initialScale = 2f,
-                        animationSpec = tween(3000, easing = FastOutSlowInEasing)
+                        animationSpec = tween(ANIMATION_TWEEN3, easing = FastOutSlowInEasing)
                     ),
                 exit = fadeOut() + scaleOut()
             ) {
@@ -172,16 +173,15 @@ fun FullScreenCelebration(
             }
             AnimatedVisibility(
                 visible = visible,
-                enter = fadeIn(animationSpec = tween(2000)) +
+                enter = fadeIn(animationSpec = tween(ANIMATION_TWEEN2)) +
                     scaleIn(
                         initialScale = 2f,
-                        animationSpec = tween(2000, easing = FastOutSlowInEasing)
+                        animationSpec = tween(ANIMATION_TWEEN2, easing = FastOutSlowInEasing)
                     ),
                 exit = fadeOut() + scaleOut()
             ) {
                 Text(
-                    text =
-                        "Кузнецов Максим",
+                    text = "Кузнецов Максим",
                     style = MaterialTheme.typography.displaySmall.copy(
                         fontWeight = FontWeight.Bold,
                         color = colors.primary,
@@ -197,16 +197,15 @@ fun FullScreenCelebration(
             }
             AnimatedVisibility(
                 visible = visible,
-                enter = fadeIn(animationSpec = tween(1000)) +
+                enter = fadeIn(animationSpec = tween(ANIMATION_TWEEN1)) +
                     scaleIn(
                         initialScale = 2f,
-                        animationSpec = tween(1000, easing = FastOutSlowInEasing)
+                        animationSpec = tween(ANIMATION_TWEEN1, easing = FastOutSlowInEasing)
                     ),
                 exit = fadeOut() + scaleOut()
             ) {
                 Text(
-                    text =
-                        "Лосев Денис",
+                    text = "Лосев Денис",
                     style = MaterialTheme.typography.displaySmall.copy(
                         fontWeight = FontWeight.Bold,
                         color = colors.primary,

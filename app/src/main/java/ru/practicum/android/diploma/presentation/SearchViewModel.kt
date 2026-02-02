@@ -1,5 +1,6 @@
 package ru.practicum.android.diploma.presentation
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -28,10 +29,8 @@ class SearchViewModel(
     private var searchJob: Job? = null
     private val _uiState = mutableStateOf<VacancySearchUiState>(VacancySearchUiState.Idle)
     val uiState: State<VacancySearchUiState> get() = _uiState
-
     private val _toastMessage = MutableSharedFlow<String>()
     val toastMessage: SharedFlow<String> = _toastMessage.asSharedFlow()
-
     private var currentPage by mutableIntStateOf(0)
     private var maxPages by mutableIntStateOf(0)
     private var isLoadingMore by mutableStateOf(false)
@@ -54,18 +53,12 @@ class SearchViewModel(
         )
 
         searchJob = viewModelScope.launch {
+
             if (!isLoadMore) {
                 _uiState.value = VacancySearchUiState.Loading
             } else {
                 isLoadingMore = true
-                if (vacanciesList.isNotEmpty()) {
-                    _uiState.value = VacancySearchUiState.Success(
-                        vacancies = vacanciesList.toList(),
-                        totalFound = totalFound,
-                        isLoadingMore = true,
-                        isLastPage = isLastPage()
-                    )
-                }
+                loadMore()
             }
 
             try {
@@ -83,6 +76,7 @@ class SearchViewModel(
                     }
                 }
             } catch (e: Exception) {
+                Log.d("SearchException", "Description: $e")
                 isException(isLoadMore, e)
             }
         }
@@ -146,6 +140,17 @@ class SearchViewModel(
         }
     }
 
+    private fun loadMore() {
+        if (vacanciesList.isNotEmpty()) {
+            _uiState.value = VacancySearchUiState.Success(
+                vacancies = vacanciesList.toList(),
+                totalFound = totalFound,
+                isLoadingMore = true,
+                isLastPage = isLastPage()
+            )
+        }
+    }
+
     private fun showToastMessage(message: String) {
         viewModelScope.launch {
             _toastMessage.emit(message)
@@ -153,10 +158,9 @@ class SearchViewModel(
     }
 
     private fun loadLogic(query: String, isLoadMore: Boolean = false) {
-
         if (!isLoadMore || currentQuery != query) {
             currentQuery = query
-            currentPage = 0
+            currentPage = 1
             maxPages = 0
             vacanciesList.clear()
             isLoadingMore = false
