@@ -11,6 +11,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
@@ -31,7 +32,9 @@ import androidx.navigation.navArgument
 import org.koin.androidx.compose.koinViewModel
 import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.presentation.SearchViewModel
+import ru.practicum.android.diploma.presentation.VacancyDetailsViewModel
 import ru.practicum.android.diploma.presentation.models.NavItem
+import ru.practicum.android.diploma.ui.compose.components.FavoriteButton
 import ru.practicum.android.diploma.ui.compose.components.TopBar
 import ru.practicum.android.diploma.ui.theme.LightGray
 import ru.practicum.android.diploma.ui.theme.Typography
@@ -48,6 +51,7 @@ fun NavGraph() {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
+
     val showBottomBar = when (currentRoute) {
         MAIN, FAVORITE, TEAM -> true
         else -> false
@@ -130,12 +134,15 @@ fun NavGraph() {
                                     contentDescription = null
                                 )
                             }
-                            IconButton(onClick = { /* логика избранное */ }) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_favorites_off),
-                                    contentDescription = null
-                                )
+                            val vacancyViewModel: VacancyDetailsViewModel = koinViewModel()
+                            val vacancyId = backStackEntry?.arguments?.getString("id")
+                            LaunchedEffect(vacancyId) {
+                                if (vacancyId != null) {
+                                    vacancyViewModel.setVacancyId(vacancyId)
+                                }
                             }
+
+                            FavoriteButton(vacancyViewModel)
                         }
                     )
                 }

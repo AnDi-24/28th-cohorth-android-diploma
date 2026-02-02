@@ -1,12 +1,11 @@
 package ru.practicum.android.diploma.domain.local.api
 
 import kotlinx.coroutines.flow.Flow
-import ru.practicum.android.diploma.data.local.VacancyEntity
+import ru.practicum.android.diploma.data.local.FavoriteVacancyEntity
 
 interface FavoriteVacancyRepository {
-
-    suspend fun addVacancyToFavorite(vacancy: VacancyEntity)
-    suspend fun deleteVacancyFromFavorite(id: Long)
-    fun getAllFavoriteVacancy(): Flow<List<VacancyEntity>>
-
+    suspend fun insert(vacancy: FavoriteVacancyEntity)
+    suspend fun deleteById(id: String)
+    fun getAll(): Flow<List<FavoriteVacancyEntity>>
+    suspend fun isFavorite(id: String): Boolean
 }

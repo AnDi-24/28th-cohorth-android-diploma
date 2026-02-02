@@ -30,6 +30,7 @@ import ru.practicum.android.diploma.presentation.VacancyDetailsViewModel
 fun VacancyScreen(vacancyId: String?) {
     val viewModel: VacancyDetailsViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     val currentState = uiState
 
     LaunchedEffect(vacancyId) {
@@ -71,7 +72,9 @@ fun VacancyScreen(vacancyId: String?) {
 }
 
 @Composable
-private fun VacancyContent(vacancy: VacancyDetailsModel) {
+private fun VacancyContent(
+    vacancy: VacancyDetailsModel
+) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
@@ -195,27 +198,4 @@ private fun VacancyContent(vacancy: VacancyDetailsModel) {
 //        }
 //    }
 // }
-// @Composable
-// fun EmployerLogoGlide(
-//    logoUrl: String?,
-//    modifier: Modifier = Modifier
-// ) {
-//    AndroidView(
-//        factory = { context ->
-//            ImageView(context).apply {
-//                scaleType = ImageView.ScaleType.CENTER_CROP
-//                adjustViewBounds = true
-//            }
-//        },
-//        update = { imageView ->
-//            // Определяем что загружать
-//            logoUrl?.let { url ->
-//                Glide.with(imageView.context)
-//                    .load(url)
-//                    .placeholder(R.drawable.team)
-//                    .into(imageView)
-//            }
-//        },
-//        modifier = modifier
-//    )
-// }
+
