@@ -1,6 +1,7 @@
 package ru.practicum.android.diploma.ui.compose.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,16 +20,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import org.koin.androidx.compose.koinViewModel
 import ru.practicum.android.diploma.domain.network.models.Contacts
 import ru.practicum.android.diploma.domain.network.models.Salary
 import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
+import ru.practicum.android.diploma.presentation.VacancyDetailsViewModel
 
 private const val FIFTY = 50
 private const val THIRTY = 30
 private const val ABOUT_COMPANY = "О компании"
+
 @Composable
 fun VacancyDetails(
     vacancy: VacancyDetailsModel,
@@ -173,6 +178,8 @@ private fun RequiredExperienceSection(
 
 @Composable
 private fun ContactsSection(contacts: Contacts) {
+    val viewModel: VacancyDetailsViewModel = koinViewModel()
+    val context = LocalContext.current
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -191,19 +198,29 @@ private fun ContactsSection(contacts: Contacts) {
             }
 
             contacts.email?.let { email ->
-                ContactItem(
-                    text = email
-                )
+                Box(
+                    modifier = Modifier.clickable(onClick = { viewModel.emailTo(context, email) })
+                ) {
+                    ContactItem(
+                        text = email
+                    )
+                }
             }
 
             contacts.phones?.forEach { phone ->
-                ContactItem(
-                    text = phone.formatted ?: ""
-                )
+                Box(
+                    modifier = Modifier.clickable(onClick = { viewModel.callTo(context, phone.formatted) })
+                ) {
+                    ContactItem(
+                        text = phone.formatted ?: ""
+                    )
+                }
+
             }
         }
     }
 }
+
 @Composable
 private fun ContactItem(
     text: String
@@ -441,9 +458,11 @@ private fun parseLinesIntoSections(lines: List<String>): Pair<List<DescriptionSe
                 addCurrentSection(sections, currentTitle, currentItems)
                 currentTitle = sectionTitle
             }
+
             currentTitle != null && line.length > 2 -> {
                 addToCurrentSection(currentItems, line)
             }
+
             line.length > 2 -> {
                 addToOtherLines(otherLines, line)
             }

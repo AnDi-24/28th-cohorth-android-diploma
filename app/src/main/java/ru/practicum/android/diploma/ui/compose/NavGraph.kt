@@ -35,6 +35,7 @@ import ru.practicum.android.diploma.presentation.SearchViewModel
 import ru.practicum.android.diploma.presentation.VacancyDetailsViewModel
 import ru.practicum.android.diploma.presentation.models.NavItem
 import ru.practicum.android.diploma.ui.compose.components.FavoriteButton
+import ru.practicum.android.diploma.ui.compose.components.ShareButton
 import ru.practicum.android.diploma.ui.compose.components.TopBar
 import ru.practicum.android.diploma.ui.theme.LightGray
 import ru.practicum.android.diploma.ui.theme.Typography
@@ -50,6 +51,7 @@ const val VACANCY = "vacancy"
 fun NavGraph() {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
+    val vacancyViewModel: VacancyDetailsViewModel = koinViewModel()
     val currentRoute = backStackEntry?.destination?.route
 
     val showBottomBar = when (currentRoute) {
@@ -128,13 +130,7 @@ fun NavGraph() {
                         title = stringResource(R.string.vacancy),
                         { navController.popBackStack() },
                         {
-                            IconButton(onClick = { /* логика поделиться */ }) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_sharing),
-                                    contentDescription = null
-                                )
-                            }
-                            val vacancyViewModel: VacancyDetailsViewModel = koinViewModel()
+                            ShareButton(vacancyViewModel)
                             val vacancyId = backStackEntry?.arguments?.getString("id")
                             LaunchedEffect(vacancyId) {
                                 if (vacancyId != null) {
