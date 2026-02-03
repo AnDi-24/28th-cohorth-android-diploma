@@ -7,6 +7,7 @@ import ru.practicum.android.diploma.data.network.api.NetworkClient
 import ru.practicum.android.diploma.data.network.models.Response
 import ru.practicum.android.diploma.data.network.models.VacancyDetailsRequest
 import ru.practicum.android.diploma.data.network.models.VacancyDetailsResponse
+import ru.practicum.android.diploma.data.network.models.VacancyDto
 import ru.practicum.android.diploma.data.network.models.VacancyListRequest
 import ru.practicum.android.diploma.util.Resource
 import ru.practicum.android.diploma.util.ResponseState
@@ -21,69 +22,120 @@ class RetrofitNetworkClient(
 ) : NetworkClient {
 
     override suspend fun doRequestVacancyDetails(dto: Any): Response {
-        // Проверка типа DTO
-        if (dto !is VacancyDetailsRequest) {
-            return Response().apply {
-                resultCode = ResponseState.INVALID_DTO_TYPE
-            }
+        if (!isValidDetailsRequest(dto)) {
+            return createInvalidDtoResponse()
         }
 
         return try {
-            // Выполнение запроса
-            val vacancy = findJobApi.getVacancyById(dto.expression, TOKEN)
-
-            if (vacancy == null) {
-                Response().apply {
-                    resultCode = ResponseState.NULL_DATA
-                }
-            } else {
-                VacancyDetailsResponse(
-                    vacancyDto = Resource.Success(data = vacancy)
-                ).apply {
-                    resultCode = ResponseState.SUCCESS
-                }
-            }
+            fetchVacancyDetails(dto as VacancyDetailsRequest)
         } catch (e: HttpException) {
-            logException("HTTP error in doRequestVacancyDetails", e)
-            Response().apply {
-                resultCode = ResponseState.HTTP_EXCEPTION
-                errorCode = e.code()
-            }
+            handleHttpExceptionForDetails(e)
         } catch (e: IOException) {
-            logException("IO error in doRequestVacancyDetails", e)
-            Response().apply {
-                resultCode = ResponseState.HTTP_EXCEPTION
-            }
+            handleIoExceptionForDetails(e)
+        }
+    }
+
+    private fun isValidDetailsRequest(dto: Any): Boolean {
+        return dto is VacancyDetailsRequest
+    }
+
+    private fun createInvalidDtoResponse(): Response {
+        return Response().apply {
+            resultCode = ResponseState.INVALID_DTO_TYPE
+        }
+    }
+
+    private suspend fun fetchVacancyDetails(request: VacancyDetailsRequest): Response {
+        val vacancy = findJobApi.getVacancyById(request.expression, TOKEN)
+        return if (vacancy == null) {
+            createNullDataResponse()
+        } else {
+            createSuccessResponse(vacancy)
+        }
+    }
+
+    private fun createNullDataResponse(): Response {
+        return Response().apply {
+            resultCode = ResponseState.NULL_DATA
+        }
+    }
+
+    private fun createSuccessResponse(vacancy: VacancyDto): Response {
+        return VacancyDetailsResponse(
+            vacancyDto = Resource.Success(data = vacancy)
+        ).apply {
+            resultCode = ResponseState.SUCCESS
+        }
+    }
+
+    private fun handleHttpExceptionForDetails(e: HttpException): Response {
+        logException("HTTP error in doRequestVacancyDetails", e)
+        return Response().apply {
+            resultCode = ResponseState.HTTP_EXCEPTION
+            errorCode = e.code()
+        }
+    }
+
+    private fun handleIoExceptionForDetails(e: IOException): Response {
+        logException("IO error in doRequestVacancyDetails", e)
+        return Response().apply {
+            resultCode = ResponseState.HTTP_EXCEPTION
         }
     }
 
     override suspend fun getVacanciesList(dto: Any): Response {
-        if (dto !is VacancyListRequest) {
-            return Response().apply { resultCode = ResponseState.UNKNOWN }
+        if (!isValidVacancyRequest(dto)) {
+            return createErrorResponse(ResponseState.UNKNOWN)
         }
 
         return try {
-            val options = createVacancyOptions(dto)
-            findJobApi.getVacanciesList(
-                options = options,
-                token = TOKEN
-            ).apply { resultCode = ResponseState.SUCCESS }
+            val options = createVacancyOptions(dto as VacancyListRequest)
+            executeVacancyListRequest(options)
         } catch (e: HttpException) {
-            Log.d("RetrofitNetworkClient", "HttpException: ${e.message()}")
-            Response().apply {
-                resultCode = ResponseState.HTTP_EXCEPTION
-                errorCode = e.code()
-            }
+            handleHttpException(e)
         } catch (e: IOException) {
-            logException("IO error in getVacanciesList", e)
-            Response().apply {
-                resultCode = ResponseState.HTTP_EXCEPTION
-            }
+            handleIOException(e)
         } catch (e: IllegalArgumentException) {
-            logException("Illegal argument in getVacanciesList", e)
-            Response().apply {
-                resultCode = ResponseState.UNKNOWN
-            }
+            handleIllegalArgumentException(e)
+        }
+    }
+
+    private fun isValidVacancyRequest(dto: Any): Boolean {
+        return dto is VacancyListRequest
+    }
+
+    private suspend fun executeVacancyListRequest(options: Map<String, String>): Response {
+        return findJobApi.getVacanciesList(
+            options = options,
+            token = TOKEN
+        ).apply { resultCode = ResponseState.SUCCESS }
+    }
+
+    private fun handleHttpException(e: HttpException): Response {
+        Log.d("RetrofitNetworkClient", "HttpException: ${e.message()}")
+        return createErrorResponse(
+            resultCode = ResponseState.HTTP_EXCEPTION,
+            errorCode = e.code()
+        )
+    }
+
+    private fun handleIOException(e: IOException): Response {
+        logException("IO error in getVacanciesList", e)
+        return createErrorResponse(ResponseState.HTTP_EXCEPTION)
+    }
+
+    private fun handleIllegalArgumentException(e: IllegalArgumentException): Response {
+        logException("Illegal argument in getVacanciesList", e)
+        return createErrorResponse(ResponseState.UNKNOWN)
+    }
+
+    private fun createErrorResponse(
+        resultCode: ResponseState,
+        errorCode: Int? = null
+    ): Response {
+        return Response().apply {
+            this.resultCode = resultCode
+            errorCode?.let { this.errorCode = it }
         }
     }
 
@@ -105,4 +157,5 @@ class RetrofitNetworkClient(
     private fun logException(message: String, exception: Exception) {
         Log.e("RetrofitNetworkClient", "$message: ${exception.message}")
     }
+
 }
