@@ -22,4 +22,8 @@ class FavoriteVacancyRepositoryImpl(
     override suspend fun isFavorite(id: String): Boolean {
         return database.favoriteVacancyDao().isFavorite(id)
     }
+
+    override suspend fun getById(id: String): FavoriteVacancyEntity? {
+        return database.favoriteVacancyDao().getById(id)
+    }
 }

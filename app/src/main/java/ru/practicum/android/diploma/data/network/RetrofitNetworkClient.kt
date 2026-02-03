@@ -2,6 +2,7 @@ package ru.practicum.android.diploma.data.network
 
 import android.util.Log
 import retrofit2.HttpException
+import java.io.IOException
 import ru.practicum.android.diploma.data.network.api.FindJobApi
 import ru.practicum.android.diploma.data.network.api.NetworkClient
 import ru.practicum.android.diploma.data.network.models.Response
@@ -43,6 +44,13 @@ class RetrofitNetworkClient(
                 }
             }
         } catch (e: HttpException) {
+            logException("HTTP error in doRequestVacancyDetails", e)
+            Response().apply {
+                resultCode = ResponseState.HTTP_EXCEPTION
+                errorCode = e.code()
+            }
+        } catch (e: IOException) {
+            logException("IO error in doRequestVacancyDetails", e)
             Response().apply {
                 resultCode = ResponseState.HTTP_EXCEPTION
             }
@@ -62,6 +70,17 @@ class RetrofitNetworkClient(
             ).apply { resultCode = ResponseState.SUCCESS }
         } catch (e: HttpException) {
             Log.d("RetrofitNetworkClient", "HttpException: ${e.message()}")
+            Response().apply {
+                resultCode = ResponseState.HTTP_EXCEPTION
+                errorCode = e.code()
+            }
+        } catch (e: IOException) {
+            logException("IO error in getVacanciesList", e)
+            Response().apply {
+                resultCode = ResponseState.HTTP_EXCEPTION
+            }
+        } catch (e: IllegalArgumentException) {
+            logException("Illegal argument in getVacanciesList", e)
             Response().apply {
                 resultCode = ResponseState.UNKNOWN
             }
@@ -83,7 +102,7 @@ class RetrofitNetworkClient(
         }
     }
 
-//    private fun isConnected(): Boolean {
-//
-//    }
+    private fun logException(message: String, exception: Exception) {
+        Log.e("RetrofitNetworkClient", "$message: ${exception.message}")
+    }
 }

@@ -38,4 +38,9 @@ class FavoriteVacancyInteractorImpl(
     override suspend fun removeFromFavorites(id: String) {
         repository.deleteById(id)
     }
+
+    override suspend fun getFavoriteVacancy(id: String): VacancyDetailsModel? {
+        val entity = repository.getById(id)
+        return entity?.let { mapper.mapFromFavoriteVacancyEntityForDetails(it) }
+    }
 }

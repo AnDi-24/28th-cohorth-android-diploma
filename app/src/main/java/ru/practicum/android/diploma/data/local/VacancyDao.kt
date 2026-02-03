@@ -20,4 +20,7 @@ interface VacancyDao {
 
     @Query("SELECT EXISTS(SELECT 1 FROM favorite_vacancies WHERE id = :id)")
     suspend fun isFavorite(id: String): Boolean
+
+    @Query("SELECT * FROM favorite_vacancies WHERE id = :id")
+    suspend fun getById(id: String): FavoriteVacancyEntity?
 }

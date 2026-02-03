@@ -70,6 +70,8 @@ dependencies {
     implementation(libs.ui.tooling.preview)
     implementation(libs.foundation.layout)
     implementation(libs.ui.graphics)
+    implementation(libs.foundation)
+    implementation(libs.androidx.foundation.layout)
     debugImplementation(libs.ui.tooling)
     ksp(libs.compiler)
     ksp(libs.room.compiler)

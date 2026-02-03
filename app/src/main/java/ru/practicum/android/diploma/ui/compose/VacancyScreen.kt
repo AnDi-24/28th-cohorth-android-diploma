@@ -13,7 +13,9 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
 import ru.practicum.android.diploma.presentation.VacancyDetailsViewModel
+import ru.practicum.android.diploma.ui.compose.components.NoInternetEmptyState
 import ru.practicum.android.diploma.ui.compose.components.VacancyDetails
+import ru.practicum.android.diploma.ui.compose.components.VacancyNotFoundEmptyState
 
 @Composable
 fun VacancyScreen(vacancyId: String?) {
@@ -56,6 +58,14 @@ fun VacancyScreen(vacancyId: String?) {
                     color = MaterialTheme.colorScheme.error
                 )
             }
+        }
+
+        is VacancyDetailsViewModel.VacancyUiState.NoInternet -> {
+            NoInternetEmptyState()
+        }
+
+        is VacancyDetailsViewModel.VacancyUiState.VacancyNotFound -> {
+            VacancyNotFoundEmptyState()
         }
     }
 }

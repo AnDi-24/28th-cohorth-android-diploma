@@ -8,4 +8,5 @@ interface FavoriteVacancyRepository {
     suspend fun deleteById(id: String)
     fun getAll(): Flow<List<FavoriteVacancyEntity>>
     suspend fun isFavorite(id: String): Boolean
+    suspend fun getById(id: String): FavoriteVacancyEntity?
 }
