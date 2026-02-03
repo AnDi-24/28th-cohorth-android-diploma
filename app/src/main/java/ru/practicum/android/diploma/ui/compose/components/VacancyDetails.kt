@@ -26,6 +26,9 @@ import ru.practicum.android.diploma.domain.network.models.Contacts
 import ru.practicum.android.diploma.domain.network.models.Salary
 import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
 
+private const val FIFTY = 50
+private const val THIRTY = 30
+private const val ABOUT_COMPANY = "О компании"
 @Composable
 fun VacancyDetails(
     vacancy: VacancyDetailsModel,
@@ -36,7 +39,6 @@ fun VacancyDetails(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-
         val formattedVacancyName = formatVacancyName(
             vacancyName = vacancy.name,
             companyName = vacancy.employer?.name
@@ -101,7 +103,7 @@ fun VacancyDetails(
 
 // Вспомогательные функции и компоненты
 
-//Серая карточка с лого, названием компании и городом
+// Серая карточка с лого, названием компании и городом
 @Composable
 private fun CompanyInfoCard(vacancy: VacancyDetailsModel) {
     Surface(
@@ -202,8 +204,6 @@ private fun ContactsSection(contacts: Contacts) {
         }
     }
 }
-
-
 @Composable
 private fun ContactItem(
     text: String
@@ -263,7 +263,7 @@ private fun DescriptionSection(description: String) {
         } else {
             // Отображаем все секции
             sections.forEach { section ->
-                if (section.title == "О компании") {
+                if (section.title == ABOUT_COMPANY) {
                     // Для секции "О компании" отображаем как абзацы
                     CompanyInfoSubsection(
                         title = section.title,
@@ -280,7 +280,7 @@ private fun DescriptionSection(description: String) {
 
             // Добавляем заглушки для отсутствующих стандартных секций
             val requiredTitles = listOf("Обязанности", "Требования", "Условия")
-            val existingStandardTitles = sections.filterNot { it.title == "О компании" }.map { it.title }
+            val existingStandardTitles = sections.filterNot { it.title == ABOUT_COMPANY }.map { it.title }
 
             requiredTitles.forEach { requiredTitle ->
                 if (!existingStandardTitles.contains(requiredTitle)) {
@@ -415,86 +415,91 @@ private fun getCurrencySymbol(currency: String): String {
 }
 
 private fun parseDescription(description: String): List<DescriptionSection> {
-    val sections = mutableListOf<DescriptionSection>()
+    val lines = preprocessDescription(description)
+    val (sections, otherLines) = parseLinesIntoSections(lines)
 
-    val lines = description.split("\n").map { it.trim() }
+    return buildFinalSections(sections, otherLines)
+}
+
+private fun preprocessDescription(description: String): List<String> {
+    return description.split("\n")
+        .map { it.trim() }
+        .filter { it.isNotBlank() }
+}
+
+private fun parseLinesIntoSections(lines: List<String>): Pair<List<DescriptionSection>, MutableList<String>> {
+    val sections = mutableListOf<DescriptionSection>()
+    val otherLines = mutableListOf<String>()
     var currentTitle: String? = null
     val currentItems = mutableListOf<String>()
-    val otherLines = mutableListOf<String>()
-
-    // Фразы для фильтрации
-    val filterPhrases = listOf(
-        "о нас", "о компании", "компания:", "компания",
-        "от компании", "информация о компании", "наша компания"
-    )
-
-    fun cleanText(text: String): String {
-        var cleaned = text.replace(Regex("^[•\\-\\*\\d+\\.\\s]+"), "").trim()
-
-        // Удаляем фильтруемые фразы
-        filterPhrases.forEach { phrase ->
-            val regex = Regex("\\b${Regex.escape(phrase)}\\b[\\s:]*", RegexOption.IGNORE_CASE)
-            cleaned = cleaned.replace(regex, "").trim()
-        }
-
-        return cleaned
-    }
-
-    fun isFilteredLine(line: String): Boolean {
-        val lowerLine = line.lowercase()
-        return filterPhrases.any { phrase ->
-            (lowerLine == phrase || lowerLine == "$phrase:") && line.length < 30
-        }
-    }
 
     for (line in lines) {
-        val lowerLine = line.lowercase()
+        val sectionTitle = detectSectionTitle(line)
 
         when {
-            lowerLine.contains("обязанности") && line.length < 50 -> {
+            sectionTitle != null -> {
                 addCurrentSection(sections, currentTitle, currentItems)
-                currentTitle = "Обязанности"
+                currentTitle = sectionTitle
             }
-
-            lowerLine.contains("требования") && line.length < 50 -> {
-                addCurrentSection(sections, currentTitle, currentItems)
-                currentTitle = "Требования"
+            currentTitle != null && line.length > 2 -> {
+                addToCurrentSection(currentItems, line)
             }
-
-            lowerLine.contains("условия") && line.length < 50 -> {
-                addCurrentSection(sections, currentTitle, currentItems)
-                currentTitle = "Условия"
-            }
-
-            line.isNotBlank() && line.length > 2 -> {
-                // Пропускаем строки только с фильтруемыми фразами
-                if (isFilteredLine(line)) {
-                    continue
-                }
-
-                if (currentTitle != null) {
-                    val cleaned = cleanText(line)
-                    if (cleaned.isNotBlank()) {
-                        currentItems.add(cleaned)
-                    }
-                } else {
-                    val cleaned = cleanText(line)
-                    if (cleaned.isNotBlank() && !isFilteredLine(cleaned)) {
-                        otherLines.add(cleaned)
-                    }
-                }
+            line.length > 2 -> {
+                addToOtherLines(otherLines, line)
             }
         }
     }
 
     addCurrentSection(sections, currentTitle, currentItems)
 
-    if (otherLines.isNotEmpty()) {
-        val companyText = otherLines.joinToString(" ")
-        sections.add(DescriptionSection("О компании", listOf(companyText)))
+    return Pair(sections, otherLines)
+}
+
+private fun detectSectionTitle(line: String): String? {
+    val lowerLine = line.lowercase()
+
+    return when {
+        lowerLine.contains("обязанности") && line.length < FIFTY -> "Обязанности"
+        lowerLine.contains("требования") && line.length < FIFTY -> "Требования"
+        lowerLine.contains("условия") && line.length < FIFTY -> "Условия"
+        else -> null
+    }
+}
+
+private fun addToCurrentSection(currentItems: MutableList<String>, line: String) {
+    if (shouldFilterLine(line)) return
+
+    val cleanedText = cleanText(line)
+    if (cleanedText.isNotBlank()) {
+        currentItems.add(cleanedText)
+    }
+}
+
+private fun addToOtherLines(otherLines: MutableList<String>, line: String) {
+    if (shouldFilterLine(line)) return
+
+    val cleanedText = cleanText(line)
+    if (cleanedText.isNotBlank()) {
+        otherLines.add(cleanedText)
+    }
+}
+
+private fun shouldFilterLine(line: String): Boolean {
+    val lowerLine = line.lowercase()
+    return FILTER_PHRASES.any { phrase ->
+        (lowerLine == phrase || lowerLine == "$phrase:") && line.length < THIRTY
+    }
+}
+
+private fun cleanText(text: String): String {
+    var cleaned = text.replace(Regex("^[•\\-\\*\\d+\\.\\s]+"), "").trim()
+
+    FILTER_PHRASES.forEach { phrase ->
+        val regex = Regex("\\b${Regex.escape(phrase)}\\b[\\s:]*", RegexOption.IGNORE_CASE)
+        cleaned = cleaned.replace(regex, "").trim()
     }
 
-    return sections
+    return cleaned
 }
 
 private fun addCurrentSection(
@@ -508,9 +513,32 @@ private fun addCurrentSection(
     }
 }
 
+private fun buildFinalSections(
+    sections: List<DescriptionSection>,
+    otherLines: MutableList<String>
+): List<DescriptionSection> {
+    val finalSections = sections.toMutableList()
+
+    if (otherLines.isNotEmpty()) {
+        val companyText = otherLines.joinToString(" ")
+        finalSections.add(DescriptionSection(ABOUT_COMPANY, listOf(companyText)))
+    }
+
+    return finalSections
+}
+
+private val FILTER_PHRASES = listOf(
+    "о нас",
+    ABOUT_COMPANY,
+    "компания:",
+    "компания",
+    "от компании",
+    "информация о компании",
+    "наша компания"
+)
+
 // Модель для секций описания
 data class DescriptionSection(
     val title: String,
     val items: List<String>
 )
-
