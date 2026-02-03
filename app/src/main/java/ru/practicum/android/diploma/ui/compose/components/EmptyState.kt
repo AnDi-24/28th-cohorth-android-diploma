@@ -29,7 +29,7 @@ fun EmptyState(
     imagePainter: Painter,
     imageHeight: Dp = 223.dp,
     titleText: String? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -73,6 +73,7 @@ fun SearchScreenEmptyState(
     EmptyState(
         imagePainter = painterResource(R.drawable.searching_man_image),
         imageHeight = 223.dp,
+        titleText = null,
         modifier = modifier
     )
 }
