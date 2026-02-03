@@ -2,7 +2,6 @@ package ru.practicum.android.diploma.data.network
 
 import android.util.Log
 import retrofit2.HttpException
-import java.io.IOException
 import ru.practicum.android.diploma.data.network.api.FindJobApi
 import ru.practicum.android.diploma.data.network.api.NetworkClient
 import ru.practicum.android.diploma.data.network.models.Response
@@ -11,6 +10,7 @@ import ru.practicum.android.diploma.data.network.models.VacancyDetailsResponse
 import ru.practicum.android.diploma.data.network.models.VacancyListRequest
 import ru.practicum.android.diploma.util.Resource
 import ru.practicum.android.diploma.util.ResponseState
+import java.io.IOException
 
 private const val TOKEN = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVC" +
     "J9.eyJpc3MiOiJwcmFjdGljdW0ucnUiLCJhdWQiOiJwcmFjdGljdW0ucnUiLCJ1c" +

@@ -69,4 +69,3 @@ fun VacancyScreen(vacancyId: String?) {
         }
     }
 }
-

@@ -25,7 +25,6 @@ class FindVacancyRepositoryImpl(
                 VacancyDetailsRequest(expression)
             )
             when (response.resultCode) {
-
                 ResponseState.SUCCESS -> {
                     val vacancyResponse = response as? VacancyDetailsResponse
                     val vacancy = vacancyResponse?.vacancyDto?.data
