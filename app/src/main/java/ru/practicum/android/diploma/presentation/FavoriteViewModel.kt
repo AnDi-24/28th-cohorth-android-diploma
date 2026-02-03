@@ -23,23 +23,23 @@ class FavoriteViewModel(
 
     private fun loadFavorites() {
         viewModelScope.launch {
-            favoriteInteractor.getAllFavoritesForList().collectLatest { vacancies ->
-                _uiState.value = if (vacancies.isEmpty()) {
-                    FavoriteUiState.Empty
-                } else {
-                    FavoriteUiState.Success(vacancies)
+            try {
+                favoriteInteractor.getAllFavoritesForList().collectLatest { vacancies ->
+                    _uiState.value = if (vacancies.isEmpty()) {
+                        FavoriteUiState.Empty
+                    } else {
+                        FavoriteUiState.Success(vacancies)
+                    }
                 }
+            } catch (e: Exception) {
+                _uiState.value = FavoriteUiState.Error
             }
-        }
-    }
 
-    fun removeFromFavorites(id: String) {
-        viewModelScope.launch {
-            favoriteInteractor.removeFromFavorites(id)
         }
     }
 
     fun refresh() {
+        _uiState.value = FavoriteUiState.Loading
         loadFavorites()
     }
 }
@@ -47,5 +47,6 @@ class FavoriteViewModel(
 sealed interface FavoriteUiState {
     object Loading : FavoriteUiState
     object Empty : FavoriteUiState
+    object Error : FavoriteUiState
     data class Success(val vacancies: List<VacancyDetailsModel>) : FavoriteUiState
 }

@@ -19,6 +19,7 @@ import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
 import ru.practicum.android.diploma.presentation.FavoriteUiState
 import ru.practicum.android.diploma.presentation.FavoriteViewModel
 import ru.practicum.android.diploma.ui.compose.components.FavoritesEmptyState
+import ru.practicum.android.diploma.ui.compose.components.VacancyFailedState
 import ru.practicum.android.diploma.ui.compose.components.VacancyListItem
 
 @Composable
@@ -49,6 +50,10 @@ fun FavoriteScreen(navController: NavController) {
                 vacancies = (uiState as FavoriteUiState.Success).vacancies,
                 navController = navController
             )
+        }
+
+        is FavoriteUiState.Error -> {
+            VacancyFailedState()
         }
     }
 }
