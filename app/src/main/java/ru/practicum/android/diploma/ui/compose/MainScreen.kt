@@ -45,7 +45,6 @@ import ru.practicum.android.diploma.ui.compose.components.VacancyFailedState
 import ru.practicum.android.diploma.ui.compose.components.VacancyListItem
 import ru.practicum.android.diploma.ui.theme.Typography
 
-
 @Composable
 fun MainScreen(
     viewModel: SearchViewModel,
