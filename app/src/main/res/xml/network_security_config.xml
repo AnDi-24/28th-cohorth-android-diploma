@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <debug-overrides>
+        <trust-anchors>
+            <!-- Trust user added CAs while debuggable only -->
+            <certificates src="user" />
+        </trust-anchors>
+    </debug-overrides>
+
+    <!-- Для debug-сборки разрешаем пользовательские сертификаты -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">10.0.2.2</domain>
+        <domain includeSubdomains="true">192.168.0.0/16</domain>
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </domain-config>
+</network-security-config>

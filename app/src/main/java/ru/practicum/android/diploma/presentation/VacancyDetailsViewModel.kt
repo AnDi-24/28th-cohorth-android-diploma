@@ -14,7 +14,6 @@ import ru.practicum.android.diploma.domain.local.api.FavoriteVacancyInteractor
 import ru.practicum.android.diploma.domain.network.api.FindVacancyInteractor
 import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
 import ru.practicum.android.diploma.util.Resource
-import ru.practicum.android.diploma.util.ResponseState
 import java.io.IOException
 
 class VacancyDetailsViewModel(
@@ -43,34 +42,57 @@ class VacancyDetailsViewModel(
 
     fun searchVacancyDetails(id: String) {
         setVacancyId(id)
-        _uiState.value = VacancyUiState.Loading
 
         viewModelScope.launch {
             try {
-                val result = retrofitInteractor.getVacancyDetails(id)
-
-                _uiState.value = when (result) {
-                    is Resource.Success -> {
-                        val vacancyModel = result.data
-                        if (vacancyModel != null) {
-                            currentVacancy = vacancyModel
-                            checkFavoriteStatus(vacancyModel.id)
-                            VacancyUiState.Success(vacancy = vacancyModel)
-                        } else {
-                            VacancyUiState.Error(ResponseState.NULL_DATA.errorMessage)
-                        }
-                    }
-
-                    is Resource.Error -> {
-                        VacancyUiState.Error(ResponseState.UNKNOWN.errorMessage)
-                    }
-                }
-
+                loadFromNetwork(id)
             } catch (e: IOException) {
-                _uiState.value = VacancyUiState.Error(
-                    "{${ResponseState.UNKNOWN.errorMessage}}: ${e.message}"
-                )
+                loadFromDatabase(id)
             }
+        }
+    }
+
+    private suspend fun loadFromNetwork(id: String) {
+        _uiState.value = VacancyUiState.Loading
+
+        val result = retrofitInteractor.getVacancyDetails(id)
+
+        when (result) {
+            is Resource.Success -> {
+                val vacancyModel = result.data
+                if (vacancyModel != null) {
+                    currentVacancy = vacancyModel
+                    checkFavoriteStatus(vacancyModel.id)
+                    _uiState.value = VacancyUiState.Success(vacancy = vacancyModel)
+                } else {
+                    removeIfFavorite(id)
+                    _uiState.value = VacancyUiState.VacancyNotFound
+                }
+            }
+
+            is Resource.Error -> {
+                val errorCode = result.errorCode
+
+                if (errorCode == 404 || errorCode == 403) {
+                    removeIfFavorite(id)
+                    _uiState.value = VacancyUiState.VacancyNotFound
+                } else {
+                    loadFromDatabase(id)
+                }
+            }
+        }
+    }
+
+    private suspend fun loadFromDatabase(id: String) {
+        _uiState.value = VacancyUiState.Loading
+
+        val favoriteVacancy = favoriteInteractor.getFavoriteVacancy(id)
+        if (favoriteVacancy != null) {
+            currentVacancy = favoriteVacancy
+            _isFavorite.value = true
+            _uiState.value = VacancyUiState.Success(vacancy = favoriteVacancy)
+        } else {
+            _uiState.value = VacancyUiState.NoInternet
         }
     }
 
@@ -136,6 +158,13 @@ class VacancyDetailsViewModel(
         }
     }
 
+    private suspend fun removeIfFavorite(vacancyId: String) {
+        if (favoriteInteractor.isFavorite(vacancyId)) {
+            favoriteInteractor.removeFromFavorites(vacancyId)
+            _isFavorite.value = false
+        }
+    }
+
     sealed class VacancyUiState {
         object Idle : VacancyUiState()
         object Loading : VacancyUiState()
@@ -144,5 +173,7 @@ class VacancyDetailsViewModel(
         ) : VacancyUiState()
 
         data class Error(val message: String) : VacancyUiState()
+        object NoInternet : VacancyUiState()
+        object VacancyNotFound : VacancyUiState()
     }
 }

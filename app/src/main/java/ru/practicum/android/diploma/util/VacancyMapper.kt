@@ -70,6 +70,78 @@ object VacancyMapper {
         )
     }
 
+    fun mapFromFavoriteVacancyEntityForDetails(entity: FavoriteVacancyEntity): VacancyDetailsModel {
+        return VacancyDetailsModel(
+            id = entity.id,
+            name = entity.name,
+            salary = entity.salaryCurrency?.let { currency ->
+                Salary(
+                    id = entity.id,
+                    currency = currency,
+                    from = entity.salaryFrom,
+                    to = entity.salaryTo
+                )
+            },
+            address = if (entity.addressCity != null || entity.addressRaw != null) {
+                Address(
+                    id = entity.id,
+                    city = entity.addressCity ?: "",
+                    street = entity.addressStreet,
+                    building = entity.addressBuilding,
+                    raw = entity.addressRaw
+                )
+            } else null,
+            experience = entity.experience?.let { experienceName ->
+                Experience(
+                    id = entity.id,
+                    name = experienceName
+                )
+            },
+            schedule = entity.schedule?.let { scheduleName ->
+                Schedule(
+                    id = entity.id,
+                    name = scheduleName
+                )
+            },
+            employment = entity.employment?.let { employmentName ->
+                Employment(
+                    id = entity.id,
+                    name = employmentName
+                )
+            },
+            contacts = if (entity.contactName != null || entity.contactEmail != null || entity.contactPhones != null) {
+                Contacts(
+                    id = entity.id,
+                    name = entity.contactName ?: "",
+                    email = entity.contactEmail,
+                    phones = entity.contactPhones?.split(";")?.map { phone ->
+                        Phone(
+                            comment = null,
+                            formatted = phone.trim()
+                        )
+                    } ?: emptyList()
+                )
+            } else null,
+            description = entity.description,
+            employer = entity.employerName?.let { employerName ->
+                Employer(
+                    id = entity.id,
+                    name = employerName,
+                    logo = entity.employerLogoUrl
+                )
+            },
+            area = entity.areaName?.let { areaName ->
+                Area(
+                    id = entity.id,
+                    name = areaName
+                )
+            },
+            skills = entity.skills?.split(", ")?.filter { it.isNotBlank() } ?: emptyList(),
+            url = entity.vacancyUrl,
+            industry = null
+        )
+    }
+
     fun mapperFromDto(vacancyDto: VacancyDto): VacancyDetailsModel {
         return VacancyDetailsModel(
             id = vacancyDto.id.orEmpty(),

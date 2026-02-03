@@ -8,4 +8,5 @@ interface FavoriteVacancyInteractor {
     suspend fun isFavorite(id: String): Boolean
     fun getAllFavoritesForList(): Flow<List<VacancyDetailsModel>>
     suspend fun removeFromFavorites(id: String)
+    suspend fun getFavoriteVacancy(id: String): VacancyDetailsModel?
 }

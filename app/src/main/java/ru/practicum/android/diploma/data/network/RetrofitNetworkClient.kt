@@ -45,6 +45,7 @@ class RetrofitNetworkClient(
         } catch (e: HttpException) {
             Response().apply {
                 resultCode = ResponseState.HTTP_EXCEPTION
+                errorCode = e.code()
             }
         }
     }
@@ -62,6 +63,11 @@ class RetrofitNetworkClient(
             ).apply { resultCode = ResponseState.SUCCESS }
         } catch (e: HttpException) {
             Log.d("RetrofitNetworkClient", "HttpException: ${e.message()}")
+            Response().apply {
+                resultCode = ResponseState.HTTP_EXCEPTION
+                errorCode = e.code()
+            }
+        } catch (e: Exception) {
             Response().apply {
                 resultCode = ResponseState.UNKNOWN
             }
@@ -82,8 +88,4 @@ class RetrofitNetworkClient(
             put("only_with_salary", request.onlyWithSalary.toString())
         }
     }
-
-//    private fun isConnected(): Boolean {
-//
-//    }
 }

@@ -38,8 +38,19 @@ class FindVacancyRepositoryImpl(
                     }
                 }
 
+                ResponseState.HTTP_EXCEPTION -> {
+                    val errorCode = response.errorCode
+                    Resource.Error(
+                        message = response.resultCode.errorMessage,
+                        errorCode = errorCode
+                    )
+                }
+
                 else -> {
-                    Resource.Error(message = response.resultCode.errorMessage)
+                    Resource.Error(
+                        message = response.resultCode.errorMessage,
+                        errorCode = null
+                    )
                 }
             }
         } catch (e: IOException) {
@@ -61,6 +72,7 @@ class FindVacancyRepositoryImpl(
                 onlyWithSalary = params.onlyWithSalary
             )
         )
+
         when (response.resultCode) {
             ResponseState.SUCCESS -> {
                 val found = (response as? VacancyListResponse)?.found ?: 0
@@ -74,7 +86,6 @@ class FindVacancyRepositoryImpl(
             ResponseState.HTTP_EXCEPTION -> emit(Resource.Error(ResponseState.HTTP_EXCEPTION.errorMessage))
             ResponseState.UNKNOWN -> emit(Resource.Error(ResponseState.UNKNOWN.errorMessage))
             ResponseState.INVALID_DTO_TYPE -> emit(Resource.Error(ResponseState.INVALID_DTO_TYPE.errorMessage))
-
         }
     }
 }
