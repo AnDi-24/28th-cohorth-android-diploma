@@ -3,6 +3,7 @@ package ru.practicum.android.diploma.presentation
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,6 +16,9 @@ import ru.practicum.android.diploma.domain.network.api.FindVacancyInteractor
 import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
 import ru.practicum.android.diploma.util.Resource
 import java.io.IOException
+
+private const val HTTP_NOT_FOUND = 404
+private const val HTTP_FORBIDDEN = 403
 
 class VacancyDetailsViewModel(
     val retrofitInteractor: FindVacancyInteractor,
@@ -47,6 +51,10 @@ class VacancyDetailsViewModel(
             try {
                 loadFromNetwork(id)
             } catch (e: IOException) {
+                logException(e)
+                loadFromDatabase(id)
+            } catch (e: IllegalStateException) {
+                logException(e)
                 loadFromDatabase(id)
             }
         }
@@ -73,7 +81,7 @@ class VacancyDetailsViewModel(
             is Resource.Error -> {
                 val errorCode = result.errorCode
 
-                if (errorCode == 404 || errorCode == 403) {
+                if (errorCode == HTTP_NOT_FOUND || errorCode == HTTP_FORBIDDEN) {
                     removeIfFavorite(id)
                     _uiState.value = VacancyUiState.VacancyNotFound
                 } else {
@@ -176,4 +184,8 @@ class VacancyDetailsViewModel(
         object NoInternet : VacancyUiState()
         object VacancyNotFound : VacancyUiState()
     }
+}
+
+private fun logException(exception: Exception) {
+    exception.message?.let { Log.e("RetrofitNetworkClient", it) }
 }

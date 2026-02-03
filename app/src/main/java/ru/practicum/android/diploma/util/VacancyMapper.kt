@@ -74,72 +74,121 @@ object VacancyMapper {
         return VacancyDetailsModel(
             id = entity.id,
             name = entity.name,
-            salary = entity.salaryCurrency?.let { currency ->
-                Salary(
-                    id = entity.id,
-                    currency = currency,
-                    from = entity.salaryFrom,
-                    to = entity.salaryTo
-                )
-            },
-            address = if (entity.addressCity != null || entity.addressRaw != null) {
-                Address(
-                    id = entity.id,
-                    city = entity.addressCity ?: "",
-                    street = entity.addressStreet,
-                    building = entity.addressBuilding,
-                    raw = entity.addressRaw
-                )
-            } else null,
-            experience = entity.experience?.let { experienceName ->
-                Experience(
-                    id = entity.id,
-                    name = experienceName
-                )
-            },
-            schedule = entity.schedule?.let { scheduleName ->
-                Schedule(
-                    id = entity.id,
-                    name = scheduleName
-                )
-            },
-            employment = entity.employment?.let { employmentName ->
-                Employment(
-                    id = entity.id,
-                    name = employmentName
-                )
-            },
-            contacts = if (entity.contactName != null || entity.contactEmail != null || entity.contactPhones != null) {
-                Contacts(
-                    id = entity.id,
-                    name = entity.contactName ?: "",
-                    email = entity.contactEmail,
-                    phones = entity.contactPhones?.split(";")?.map { phone ->
-                        Phone(
-                            comment = null,
-                            formatted = phone.trim()
-                        )
-                    } ?: emptyList()
-                )
-            } else null,
+            salary = createSalaryFromEntity(entity),
+            address = createAddressFromEntity(entity),
+            experience = createExperienceFromEntity(entity),
+            schedule = createScheduleFromEntity(entity),
+            employment = createEmploymentFromEntity(entity),
+            contacts = createContactsFromEntity(entity),
             description = entity.description,
-            employer = entity.employerName?.let { employerName ->
-                Employer(
-                    id = entity.id,
-                    name = employerName,
-                    logo = entity.employerLogoUrl
-                )
-            },
-            area = entity.areaName?.let { areaName ->
-                Area(
-                    id = entity.id,
-                    name = areaName
-                )
-            },
-            skills = entity.skills?.split(", ")?.filter { it.isNotBlank() } ?: emptyList(),
+            employer = createEmployerFromEntity(entity),
+            area = createAreaFromEntity(entity),
+            skills = createSkillsFromEntity(entity),
             url = entity.vacancyUrl,
             industry = null
         )
+    }
+
+    private fun createSalaryFromEntity(entity: FavoriteVacancyEntity): Salary? {
+        return entity.salaryCurrency?.let { currency ->
+            Salary(
+                id = entity.id,
+                currency = currency,
+                from = entity.salaryFrom,
+                to = entity.salaryTo
+            )
+        }
+    }
+
+    private fun createAddressFromEntity(entity: FavoriteVacancyEntity): Address? {
+        return if (entity.addressCity != null || entity.addressRaw != null) {
+            Address(
+                id = entity.id,
+                city = entity.addressCity ?: "",
+                street = entity.addressStreet,
+                building = entity.addressBuilding,
+                raw = entity.addressRaw
+            )
+        } else {
+            null
+        }
+    }
+
+    private fun createExperienceFromEntity(entity: FavoriteVacancyEntity): Experience? {
+        return entity.experience?.let { experienceName ->
+            Experience(
+                id = entity.id,
+                name = experienceName
+            )
+        }
+    }
+
+    private fun createScheduleFromEntity(entity: FavoriteVacancyEntity): Schedule? {
+        return entity.schedule?.let { scheduleName ->
+            Schedule(
+                id = entity.id,
+                name = scheduleName
+            )
+        }
+    }
+
+    private fun createEmploymentFromEntity(entity: FavoriteVacancyEntity): Employment? {
+        return entity.employment?.let { employmentName ->
+            Employment(
+                id = entity.id,
+                name = employmentName
+            )
+        }
+    }
+
+    private fun createContactsFromEntity(entity: FavoriteVacancyEntity): Contacts? {
+        return if (entity.contactName != null || entity.contactEmail != null || entity.contactPhones != null) {
+            Contacts(
+                id = entity.id,
+                name = entity.contactName ?: "",
+                email = entity.contactEmail,
+                phones = createPhonesFromEntity(entity)
+            )
+        } else {
+            null
+        }
+    }
+
+    private fun createPhonesFromEntity(entity: FavoriteVacancyEntity): List<Phone> {
+        return entity.contactPhones?.split(";")
+            ?.mapNotNull { phone ->
+                phone.trim().takeIf { it.isNotBlank() }?.let { formatted ->
+                    Phone(
+                        comment = null,
+                        formatted = formatted
+                    )
+                }
+            } ?: emptyList()
+    }
+
+    private fun createEmployerFromEntity(entity: FavoriteVacancyEntity): Employer? {
+        return entity.employerName?.let { employerName ->
+            Employer(
+                id = entity.id,
+                name = employerName,
+                logo = entity.employerLogoUrl
+            )
+        }
+    }
+
+    private fun createAreaFromEntity(entity: FavoriteVacancyEntity): Area? {
+        return entity.areaName?.let { areaName ->
+            Area(
+                id = entity.id,
+                name = areaName
+            )
+        }
+    }
+
+    private fun createSkillsFromEntity(entity: FavoriteVacancyEntity): List<String> {
+        return entity.skills?.split(", ")
+            ?.filter { it.isNotBlank() }
+            ?: emptyList()
     }
 
     fun mapperFromDto(vacancyDto: VacancyDto): VacancyDetailsModel {
@@ -281,7 +330,7 @@ object VacancyMapper {
             )
         } else {
             Employer(
-                id = dto.name ?: "", // Используем name как id
+                id = dto.name ?: "",
                 name = dto.name ?: "",
                 logo = dto.logo
             )

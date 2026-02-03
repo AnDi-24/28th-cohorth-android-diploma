@@ -1,5 +1,6 @@
 package ru.practicum.android.diploma.presentation
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -9,6 +10,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ru.practicum.android.diploma.domain.local.api.FavoriteVacancyInteractor
 import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
+import java.io.IOException
 
 class FavoriteViewModel(
     private val favoriteInteractor: FavoriteVacancyInteractor
@@ -31,10 +33,16 @@ class FavoriteViewModel(
                         FavoriteUiState.Success(vacancies)
                     }
                 }
-            } catch (e: Exception) {
+            } catch (e: IOException) {
+                logException("IO error loading favorites", e)
+                _uiState.value = FavoriteUiState.Error
+            } catch (e: IllegalStateException) {
+                logException("Illegal state loading favorites", e)
+                _uiState.value = FavoriteUiState.Error
+            } catch (e: IllegalArgumentException) {
+                logException("Illegal argument loading favorites", e)
                 _uiState.value = FavoriteUiState.Error
             }
-
         }
     }
 
@@ -49,4 +57,8 @@ sealed interface FavoriteUiState {
     object Empty : FavoriteUiState
     object Error : FavoriteUiState
     data class Success(val vacancies: List<VacancyDetailsModel>) : FavoriteUiState
+}
+
+private fun logException(message: String, exception: Exception) {
+    Log.e("FavoriteViewModel", "$message: ${exception.message}")
 }
