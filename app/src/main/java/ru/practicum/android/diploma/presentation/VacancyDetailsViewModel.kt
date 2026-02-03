@@ -1,5 +1,9 @@
 package ru.practicum.android.diploma.presentation
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -78,7 +82,7 @@ class VacancyDetailsViewModel(
                 val newFavoriteStatus = favoriteInteractor.isFavorite(currentVacancyValue.id)
                 _isFavorite.value = newFavoriteStatus
             } else if (currentVacancyId != null) {
-                val result = retrofitInteractor.getVacancyDetails(currentVacancyId!!)
+                val result = retrofitInteractor.getVacancyDetails(currentVacancyId ?: "")
                 if (result is Resource.Success) {
                     val vacancy = result.data
                     if (vacancy != null) {
@@ -96,6 +100,39 @@ class VacancyDetailsViewModel(
         viewModelScope.launch {
             val status = favoriteInteractor.isFavorite(vacancyId)
             _isFavorite.value = status
+        }
+    }
+
+    fun emailTo(context: Context, emailAddress: String) {
+        val sendIntent = Intent()
+        sendIntent.action = Intent.ACTION_SENDTO
+        sendIntent.data = "mailto:".toUri()
+        sendIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf(emailAddress))
+        sendIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        context.startActivity(sendIntent)
+    }
+
+    fun callTo(context: Context, phoneNumber: String) {
+        val cleanNumber = phoneNumber.replace(Regex("[^+0-9]"), "")
+        val intent = Intent(Intent.ACTION_DIAL).apply {
+            data = Uri.parse("tel:$cleanNumber")
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+        val chooserIntent = Intent.createChooser(intent, "Выберите приложение для звонка")
+        context.startActivity(chooserIntent)
+    }
+
+    fun shareVacancy(context: Context) {
+        viewModelScope.launch {
+            val result = retrofitInteractor.getVacancyDetails(currentVacancyId ?: "")
+            val vacancyModel = result.data
+            val shareIntent = Intent()
+            shareIntent.action = Intent.ACTION_SEND
+            shareIntent.putExtra(Intent.EXTRA_TEXT, vacancyModel?.url)
+            shareIntent.type = "text/plain"
+            val messageIntent = Intent.createChooser(shareIntent, null)
+            messageIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            context.startActivity(messageIntent)
         }
     }
 

@@ -21,7 +21,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ru.practicum.android.diploma.domain.network.models.Salary
 import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
-import ru.practicum.android.diploma.util.EmployerLogoGlide
 
 @Composable
 fun VacancyListItem(

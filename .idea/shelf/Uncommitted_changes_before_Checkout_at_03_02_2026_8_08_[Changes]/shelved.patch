@@ -1,0 +1,255 @@
+Index: app/src/main/java/ru/practicum/android/diploma/ui/compose/components/EmptyState.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ru.practicum.android.diploma.ui.compose.components\r\n\r\nimport androidx.compose.foundation.Image\r\nimport androidx.compose.foundation.layout.Arrangement\r\nimport androidx.compose.foundation.layout.Box\r\nimport androidx.compose.foundation.layout.Column\r\nimport androidx.compose.foundation.layout.Spacer\r\nimport androidx.compose.foundation.layout.fillMaxSize\r\nimport androidx.compose.foundation.layout.fillMaxWidth\r\nimport androidx.compose.foundation.layout.height\r\nimport androidx.compose.foundation.layout.padding\r\nimport androidx.compose.material3.MaterialTheme\r\nimport androidx.compose.material3.Text\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.compose.ui.Alignment\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.graphics.painter.Painter\r\nimport androidx.compose.ui.layout.ContentScale\r\nimport androidx.compose.ui.res.painterResource\r\nimport androidx.compose.ui.res.stringResource\r\nimport androidx.compose.ui.text.style.TextAlign\r\nimport androidx.compose.ui.tooling.preview.Preview\r\nimport androidx.compose.ui.unit.Dp\r\nimport androidx.compose.ui.unit.dp\r\nimport ru.practicum.android.diploma.R\r\n\r\n@Composable\r\nfun EmptyState(\r\n    imagePainter: Painter,\r\n    imageHeight: Dp = 223.dp,\r\n    titleText: String? = null,\r\n    modifier: Modifier = Modifier\r\n) {\r\n    Box(\r\n        modifier = Modifier.fillMaxSize(),\r\n        contentAlignment = Alignment.Center\r\n    ) {\r\n        Column(\r\n            modifier = Modifier\r\n                .fillMaxWidth()\r\n                .padding(horizontal = 16.dp),\r\n            horizontalAlignment = Alignment.CenterHorizontally,\r\n            verticalArrangement = Arrangement.Center\r\n        ) {\r\n            Image(\r\n                painter = imagePainter,\r\n                contentDescription = titleText ?: stringResource(R.string.empty),\r\n                modifier = Modifier\r\n                    .fillMaxWidth()\r\n                    .height(imageHeight),\r\n                contentScale = ContentScale.Fit\r\n            )\r\n\r\n            titleText?.let { text ->\r\n                Spacer(modifier = Modifier.height(16.dp))\r\n                Text(\r\n                    text = text,\r\n                    style = MaterialTheme.typography.titleMedium,\r\n                    textAlign = TextAlign.Center,\r\n                    modifier = Modifier\r\n                        .fillMaxWidth()\r\n                        .padding(horizontal = 46.dp)\r\n                )\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\n@Composable\r\nfun SearchScreenEmptyState(\r\n    modifier: Modifier = Modifier\r\n) {\r\n    EmptyState(\r\n        imagePainter = painterResource(R.drawable.searching_man_image),\r\n        imageHeight = 223.dp,\r\n        modifier = modifier\r\n    )\r\n}\r\n\r\n@Preview(showBackground = true)\r\n@Composable\r\nfun SearchScreenEmptyStatePreview() {\r\n    MaterialTheme {\r\n        SearchScreenEmptyState()\r\n    }\r\n}\r\n\r\n@Composable\r\nfun NoInternetEmptyState(\r\n    modifier: Modifier = Modifier\r\n) {\r\n    EmptyState(\r\n        imagePainter = painterResource(R.drawable.scull_image),\r\n        titleText = stringResource(R.string.no_internet),\r\n        imageHeight = 223.dp,\r\n        modifier = modifier\r\n    )\r\n}\r\n\r\n@Preview(showBackground = true)\r\n@Composable\r\nfun NoInternetEmptyStatePreview() {\r\n    MaterialTheme {\r\n        NoInternetEmptyState()\r\n    }\r\n}\r\n\r\n@Composable\r\nfun NoRegionEmptyState(\r\n    modifier: Modifier = Modifier\r\n) {\r\n    EmptyState(\r\n        imagePainter = painterResource(R.drawable.angry_cat_image),\r\n        titleText = stringResource(R.string.no_region),\r\n        imageHeight = 223.dp,\r\n        modifier = modifier\r\n    )\r\n}\r\n\r\n@Preview(showBackground = true)\r\n@Composable\r\nfun NoRegionEmptyStatePreview() {\r\n    MaterialTheme {\r\n        NoRegionEmptyState()\r\n    }\r\n}\r\n\r\n@Composable\r\nfun GetListFailedEmptyState(\r\n    modifier: Modifier = Modifier\r\n) {\r\n    EmptyState(\r\n        imagePainter = painterResource(R.drawable.magic_carpet_image),\r\n        titleText = stringResource(R.string.get_list_failed),\r\n        imageHeight = 223.dp,\r\n        modifier = modifier\r\n    )\r\n}\r\n\r\n@Preview(showBackground = true)\r\n@Composable\r\nfun GetListFailedEmptyStatePreview() {\r\n    MaterialTheme {\r\n        GetListFailedEmptyState()\r\n    }\r\n}\r\n\r\n@Composable\r\nfun VacancyNotFoundEmptyState(\r\n    modifier: Modifier = Modifier\r\n) {\r\n    EmptyState(\r\n        imagePainter = painterResource(R.drawable.fun_carpet_image),\r\n        titleText = stringResource(R.string.vacancy_not_found),\r\n        imageHeight = 223.dp,\r\n        modifier = modifier\r\n    )\r\n}\r\n\r\n@Preview(showBackground = true)\r\n@Composable\r\nfun VacancyNotFoundEmptyStatePreview() {\r\n    MaterialTheme {\r\n        VacancyNotFoundEmptyState()\r\n    }\r\n}\r\n\r\n@Composable\r\nfun ServerErrorMainEmptyState(\r\n    modifier: Modifier = Modifier\r\n) {\r\n    EmptyState(\r\n        imagePainter = painterResource(R.drawable.server_error_image),\r\n        titleText = stringResource(R.string.server_error),\r\n        imageHeight = 223.dp,\r\n        modifier = modifier\r\n    )\r\n}\r\n\r\n@Preview(showBackground = true)\r\n@Composable\r\nfun ServerErrorMainEmptyStatePreview() {\r\n    MaterialTheme {\r\n        ServerErrorMainEmptyState()\r\n    }\r\n}\r\n\r\n@Composable\r\nfun ServerErrorVacancyEmptyState(\r\n    modifier: Modifier = Modifier\r\n) {\r\n    EmptyState(\r\n        imagePainter = painterResource(R.drawable.server_error_cat_image),\r\n        titleText = stringResource(R.string.server_error),\r\n        imageHeight = 223.dp,\r\n        modifier = modifier\r\n    )\r\n}\r\n\r\n@Preview(showBackground = true)\r\n@Composable\r\nfun ServerErrorVacancyEmptyStatePreview() {\r\n    MaterialTheme {\r\n        ServerErrorVacancyEmptyState()\r\n    }\r\n}\r\n\r\n@Composable\r\nfun FavoritesEmptyState(\r\n    modifier: Modifier = Modifier\r\n) {\r\n    EmptyState(\r\n        imagePainter = painterResource(R.drawable.empty_list_image),\r\n        titleText = stringResource(R.string.empty_list),\r\n        imageHeight = 223.dp,\r\n        modifier = modifier\r\n    )\r\n}\r\n\r\n@Preview(showBackground = true)\r\n@Composable\r\nfun FavoritesEmptyStatePreview() {\r\n    MaterialTheme {\r\n        FavoritesEmptyState()\r\n    }\r\n}\r\n\r\n@Composable\r\nfun VacancyFailedState(\r\n    modifier: Modifier = Modifier\r\n) {\r\n    EmptyState(\r\n        imagePainter = painterResource(R.drawable.angry_cat_image),\r\n        titleText = stringResource(R.string.get_vacancy_failed),\r\n        imageHeight = 223.dp,\r\n        modifier = modifier\r\n    )\r\n}\r\n\r\n@Preview(showBackground = true)\r\n@Composable\r\nfun EmptyFavoritesStatePreview() {\r\n    MaterialTheme {\r\n        VacancyFailedState()\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/ru/practicum/android/diploma/ui/compose/components/EmptyState.kt b/app/src/main/java/ru/practicum/android/diploma/ui/compose/components/EmptyState.kt
+--- a/app/src/main/java/ru/practicum/android/diploma/ui/compose/components/EmptyState.kt	(revision 756a151a78cb9ac98975b6d0232456d691fa616c)
++++ b/app/src/main/java/ru/practicum/android/diploma/ui/compose/components/EmptyState.kt	(date 1769869577073)
+@@ -29,7 +29,7 @@
+     imagePainter: Painter,
+     imageHeight: Dp = 223.dp,
+     titleText: String? = null,
+-    modifier: Modifier = Modifier
++    modifier: Modifier
+ ) {
+     Box(
+         modifier = Modifier.fillMaxSize(),
+@@ -73,6 +73,7 @@
+     EmptyState(
+         imagePainter = painterResource(R.drawable.searching_man_image),
+         imageHeight = 223.dp,
++        titleText = null,
+         modifier = modifier
+     )
+ }
+Index: app/src/main/java/ru/practicum/android/diploma/ui/compose/VacancyScreen.kt
+===================================================================
+diff --git a/app/src/main/java/ru/practicum/android/diploma/ui/compose/VacancyScreen.kt b/app/src/main/java/ru/practicum/android/diploma/ui/compose/VacancyScreen.kt
+deleted file mode 100644
+--- a/app/src/main/java/ru/practicum/android/diploma/ui/compose/VacancyScreen.kt	(revision 756a151a78cb9ac98975b6d0232456d691fa616c)
++++ /dev/null	(revision 756a151a78cb9ac98975b6d0232456d691fa616c)
+@@ -1,221 +0,0 @@
+-package ru.practicum.android.diploma.ui.compose
+-
+-import androidx.compose.foundation.BorderStroke
+-import androidx.compose.foundation.layout.Arrangement
+-import androidx.compose.foundation.layout.Box
+-import androidx.compose.foundation.layout.PaddingValues
+-import androidx.compose.foundation.layout.Row
+-import androidx.compose.foundation.layout.fillMaxSize
+-import androidx.compose.foundation.layout.fillMaxWidth
+-import androidx.compose.foundation.layout.height
+-import androidx.compose.foundation.layout.padding
+-import androidx.compose.foundation.lazy.LazyColumn
+-import androidx.compose.material3.CircularProgressIndicator
+-import androidx.compose.material3.MaterialTheme
+-import androidx.compose.material3.Surface
+-import androidx.compose.material3.Text
+-import androidx.compose.runtime.Composable
+-import androidx.compose.runtime.LaunchedEffect
+-import androidx.compose.runtime.getValue
+-import androidx.compose.ui.Alignment
+-import androidx.compose.ui.Modifier
+-import androidx.compose.ui.text.font.FontWeight
+-import androidx.compose.ui.unit.dp
+-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+-import org.koin.androidx.compose.koinViewModel
+-import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
+-import ru.practicum.android.diploma.presentation.VacancyDetailsViewModel
+-
+-@Composable
+-fun VacancyScreen(vacancyId: String?) {
+-    val viewModel: VacancyDetailsViewModel = koinViewModel()
+-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+-    val currentState = uiState
+-
+-    LaunchedEffect(vacancyId) {
+-        if (vacancyId != null) {
+-            viewModel.searchVacancyDetails(vacancyId)
+-        }
+-    }
+-
+-    when (currentState) {
+-        VacancyDetailsViewModel.VacancyUiState.Loading -> {
+-            Box(
+-                modifier = Modifier.fillMaxSize(),
+-                contentAlignment = Alignment.Center
+-            ) {
+-                CircularProgressIndicator()
+-            }
+-        }
+-
+-        VacancyDetailsViewModel.VacancyUiState.Idle -> {
+-        }
+-
+-        is VacancyDetailsViewModel.VacancyUiState.Success -> {
+-            val vacancy = currentState.vacancy
+-            VacancyContent(vacancy)
+-        }
+-
+-        is VacancyDetailsViewModel.VacancyUiState.Error -> {
+-            Box(
+-                modifier = Modifier.fillMaxSize(),
+-                contentAlignment = Alignment.Center
+-            ) {
+-                Text(
+-                    text = currentState.message,
+-                    color = MaterialTheme.colorScheme.error
+-                )
+-            }
+-        }
+-    }
+-}
+-
+-@Composable
+-private fun VacancyContent(vacancy: VacancyDetailsModel) {
+-    LazyColumn(
+-        modifier = Modifier.fillMaxSize(),
+-        contentPadding = PaddingValues(16.dp),
+-        verticalArrangement = Arrangement.spacedBy(3.dp)
+-    ) {
+-        item {
+-            vacancy.url?.let {
+-                Text(
+-                    text = it,
+-                    fontWeight = FontWeight.Bold,
+-                    modifier = Modifier.fillMaxWidth()
+-                )
+-            }
+-        }
+-
+-        item {
+-            Text(
+-                text = vacancy.name,
+-                fontWeight = FontWeight.Bold,
+-                modifier = Modifier.fillMaxWidth()
+-            )
+-        }
+-
+-        item {
+-            Surface(
+-                modifier = Modifier
+-                    .fillMaxWidth()
+-                    .height(100.dp),
+-                shape = MaterialTheme.shapes.medium,
+-                color = MaterialTheme.colorScheme.surfaceVariant,
+-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+-            ) {
+-                Row(
+-                    modifier = Modifier
+-                        .fillMaxSize()
+-                        .padding(16.dp),
+-                    verticalAlignment = Alignment.CenterVertically,
+-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+-                ) {
+-                }
+-            }
+-        }
+-    }
+-}
+-
+-// @Composable
+-// fun VacancyScreen(navController: NavController) {
+-//    val viewModel: VacancyDetailsViewModel = koinViewModel()
+-//    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+-//    // Создаем локальную копию для smart cast
+-//    val currentState = uiState
+-//
+-//    val vacancyData: VacancyDetailsModel = when (currentState) {
+-//        is VacancyDetailsViewModel.VacancyUiState.Success -> {
+-//            val vacancy = currentState.vacancy
+-//            VacancyDetailsModel(
+-//                id = vacancy.id,
+-//                name = vacancy.name,
+-//                salary = vacancy.salary,
+-//                address = vacancy.address,
+-//                experience = vacancy.experience,
+-//                schedule = vacancy.schedule,
+-//                employment = vacancy.employment,
+-//                description = vacancy.description,
+-//                employer = vacancy.employer,
+-//                skills = vacancy.skills,
+-//                url = vacancy.url
+-//            )
+-//        }
+-//
+-//        else -> {
+-//        }
+-//    } as VacancyDetailsModel
+-//
+-//    LazyColumn(
+-//        modifier = Modifier.fillMaxSize(),
+-//        contentPadding = PaddingValues(16.dp),
+-//        verticalArrangement = Arrangement.spacedBy(3.dp)
+-//    ) {
+-//        item {
+-//            vacancyData.url?.let {
+-//                Text(
+-//                    text = it,
+-//                    fontWeight = FontWeight.Bold,
+-//                    modifier = Modifier.fillMaxWidth()
+-//                )
+-//            }
+-//        }
+-//
+-//        item {
+-// //            Text(
+-// //                text = vacancyData.salary,
+-// //                fontWeight = FontWeight.Bold,
+-// //                modifier = Modifier.fillMaxWidth()
+-// //            )
+-//        }
+-//
+-//        item {
+-//            Surface(
+-//                modifier = Modifier.fillMaxWidth()
+-//                    .height(100.dp),
+-//                shape = MaterialTheme.shapes.medium,
+-//                color = MaterialTheme.colorScheme.surfaceVariant,
+-//                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+-//            ) {
+-//                Row(
+-//                    modifier = Modifier
+-//                        .fillMaxSize()
+-//                        .padding(16.dp),
+-//                    verticalAlignment = Alignment.CenterVertically,
+-//                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+-//                ) {
+-//                    EmployerLogoGlide(
+-//                        logoUrl = vacancyData.url, // Используем URL логотипа
+-//                        modifier = Modifier
+-//                            .size(80.dp)
+-//                            .clip(RoundedCornerShape(8.dp))
+-//                    )
+-//                }
+-//            }
+-//        }
+-//    }
+-// }
+-// @Composable
+-// fun EmployerLogoGlide(
+-//    logoUrl: String?,
+-//    modifier: Modifier = Modifier
+-// ) {
+-//    AndroidView(
+-//        factory = { context ->
+-//            ImageView(context).apply {
+-//                scaleType = ImageView.ScaleType.CENTER_CROP
+-//                adjustViewBounds = true
+-//            }
+-//        },
+-//        update = { imageView ->
+-//            // Определяем что загружать
+-//            logoUrl?.let { url ->
+-//                Glide.with(imageView.context)
+-//                    .load(url)
+-//                    .placeholder(R.drawable.team)
+-//                    .into(imageView)
+-//            }
+-//        },
+-//        modifier = modifier
+-//    )
+-// }

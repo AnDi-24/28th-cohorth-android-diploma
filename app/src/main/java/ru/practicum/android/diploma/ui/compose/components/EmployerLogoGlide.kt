@@ -1,4 +1,4 @@
-package ru.practicum.android.diploma.util
+package ru.practicum.android.diploma.ui.compose.components
 
 import android.widget.ImageView
 import androidx.compose.runtime.Composable
