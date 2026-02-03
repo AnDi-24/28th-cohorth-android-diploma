@@ -156,7 +156,6 @@ private fun IdleState() {
 
 @Composable
 private fun LoadingState(colors: ColorScheme) {
-
     Box(
         modifier = Modifier
             .fillMaxSize()

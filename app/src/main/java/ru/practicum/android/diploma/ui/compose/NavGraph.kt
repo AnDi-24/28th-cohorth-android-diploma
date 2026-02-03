@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
@@ -61,89 +62,12 @@ fun NavGraph() {
     val viewModel: SearchViewModel = koinViewModel()
 
     val topBar: @Composable () -> Unit = {
-        when (currentRoute) {
-            MAIN -> {
-                TopBar(
-                    title = stringResource(R.string.main_screen),
-                    null,
-                    {
-                        IconButton(onClick = { navController.navigate(FILTER) }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_filters),
-                                contentDescription = null
-                            )
-                        }
-                    }
-                )
-            }
-
-            TEAM -> {
-                TopBar(
-                    title = stringResource(R.string.team_screen),
-                )
-            }
-
-            FILTER -> {
-                TopBar(
-                    title = stringResource(R.string.filter),
-                    { navController.popBackStack() }
-                )
-            }
-
-//            VACANCY -> {
-//                TopBar(
-//                    title = stringResource(R.string.vacancy),
-//                    { navController.popBackStack() },
-//                    {
-//                        IconButton(onClick = { /* логика поделиться */ }) {
-//                            Icon(
-//                                painter = painterResource(id = R.drawable.ic_sharing),
-//                                contentDescription = null
-//                            )
-//                        }
-//                        IconButton(onClick = { /* логика избранное */ }) {
-//                            Icon(
-//                                painter = painterResource(id = R.drawable.ic_favorites_off),
-//                                contentDescription = null
-//                            )
-//                        }
-//                    }
-//                )
-//            }
-
-            OPTION -> {
-                TopBar(
-                    title = stringResource(R.string.filter_option),
-                    { navController.popBackStack() }
-                )
-            }
-
-            FAVORITE -> {
-                TopBar(
-                    title = stringResource(R.string.favorite_screen)
-                )
-            }
-
-            is String -> {
-                if (currentRoute.startsWith(VACANCY)) {
-                    TopBar(
-                        title = stringResource(R.string.vacancy),
-                        { navController.popBackStack() },
-                        {
-                            ShareButton(vacancyViewModel)
-                            val vacancyId = backStackEntry?.arguments?.getString("id")
-                            LaunchedEffect(vacancyId) {
-                                if (vacancyId != null) {
-                                    vacancyViewModel.setVacancyId(vacancyId)
-                                }
-                            }
-
-                            FavoriteButton(vacancyViewModel)
-                        }
-                    )
-                }
-            }
-        }
+        TopBar(
+            currentRoute,
+            navController,
+            backStackEntry,
+            vacancyViewModel
+        )
     }
     Scaffold(
         topBar = topBar,
@@ -179,6 +103,77 @@ fun NavGraph() {
             }
             composable(OPTION) {
                 FilterOptionScreen()
+            }
+        }
+    }
+}
+
+@Composable
+fun TopBar(
+    currentRoute: String?,
+    navController: NavController,
+    backStackEntry: NavBackStackEntry? = null,
+    vacancyViewModel: VacancyDetailsViewModel
+) {
+    when (currentRoute) {
+        MAIN -> {
+            TopBar(
+                title = stringResource(R.string.main_screen),
+                null,
+                {
+                    IconButton(onClick = { navController.navigate(FILTER) }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_filters),
+                            contentDescription = null
+                        )
+                    }
+                }
+            )
+        }
+
+        TEAM -> {
+            TopBar(
+                title = stringResource(R.string.team_screen),
+            )
+        }
+
+        FILTER -> {
+            TopBar(
+                title = stringResource(R.string.filter),
+                { navController.popBackStack() }
+            )
+        }
+
+        OPTION -> {
+            TopBar(
+                title = stringResource(R.string.filter_option),
+                { navController.popBackStack() }
+            )
+        }
+
+        FAVORITE -> {
+            TopBar(
+                title = stringResource(R.string.favorite_screen)
+            )
+        }
+
+        is String -> {
+            if (currentRoute.startsWith(VACANCY)) {
+                TopBar(
+                    title = stringResource(R.string.vacancy),
+                    { navController.popBackStack() },
+                    {
+                        ShareButton(vacancyViewModel)
+                        val vacancyId = backStackEntry?.arguments?.getString("id")
+                        LaunchedEffect(vacancyId) {
+                            if (vacancyId != null) {
+                                vacancyViewModel.setVacancyId(vacancyId)
+                            }
+                        }
+
+                        FavoriteButton(vacancyViewModel)
+                    }
+                )
             }
         }
     }
