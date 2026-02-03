@@ -171,8 +171,7 @@ fun NavGraph() {
             }
             composable(
                 route = "$VACANCY/{id}",
-                arguments = listOf(
-                    navArgument("id") { type = NavType.StringType })
+                arguments = listOf(navArgument("id") { type = NavType.StringType })
             ) { backStackEntry ->
                 val vacancyId = backStackEntry.arguments?.getString("id")
                 VacancyScreen(vacancyId)

@@ -14,8 +14,7 @@ fun ShareButton(viewModel: VacancyDetailsViewModel) {
 
     IconButton(
         onClick = { viewModel.shareVacancy(context) }
-    )
-    {
+    ) {
         Icon(
             painter = painterResource(id = R.drawable.ic_sharing),
             contentDescription = null
