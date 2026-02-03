@@ -1,10 +1,14 @@
 package ru.practicum.android.diploma.ui.compose
 
+import android.content.Context
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,8 +23,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
 import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
@@ -30,6 +36,7 @@ import ru.practicum.android.diploma.presentation.VacancyDetailsViewModel
 fun VacancyScreen(vacancyId: String?) {
     val viewModel: VacancyDetailsViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     val currentState = uiState
 
@@ -54,7 +61,7 @@ fun VacancyScreen(vacancyId: String?) {
 
         is VacancyDetailsViewModel.VacancyUiState.Success -> {
             val vacancy = currentState.vacancy
-            VacancyContent(vacancy)
+            VacancyContent(vacancy, viewModel, context)
         }
 
         is VacancyDetailsViewModel.VacancyUiState.Error -> {
@@ -73,51 +80,71 @@ fun VacancyScreen(vacancyId: String?) {
 
 @Composable
 private fun VacancyContent(
-    vacancy: VacancyDetailsModel
+    vacancy: VacancyDetailsModel,
+    viewModel: VacancyDetailsViewModel,
+    context: Context
 ) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(3.dp)
-    ) {
-        item {
-            vacancy.url?.let {
+    Column() {
+        val phoneNumber = "+7(495)-123-456-78"
+        val email = "example1@yandex.ru"
+        Spacer(modifier = Modifier.padding(20.dp))
+        Text(
+            text = phoneNumber,
+            fontSize = 20.sp,
+            modifier = Modifier.clickable(onClick = { viewModel.callTo(context, phoneNumber) })
+        )
+        Spacer(modifier = Modifier.padding(20.dp))
+        Text(
+            text = email,
+            fontSize = 20.sp,
+            modifier = Modifier.clickable(onClick = { viewModel.emailTo(context, email) })
+        )
+        Spacer(modifier = Modifier.padding(20.dp))
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(3.dp)
+        ) {
+            item {
+                vacancy.url?.let {
+                    Text(
+                        text = it,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+
+            item {
                 Text(
-                    text = it,
+                    text = vacancy.name,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
-        }
 
-        item {
-            Text(
-                text = vacancy.name,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-
-        item {
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp),
-                shape = MaterialTheme.shapes.medium,
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
-            ) {
-                Row(
+            item {
+                Surface(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        .fillMaxWidth()
+                        .height(100.dp),
+                    shape = MaterialTheme.shapes.medium,
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
                 ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                    }
                 }
             }
         }
     }
+
 }
 
 // @Composable
