@@ -2,7 +2,6 @@ package ru.practicum.android.diploma.presentation
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.util.Log
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
@@ -145,7 +144,7 @@ class VacancyDetailsViewModel(
     fun callTo(context: Context, phoneNumber: String) {
         val cleanNumber = phoneNumber.replace(Regex("[^+0-9]"), "")
         val intent = Intent(Intent.ACTION_DIAL).apply {
-            data = Uri.parse("tel:$cleanNumber")
+            data = "tel:$cleanNumber".toUri()
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
         }
         val chooserIntent = Intent.createChooser(intent, "Выберите приложение для звонка")
@@ -154,11 +153,10 @@ class VacancyDetailsViewModel(
 
     fun shareVacancy(context: Context) {
         viewModelScope.launch {
-            val result = retrofitInteractor.getVacancyDetails(currentVacancyId ?: "")
-            val vacancyModel = result.data
+            loadFromDatabase(currentVacancyId ?: "")
             val shareIntent = Intent()
             shareIntent.action = Intent.ACTION_SEND
-            shareIntent.putExtra(Intent.EXTRA_TEXT, vacancyModel?.url)
+            shareIntent.putExtra(Intent.EXTRA_TEXT, currentVacancy?.url)
             shareIntent.type = "text/plain"
             val messageIntent = Intent.createChooser(shareIntent, null)
             messageIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
