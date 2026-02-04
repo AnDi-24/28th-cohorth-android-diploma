@@ -3,9 +3,9 @@ package ru.practicum.android.diploma.ui.compose.components
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -20,10 +20,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.presentation.SearchViewModel
+import ru.practicum.android.diploma.ui.theme.InputFieldHeight
+import ru.practicum.android.diploma.ui.theme.Spacing8
 
 private const val SEARCH_DEBOUNCE_DELAY = 2000L
 
@@ -52,11 +53,11 @@ fun SearchField(
         onValueChange = { newValue ->
             inputValue = newValue
         },
-        shape = RoundedCornerShape(12.dp),
+        shape = MaterialTheme.shapes.medium,
         modifier = Modifier
-            .height(70.dp)
+            .height(InputFieldHeight)
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = Spacing8),
         placeholder = { Text(label) },
         trailingIcon = {
             if (inputValue.isNotEmpty()) {

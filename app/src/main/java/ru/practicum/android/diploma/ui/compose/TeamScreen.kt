@@ -34,7 +34,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -43,6 +42,9 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import kotlinx.coroutines.delay
 import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.ui.compose.components.PositiveButton
+import ru.practicum.android.diploma.ui.theme.PulseButtonSize
+import ru.practicum.android.diploma.ui.theme.Spacing150
+import ru.practicum.android.diploma.ui.theme.Spacing50
 
 private const val APPEAR_DELAY = 500L
 private const val ANIMATION_TWEEN1 = 1000
@@ -92,7 +94,7 @@ fun CelebrationButton(
             isEnabled = true,
             modifier = Modifier
                 .clip(CircleShape)
-                .size(200.dp)
+                .size(PulseButtonSize)
                 .graphicsLayer {
                     scaleX = pulseScale
                     scaleY = pulseScale
@@ -145,7 +147,7 @@ fun FullScreenCelebration() {
                     )
                 ),
                 modifier = Modifier
-                    .padding(top = 50.dp)
+                    .padding(top = Spacing50)
             )
             AnimatedVisibility(
                 visible = visible,
@@ -168,7 +170,7 @@ fun FullScreenCelebration() {
                         )
                     ),
                     modifier = Modifier
-                        .padding(top = 150.dp)
+                        .padding(top = Spacing150)
                 )
             }
             AnimatedVisibility(
@@ -192,7 +194,7 @@ fun FullScreenCelebration() {
                         )
                     ),
                     modifier = Modifier
-                        .padding(top = 50.dp)
+                        .padding(top = Spacing50)
                 )
             }
             AnimatedVisibility(
@@ -216,7 +218,7 @@ fun FullScreenCelebration() {
                         )
                     ),
                     modifier = Modifier
-                        .padding(top = 50.dp)
+                        .padding(top = Spacing50)
                 )
             }
         }

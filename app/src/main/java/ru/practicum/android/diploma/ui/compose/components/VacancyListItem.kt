@@ -19,8 +19,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import ru.practicum.android.diploma.domain.network.models.Salary
 import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
+import ru.practicum.android.diploma.util.formatters.formatSalary
+import ru.practicum.android.diploma.util.formatters.formatVacancyNameForListItem
 
 @Composable
 fun VacancyListItem(
@@ -69,9 +70,10 @@ fun VacancyListItem(
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                val formattedVacancyName = formatVacancyName(
+                val formattedVacancyName = formatVacancyNameForListItem(
                     vacancyName = vacancy.name,
-                    companyName = vacancy.employer?.name
+                    companyName = vacancy.employer?.name,
+                    area = vacancy.area?.name
                 )
 
                 Text(
@@ -98,50 +100,5 @@ fun VacancyListItem(
                 }
             }
         }
-    }
-}
-
-private fun formatVacancyName(vacancyName: String, companyName: String?): String {
-    if (companyName.isNullOrBlank()) return vacancyName
-
-    var result = vacancyName
-    val lowerVacancyName = vacancyName.lowercase()
-    val lowerCompanyName = companyName.lowercase()
-
-    when {
-        lowerVacancyName.endsWith(" в $lowerCompanyName") -> {
-            result = vacancyName.removeSuffix(" в $companyName").trim()
-        }
-
-        lowerVacancyName.endsWith(lowerCompanyName) -> {
-            result = vacancyName.removeSuffix(companyName).trim()
-        }
-    }
-
-    return result
-}
-
-private fun formatSalary(salary: Salary?): String {
-    return buildString {
-        salary?.from?.let { from ->
-            salary.to?.let { to ->
-                append("от $from до $to")
-            } ?: append("от $from")
-        } ?: salary?.to?.let { to ->
-            append("до $to")
-        } ?: return "Зарплата не указана"
-
-        salary?.currency?.let { currency ->
-            append(" ${getCurrencySymbol(currency)}")
-        }
-    }
-}
-
-private fun getCurrencySymbol(currency: String): String {
-    return when (currency) {
-        "RUR", "RUB" -> "₽"
-        "USD" -> "$"
-        "EUR" -> "€"
-        else -> currency
     }
 }

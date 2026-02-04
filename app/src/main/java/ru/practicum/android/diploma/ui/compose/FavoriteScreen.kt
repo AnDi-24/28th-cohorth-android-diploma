@@ -11,7 +11,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import org.koin.androidx.compose.koinViewModel
@@ -21,6 +20,8 @@ import ru.practicum.android.diploma.presentation.FavoriteViewModel
 import ru.practicum.android.diploma.ui.compose.components.FavoritesEmptyState
 import ru.practicum.android.diploma.ui.compose.components.VacancyFailedState
 import ru.practicum.android.diploma.ui.compose.components.VacancyListItem
+import ru.practicum.android.diploma.ui.theme.Spacing16
+import ru.practicum.android.diploma.ui.theme.Spacing4
 
 @Composable
 fun FavoriteScreen(navController: NavController) {
@@ -69,7 +70,7 @@ private fun FavoriteVacanciesList(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = Spacing16)
         ) {
             items(
                 items = vacancies,
@@ -80,7 +81,7 @@ private fun FavoriteVacanciesList(
                     onClick = {
                         navController.navigate("$VACANCY/${vacancy.id}")
                     },
-                    modifier = Modifier.padding(vertical = 4.dp)
+                    modifier = Modifier.padding(vertical = Spacing4)
                 )
             }
         }
