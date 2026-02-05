@@ -53,7 +53,6 @@ class SearchViewModel(
     private var totalFound by mutableIntStateOf(0)
     private var lastShownToastMessage: String? = null
     private var currentQuery = ""
-    lateinit var chosenIndustry: IndustryModel
 
     init {
         val prefsId = prefsInteractor.getFilterSettings()?.industry ?: ""
@@ -61,7 +60,7 @@ class SearchViewModel(
 //        searchIndustries(prefsName)
 
         if (prefsId.isNotEmpty() && prefsName.isNotEmpty()) {
-            chosenIndustry = IndustryModel(prefsId, prefsName)
+            val chosenIndustry = IndustryModel(prefsId, prefsName)
             selectedIndustry(chosenIndustry)
         } else {
             searchIndustries("")
@@ -117,7 +116,6 @@ class SearchViewModel(
 
     fun searchIndustries(query: String) {
         searchJob?.cancel()
-
 
         searchJob = viewModelScope.launch {
             try {

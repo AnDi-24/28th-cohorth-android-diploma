@@ -13,6 +13,4 @@ sealed interface IndustryUiState {
     data class Selected(
         val industry: IndustryModel
     ) : IndustryUiState
-
-
 }
