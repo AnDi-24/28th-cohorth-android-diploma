@@ -8,13 +8,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -33,6 +36,7 @@ fun FilterOptionScreen(
     filterViewModel: FilterViewModel
 ) {
     val filterUiState by viewModel.filterUiState
+    var selectedIndex by remember { mutableStateOf(-1) }
 
     Column() {
         Box(modifier = Modifier.padding(16.dp)) {
@@ -43,24 +47,37 @@ fun FilterOptionScreen(
             )
         }
         when (filterUiState) {
-            is IndustryUiState.Selected ->
+            is IndustryUiState.OnSelect -> {
+                val selectedState = filterUiState as IndustryUiState.OnSelect
                 LazyColumn() {
-                    items((filterUiState as IndustryUiState.Selected).industries) { item ->
+                    itemsIndexed(selectedState.industries) { index, item ->
                         IndustriesItem(
                             item = item,
-                            isSelected = (filterUiState as IndustryUiState.Selected).selectedFlag,
+                            isSelected = index == selectedIndex,
                             onSelect = {
-                                viewModel.queryFiller(item)
+                                selectedIndex = index
+//                                viewModel.searchIndustries(item.name)
+                                viewModel.selectedIndustry(item)
                                 filterViewModel.updateIndustry(item.id)
+                                filterViewModel.updateIndustryName(item.name)
                             }
                         )
                     }
                 }
+            }
+
+            is IndustryUiState.Selected -> {
+                val selectedState = filterUiState as IndustryUiState.Selected
+                IndustriesItem(
+                    selectedState.industry,
+                    true,
+                    {}
+                )
+            }
 
             else ->
                 GetListFailedEmptyState()
         }
-
     }
 }
 
@@ -69,7 +86,6 @@ fun IndustriesItem(
     item: IndustryModel,
     isSelected: Boolean,
     onSelect: () -> Unit
-
 ) {
     Row(
         modifier = Modifier

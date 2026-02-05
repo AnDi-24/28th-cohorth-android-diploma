@@ -15,7 +15,8 @@ val presentationModule = module {
     viewModel {
         SearchViewModel(
             searchInteractor = get(),
-            industryInteractor = get()
+            industryInteractor = get(),
+            prefsInteractor = get()
         )
     }
 

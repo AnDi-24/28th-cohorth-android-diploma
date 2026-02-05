@@ -22,6 +22,7 @@ import ru.practicum.android.diploma.domain.network.api.industries.IndustriesInte
 import ru.practicum.android.diploma.domain.network.models.SearchParams
 import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
 import ru.practicum.android.diploma.domain.network.models.industries.IndustryModel
+import ru.practicum.android.diploma.domain.prefs.PrefsInteractor
 import ru.practicum.android.diploma.presentation.models.IndustryUiState
 import ru.practicum.android.diploma.presentation.models.VacancySearchUiState
 import ru.practicum.android.diploma.util.Resource
@@ -32,6 +33,7 @@ const val NETWORK_ERROR = "Ошибка сети"
 class SearchViewModel(
     val searchInteractor: FindVacancyInteractor,
     val industryInteractor: IndustriesInteractor,
+    val prefsInteractor: PrefsInteractor
 ) : ViewModel() {
 
     private var searchJob: Job? = null
@@ -39,7 +41,7 @@ class SearchViewModel(
     val uiState: State<VacancySearchUiState> get() = _uiState
     private val _toastMessage = MutableSharedFlow<String>()
 
-    private val _filterUiState = mutableStateOf<IndustryUiState>(IndustryUiState.Selected(emptyList(), false))
+    private val _filterUiState = mutableStateOf<IndustryUiState>(IndustryUiState.OnSelect(emptyList()))
     val filterUiState: State<IndustryUiState> get() = _filterUiState
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
@@ -51,9 +53,19 @@ class SearchViewModel(
     private var totalFound by mutableIntStateOf(0)
     private var lastShownToastMessage: String? = null
     private var currentQuery = ""
+    lateinit var chosenIndustry: IndustryModel
 
     init {
-        searchIndustries("")
+        val prefsId = prefsInteractor.getFilterSettings()?.industry ?: ""
+        val prefsName = prefsInteractor.getFilterSettings()?.industryName ?: ""
+//        searchIndustries(prefsName)
+
+        if (prefsId.isNotEmpty() && prefsName.isNotEmpty()) {
+            chosenIndustry = IndustryModel(prefsId, prefsName)
+            selectedIndustry(chosenIndustry)
+        } else {
+            searchIndustries("")
+        }
     }
 
     fun setSearchQuery(query: String) {
@@ -106,13 +118,14 @@ class SearchViewModel(
     fun searchIndustries(query: String) {
         searchJob?.cancel()
 
+
         searchJob = viewModelScope.launch {
             try {
                 when (val resource = industryInteractor.getIndustries()) {
                     is Resource.Success -> {
-                        _filterUiState.value = IndustryUiState.Selected(resource.data?.filter { industry ->
+                        _filterUiState.value = IndustryUiState.OnSelect(resource.data?.filter { industry ->
                             industry.name.contains(query, ignoreCase = true)
-                        } ?: emptyList(), false)
+                        } ?: emptyList())
                     }
 
                     is Resource.Error -> {
@@ -127,12 +140,9 @@ class SearchViewModel(
         }
     }
 
-    fun queryFiller(choose: IndustryModel) {
-        _searchQuery.value = choose.name
-        val chosenOne = listOf(
-            choose
-        )
-        _filterUiState.value = IndustryUiState.Selected(chosenOne, true)
+    fun selectedIndustry(industry: IndustryModel) {
+        _searchQuery.value = industry.name
+        _filterUiState.value = IndustryUiState.Selected(industry)
 
     }
 

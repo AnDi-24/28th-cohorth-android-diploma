@@ -6,8 +6,13 @@ sealed interface IndustryUiState {
 
     object Empty : IndustryUiState
 
-    data class Selected(
-        val industries: List<IndustryModel>,
-        val selectedFlag: Boolean
+    data class OnSelect(
+        val industries: List<IndustryModel>
     ) : IndustryUiState
+
+    data class Selected(
+        val industry: IndustryModel
+    ) : IndustryUiState
+
+
 }
