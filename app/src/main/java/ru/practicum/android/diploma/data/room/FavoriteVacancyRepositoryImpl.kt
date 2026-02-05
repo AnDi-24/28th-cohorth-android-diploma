@@ -1,7 +1,7 @@
-package ru.practicum.android.diploma.data.local
+package ru.practicum.android.diploma.data.room
 
 import kotlinx.coroutines.flow.Flow
-import ru.practicum.android.diploma.domain.local.api.FavoriteVacancyRepository
+import ru.practicum.android.diploma.domain.room.api.FavoriteVacancyRepository
 
 class FavoriteVacancyRepositoryImpl(
     val database: AppDatabase
