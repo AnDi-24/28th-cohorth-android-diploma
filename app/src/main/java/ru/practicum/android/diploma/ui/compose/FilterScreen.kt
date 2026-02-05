@@ -30,9 +30,12 @@ fun FilterScreen(navController: NavController) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Button(onClick = { navController.navigate(OPTION) }) {
+            Text("Выбрать опцию")
+        }
         Button(
             onClick = {
-                viewModel.updateIndustry("Va!!!!gon")
+                viewModel.loadFilters()
             }
         ) {
             Text(

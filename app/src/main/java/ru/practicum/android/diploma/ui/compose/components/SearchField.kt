@@ -13,16 +13,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.presentation.SearchViewModel
+import ru.practicum.android.diploma.ui.compose.FILTER
+import ru.practicum.android.diploma.ui.compose.MAIN
+import ru.practicum.android.diploma.ui.compose.OPTION
 import ru.practicum.android.diploma.ui.theme.InputFieldHeight
 import ru.practicum.android.diploma.ui.theme.Spacing8
 
@@ -31,17 +34,24 @@ private const val SEARCH_DEBOUNCE_DELAY = 2000L
 @Composable
 fun SearchField(
     label: String,
-    viewModel: SearchViewModel
+    viewModel: SearchViewModel,
+    screenTag: String,
 ) {
-    var query by rememberSaveable { mutableStateOf("") }
-    var inputValue by remember { mutableStateOf(query) }
+    val queryState = viewModel.searchQuery.collectAsStateWithLifecycle()
+    var inputValue by rememberSaveable { mutableStateOf(queryState.value) }
+
+    LaunchedEffect(queryState.value) {
+        if (queryState.value != inputValue) {
+            inputValue = queryState.value
+        }
+    }
 
     LaunchedEffect(inputValue) {
-        if (inputValue != query) {
+        if (inputValue != queryState.value) {
             delay(SEARCH_DEBOUNCE_DELAY)
-            query = inputValue
+            viewModel.setSearchQuery(inputValue)
             if (inputValue.isNotEmpty()) {
-                viewModel.searchVacancies(inputValue)
+                behaviorSelector(inputValue, screenTag, viewModel)
             } else {
                 viewModel.clearSearch()
             }
@@ -49,6 +59,7 @@ fun SearchField(
     }
 
     TextField(
+        maxLines = 1,
         value = inputValue,
         onValueChange = { newValue ->
             inputValue = newValue
@@ -59,12 +70,13 @@ fun SearchField(
             .fillMaxWidth()
             .padding(vertical = Spacing8),
         placeholder = { Text(label) },
+        label = shouldBeLabel(screenTag),
         trailingIcon = {
             if (inputValue.isNotEmpty()) {
                 IconButton(
                     onClick = {
                         inputValue = ""
-                        query = ""
+                        viewModel.setSearchQuery("")
                         viewModel.clearSearch()
                     }
                 ) {
@@ -89,4 +101,22 @@ fun SearchField(
             unfocusedIndicatorColor = Color.Transparent
         )
     )
+}
+
+private fun shouldBeLabel(tag: String): (@Composable () -> Unit)? {
+    return if (tag == FILTER) {
+        { Text("Ожидаемая зарплата") }
+    } else {
+        null
+    }
+}
+
+private fun behaviorSelector(
+    inputValue: String,
+    screenTag: String,
+    viewModel: SearchViewModel
+) {
+    if (screenTag == MAIN) viewModel.searchVacancies(inputValue)
+    if (screenTag == OPTION) viewModel.searchIndustries(inputValue)
+    if (screenTag == FILTER) TODO()
 }

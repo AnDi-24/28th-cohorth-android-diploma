@@ -34,6 +34,13 @@ class FilterViewModel(
         prefsInteractor.updateData(updated)
     }
 
+    fun updateIndustryName(industryName: String) {
+        val current = _filterState.value
+        val updated = current.copy(industryName = industryName)
+        _filterState.value = updated
+        prefsInteractor.updateData(updated)
+    }
+
     fun updateSalary(salary: Int) {
         val current = _filterState.value
         val updated = current.copy(salary = salary)

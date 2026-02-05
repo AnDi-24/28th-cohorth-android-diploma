@@ -11,12 +11,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import ru.practicum.android.diploma.domain.network.api.FindVacancyInteractor
+import ru.practicum.android.diploma.domain.network.api.industries.IndustriesInteractor
 import ru.practicum.android.diploma.domain.network.models.SearchParams
 import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
+import ru.practicum.android.diploma.domain.network.models.industries.IndustryModel
+import ru.practicum.android.diploma.domain.prefs.PrefsInteractor
+import ru.practicum.android.diploma.presentation.models.IndustryUiState
 import ru.practicum.android.diploma.presentation.models.VacancySearchUiState
 import ru.practicum.android.diploma.util.Resource
 import java.io.IOException
@@ -24,13 +31,20 @@ import java.io.IOException
 const val NETWORK_ERROR = "Ошибка сети"
 
 class SearchViewModel(
-    val interactor: FindVacancyInteractor
+    val searchInteractor: FindVacancyInteractor,
+    val industryInteractor: IndustriesInteractor,
+    val prefsInteractor: PrefsInteractor
 ) : ViewModel() {
 
     private var searchJob: Job? = null
     private val _uiState = mutableStateOf<VacancySearchUiState>(VacancySearchUiState.Idle)
     val uiState: State<VacancySearchUiState> get() = _uiState
     private val _toastMessage = MutableSharedFlow<String>()
+
+    private val _filterUiState = mutableStateOf<IndustryUiState>(IndustryUiState.OnSelect(emptyList()))
+    val filterUiState: State<IndustryUiState> get() = _filterUiState
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
     val toastMessage: SharedFlow<String> = _toastMessage.asSharedFlow()
     private var currentPage by mutableIntStateOf(0)
     private var maxPages by mutableIntStateOf(0)
@@ -39,6 +53,23 @@ class SearchViewModel(
     private var totalFound by mutableIntStateOf(0)
     private var lastShownToastMessage: String? = null
     private var currentQuery = ""
+
+    init {
+        val prefsId = prefsInteractor.getFilterSettings()?.industry ?: ""
+        val prefsName = prefsInteractor.getFilterSettings()?.industryName ?: ""
+//        searchIndustries(prefsName)
+
+        if (prefsId.isNotEmpty() && prefsName.isNotEmpty()) {
+            val chosenIndustry = IndustryModel(prefsId, prefsName)
+            selectedIndustry(chosenIndustry)
+        } else {
+            searchIndustries("")
+        }
+    }
+
+    fun setSearchQuery(query: String) {
+        _searchQuery.value = query
+    }
 
     fun searchVacancies(query: String, isLoadMore: Boolean = false) {
         searchJob?.cancel()
@@ -63,7 +94,7 @@ class SearchViewModel(
             }
 
             try {
-                interactor.getListVacancies(
+                searchInteractor.getListVacancies(
                     searchParams
                 ).collect { resource ->
                     when (resource) {
@@ -81,6 +112,36 @@ class SearchViewModel(
                 isError(NETWORK_ERROR, isLoadMore)
             }
         }
+    }
+
+    fun searchIndustries(query: String) {
+        searchJob?.cancel()
+
+        searchJob = viewModelScope.launch {
+            try {
+                when (val resource = industryInteractor.getIndustries()) {
+                    is Resource.Success -> {
+                        _filterUiState.value = IndustryUiState.OnSelect(resource.data?.filter { industry ->
+                            industry.name.contains(query, ignoreCase = true)
+                        } ?: emptyList())
+                    }
+
+                    is Resource.Error -> {
+                        handleError(resource.message ?: "")
+                    }
+                }
+
+            } catch (e: IOException) {
+                Log.d("Exception Message", "Exception $e")
+                handleError(NETWORK_ERROR)
+            }
+        }
+    }
+
+    fun selectedIndustry(industry: IndustryModel) {
+        _searchQuery.value = industry.name
+        _filterUiState.value = IndustryUiState.Selected(industry)
+
     }
 
     private fun isSuccess(resource: Resource<Triple<List<VacancyDetailsModel>, Int, Int>>) {
@@ -177,6 +238,8 @@ class SearchViewModel(
     fun clearSearch() {
         searchJob?.cancel()
         _uiState.value = VacancySearchUiState.Idle
+        searchIndustries("")
+        _searchQuery.value = ""
         vacanciesList.clear()
         currentPage = 0
         maxPages = 0
