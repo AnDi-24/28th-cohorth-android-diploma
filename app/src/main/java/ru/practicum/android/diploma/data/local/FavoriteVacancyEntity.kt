@@ -2,8 +2,9 @@ package ru.practicum.android.diploma.data.local
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import ru.practicum.android.diploma.FAVORITE_VACANCIES
 
-@Entity(tableName = "favorite_vacancies")
+@Entity(tableName = FAVORITE_VACANCIES)
 data class FavoriteVacancyEntity(
     @PrimaryKey
     val id: String,
