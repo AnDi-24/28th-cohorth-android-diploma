@@ -104,7 +104,7 @@ fun SearchField(
 }
 
 private fun shouldBeLabel(tag: String): (@Composable () -> Unit)? {
-    return if (tag == OPTION) {
+    return if (tag == FILTER) {
         { Text("Ожидаемая зарплата") }
     } else {
         null

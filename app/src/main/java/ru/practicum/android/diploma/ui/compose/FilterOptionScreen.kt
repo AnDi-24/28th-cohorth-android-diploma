@@ -20,6 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import ru.practicum.android.diploma.R
+import ru.practicum.android.diploma.domain.network.models.industries.IndustryModel
+import ru.practicum.android.diploma.presentation.FilterViewModel
 import ru.practicum.android.diploma.presentation.SearchViewModel
 import ru.practicum.android.diploma.presentation.models.IndustryUiState
 import ru.practicum.android.diploma.ui.compose.components.GetListFailedEmptyState
@@ -27,13 +29,13 @@ import ru.practicum.android.diploma.ui.compose.components.SearchField
 
 @Composable
 fun FilterOptionScreen(
-    viewModel: SearchViewModel
+    viewModel: SearchViewModel,
+    filterViewModel: FilterViewModel
 ) {
     val filterUiState by viewModel.filterUiState
 
     Column() {
-        Box(modifier = Modifier.padding(16.dp))
-        {
+        Box(modifier = Modifier.padding(16.dp)) {
             SearchField(
                 label = stringResource(R.string.request_placeholder),
                 viewModel = viewModel,
@@ -49,6 +51,7 @@ fun FilterOptionScreen(
                             isSelected = (filterUiState as IndustryUiState.Selected).selectedFlag,
                             onSelect = {
                                 viewModel.queryFiller(item)
+                                filterViewModel.updateIndustry(item.id)
                             }
                         )
                     }
@@ -63,7 +66,7 @@ fun FilterOptionScreen(
 
 @Composable
 fun IndustriesItem(
-    item: SearchViewModel.IndustriesExample,
+    item: IndustryModel,
     isSelected: Boolean,
     onSelect: () -> Unit
 

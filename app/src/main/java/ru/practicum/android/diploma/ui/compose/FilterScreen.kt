@@ -23,6 +23,8 @@ fun FilterScreen(navController: NavController) {
     val viewModel: FilterViewModel = koinViewModel()
     val filterData by viewModel.filterState.collectAsState()
 
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -30,9 +32,12 @@ fun FilterScreen(navController: NavController) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Button(onClick = { navController.navigate(OPTION) }) {
+            Text("Выбрать опцию")
+        }
         Button(
             onClick = {
-                viewModel.updateIndustry("Va!!!!gon")
+                viewModel.loadFilters()
             }
         ) {
             Text(
