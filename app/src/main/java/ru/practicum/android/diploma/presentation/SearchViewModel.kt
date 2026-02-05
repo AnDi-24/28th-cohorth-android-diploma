@@ -109,16 +109,16 @@ class SearchViewModel(
         searchJob = viewModelScope.launch {
             try {
                 when (val resource = industryInteractor.getIndustries()) {
-                        is Resource.Success -> {
-                            _filterUiState.value = IndustryUiState.Selected(resource.data?.filter { industry ->
-                                industry.name.contains(query, ignoreCase = true)
-                            } ?: emptyList(), false)
-                        }
-
-                        is Resource.Error -> {
-                            handleError(resource.message ?: "")
-                        }
+                    is Resource.Success -> {
+                        _filterUiState.value = IndustryUiState.Selected(resource.data?.filter { industry ->
+                            industry.name.contains(query, ignoreCase = true)
+                        } ?: emptyList(), false)
                     }
+
+                    is Resource.Error -> {
+                        handleError(resource.message ?: "")
+                    }
+                }
 
             } catch (e: IOException) {
                 Log.d("Exception Message", "Exception $e")

@@ -23,8 +23,6 @@ fun FilterScreen(navController: NavController) {
     val viewModel: FilterViewModel = koinViewModel()
     val filterData by viewModel.filterState.collectAsState()
 
-
-
     Column(
         modifier = Modifier
             .fillMaxSize()

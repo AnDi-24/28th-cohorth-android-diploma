@@ -56,14 +56,13 @@ fun NavGraph() {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val viewModel: SearchViewModel = koinViewModel()
     val vacancyViewModel: VacancyDetailsViewModel = koinViewModel()
-    val filterViewModel: FilterViewModel =koinViewModel ()
+    val filterViewModel: FilterViewModel = koinViewModel()
     val currentRoute = backStackEntry?.destination?.route
 
     val showBottomBar = when (currentRoute) {
         MAIN, FAVORITE, TEAM -> true
         else -> false
     }
-
 
     val topBar: @Composable () -> Unit = {
         TopBar(
