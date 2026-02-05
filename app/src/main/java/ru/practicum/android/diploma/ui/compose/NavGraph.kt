@@ -103,7 +103,7 @@ fun NavGraph() {
                 VacancyScreen(vacancyId)
             }
             composable(OPTION) {
-                FilterOptionScreen()
+                FilterOptionScreen(viewModel)
             }
         }
     }
