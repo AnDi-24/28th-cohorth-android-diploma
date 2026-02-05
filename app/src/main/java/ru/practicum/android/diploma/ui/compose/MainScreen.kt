@@ -75,7 +75,8 @@ fun MainScreen(
     Column(modifier = Modifier.padding(Spacing16)) {
         SearchField(
             label = stringResource(R.string.request_placeholder),
-            viewModel = viewModel
+            viewModel = viewModel,
+            MAIN
         )
 
         when (uiState) {
