@@ -1,7 +1,7 @@
 package ru.practicum.android.diploma.util
 
-import ru.practicum.android.diploma.data.room.FavoriteVacancyEntity
 import ru.practicum.android.diploma.data.network.models.VacancyDto
+import ru.practicum.android.diploma.data.room.FavoriteVacancyEntity
 import ru.practicum.android.diploma.domain.network.models.Address
 import ru.practicum.android.diploma.domain.network.models.Area
 import ru.practicum.android.diploma.domain.network.models.Contacts

@@ -3,7 +3,7 @@ package ru.practicum.android.diploma.domain.prefs
 import ru.practicum.android.diploma.data.prefs.PrefsStorageApi
 
 class PrefsInteractorImpl(
-private val prefsStorage: PrefsStorageApi<FilterSettingsModel>
+    private val prefsStorage: PrefsStorageApi<FilterSettingsModel>
 ) : PrefsInteractor {
     override fun getFilterSettings(): FilterSettingsModel? {
         return prefsStorage.getData()

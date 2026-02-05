@@ -16,6 +16,8 @@ import org.koin.androidx.compose.koinViewModel
 import ru.practicum.android.diploma.presentation.FilterViewModel
 import ru.practicum.android.diploma.ui.theme.Spacing16
 
+private const val MOK_SALARY = 14000
+
 @Composable
 fun FilterScreen(navController: NavController) {
     val viewModel: FilterViewModel = koinViewModel()
@@ -28,26 +30,30 @@ fun FilterScreen(navController: NavController) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Button(onClick = {
-//            navController.navigate(OPTION)
-            viewModel.updateIndustry("Va!!!!gon")
-        }
+        Button(
+            onClick = {
+                viewModel.updateIndustry("Va!!!!gon")
+            }
         ) {
             Text(
                 "Обновить отрасль"
             )
         }
-        Button(onClick = {
-            viewModel.updateSalary(4000)
-        }
+
+        Button(
+            onClick = {
+                viewModel.updateSalary(MOK_SALARY)
+            }
         ) {
             Text(
                 "Обновить зарплату"
             )
         }
-        Button(onClick = {
-            viewModel.updateShowSalary(true)
-        }
+
+        Button(
+            onClick = {
+                viewModel.updateShowSalary(true)
+            }
         ) {
             Text(
                 "Обновить чек-бокс"
