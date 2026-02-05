@@ -72,6 +72,7 @@ dependencies {
     implementation(libs.ui.graphics)
     implementation(libs.foundation)
     implementation(libs.androidx.foundation.layout)
+    implementation(libs.androidx.junit.ktx)
     debugImplementation(libs.ui.tooling)
     ksp(libs.compiler)
     ksp(libs.room.compiler)

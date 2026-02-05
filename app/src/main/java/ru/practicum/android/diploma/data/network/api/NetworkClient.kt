@@ -6,4 +6,6 @@ interface NetworkClient {
     suspend fun doRequestVacancyDetails(dto: Any): Response
 
     suspend fun getVacanciesList(dto: Any): Response
+
+    suspend fun getIndustries(): Response
 }
