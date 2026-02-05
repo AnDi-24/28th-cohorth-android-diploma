@@ -5,13 +5,13 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import ru.practicum.android.diploma.data.local.AppDatabase
-import ru.practicum.android.diploma.data.local.FavoriteVacancyRepositoryImpl
+import ru.practicum.android.diploma.data.room.AppDatabase
+import ru.practicum.android.diploma.data.room.FavoriteVacancyRepositoryImpl
 import ru.practicum.android.diploma.data.network.FindVacancyRepositoryImpl
 import ru.practicum.android.diploma.data.network.RetrofitNetworkClient
 import ru.practicum.android.diploma.data.network.api.FindJobApi
 import ru.practicum.android.diploma.data.network.api.NetworkClient
-import ru.practicum.android.diploma.domain.local.api.FavoriteVacancyRepository
+import ru.practicum.android.diploma.domain.room.api.FavoriteVacancyRepository
 import ru.practicum.android.diploma.domain.network.api.FindVacancyRepository
 
 val dataModule = module {
