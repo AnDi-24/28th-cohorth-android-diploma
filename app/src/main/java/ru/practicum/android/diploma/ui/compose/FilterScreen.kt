@@ -1,69 +1,133 @@
 package ru.practicum.android.diploma.ui.compose
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import org.koin.androidx.compose.koinViewModel
+import ru.practicum.android.diploma.R
+import ru.practicum.android.diploma.domain.prefs.FilterSettingsModel
 import ru.practicum.android.diploma.presentation.FilterViewModel
+import ru.practicum.android.diploma.presentation.SearchViewModel
+import ru.practicum.android.diploma.ui.compose.components.IndustrySelectionButton
+import ru.practicum.android.diploma.ui.compose.components.NegativeButton
+import ru.practicum.android.diploma.ui.compose.components.PositiveButton
+import ru.practicum.android.diploma.ui.compose.components.SalaryInputField
 import ru.practicum.android.diploma.ui.theme.Spacing16
-
-private const val MOK_SALARY = 14000
+import ru.practicum.android.diploma.ui.theme.Spacing8
 
 @Composable
 fun FilterScreen(navController: NavController) {
     val viewModel: FilterViewModel = koinViewModel()
-    val filterData by viewModel.filterState.collectAsState()
+    val searchViewModel: SearchViewModel = koinViewModel()
+    val filterState by viewModel.filterState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.loadFilters()
+    }
+
+    FilterScreenContent(
+        filterState = filterState,
+        onIndustryClick = {
+            navController.navigate(OPTION)
+        },
+        onIndustryClear = {
+            viewModel.updateIndustry("")
+            viewModel.updateIndustryName("")
+        },
+        onSalaryChanged = { salaryText ->
+            val salary = salaryText.toIntOrNull() ?: 0
+            viewModel.updateSalary(salary)
+        },
+        onSalaryClear = {
+            viewModel.updateSalary(0)
+        },
+        onApplyFilters = {
+            searchViewModel.searchWithFilters()
+            navController.popBackStack()
+        },
+        onResetFilters = {
+            viewModel.updateIndustry("")
+            viewModel.updateIndustryName("")
+            viewModel.updateSalary(0)
+            viewModel.updateShowSalary(false)
+            searchViewModel.searchWithFilters()
+        }
+    )
+}
+
+@Composable
+fun FilterScreenContent(
+    filterState: FilterSettingsModel,
+    onIndustryClick: () -> Unit,
+    onIndustryClear: () -> Unit,
+    onSalaryChanged: (String) -> Unit,
+    onSalaryClear: () -> Unit,
+    onApplyFilters: () -> Unit,
+    onResetFilters: () -> Unit
+) {
+    val hasFiltersSelected = filterState.industry.isNotEmpty() || filterState.salary > 0
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(Spacing16),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+            .background(MaterialTheme.colorScheme.background)
     ) {
-        Button(onClick = { navController.navigate(OPTION) }) {
-            Text("Выбрать опцию")
-        }
-        Button(
-            onClick = {
-                viewModel.loadFilters()
-            }
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .padding(Spacing16),
+            verticalArrangement = Arrangement.spacedBy(Spacing8)
         ) {
-            Text(
-                "Обновить отрасль"
+            IndustrySelectionButton(
+                modifier = Modifier.fillMaxWidth(),
+                isIndustrySelected = filterState.industry.isNotEmpty(),
+                selectedIndustryName = filterState.industryName.takeIf { it.isNotEmpty() },
+                onClearClick = onIndustryClear,
+                onClick = onIndustryClick
+            )
+
+            Spacer(modifier = Modifier.height(Spacing16))
+
+            SalaryInputField(
+                modifier = Modifier.fillMaxWidth(),
+                salaryText = if (filterState.salary > 0) filterState.salary.toString() else "",
+                onSalaryChanged = onSalaryChanged,
+                onClearClick = onSalaryClear
             )
         }
 
-        Button(
-            onClick = {
-                viewModel.updateSalary(MOK_SALARY)
-            }
-        ) {
-            Text(
-                "Обновить зарплату"
-            )
-        }
+        if (hasFiltersSelected) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(Spacing16),
+                verticalArrangement = Arrangement.spacedBy(Spacing8)
+            ) {
+                PositiveButton(
+                    text = R.string.select,
+                    onClick = onApplyFilters,
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-        Button(
-            onClick = {
-                viewModel.updateShowSalary(true)
+                NegativeButton(
+                    text = R.string.reset,
+                    onClick = onResetFilters,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
-        ) {
-            Text(
-                "Обновить чек-бокс"
-            )
         }
-        Text(filterData.industry)
-        Text(filterData.salary.toString())
-        Text(filterData.showSalary.toString())
     }
 }

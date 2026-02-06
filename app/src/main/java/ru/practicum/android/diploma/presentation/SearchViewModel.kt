@@ -11,12 +11,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import ru.practicum.android.diploma.domain.network.api.FindVacancyInteractor
+import ru.practicum.android.diploma.domain.network.api.industries.IndustriesInteractor
 import ru.practicum.android.diploma.domain.network.models.SearchParams
 import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
+import ru.practicum.android.diploma.domain.network.models.industries.IndustryModel
+import ru.practicum.android.diploma.domain.prefs.FilterSettingsModel
+import ru.practicum.android.diploma.domain.prefs.PrefsInteractor
+import ru.practicum.android.diploma.presentation.models.IndustryUiState
 import ru.practicum.android.diploma.presentation.models.VacancySearchUiState
 import ru.practicum.android.diploma.util.Resource
 import java.io.IOException
@@ -24,13 +32,59 @@ import java.io.IOException
 const val NETWORK_ERROR = "Ошибка сети"
 
 class SearchViewModel(
-    val searchInteractor: FindVacancyInteractor
+    private val searchInteractor: FindVacancyInteractor,
+    private val industryInteractor: IndustriesInteractor,
+    private val prefsInteractor: PrefsInteractor
 ) : ViewModel() {
+    private var lastRequestString: String = ""
+
+    // Функция для формирования строки запроса
+    private fun buildRequestString(
+        query: String,
+        industryId: Int?,
+        salary: Int?,
+        page: Int,
+        showSalary: Boolean
+    ): String {
+        val params = mutableListOf<String>()
+
+        if (query.isNotEmpty()) params.add("text=$query")
+        industryId?.let { params.add("industry=$it") }
+        salary?.takeIf { it > 0 }?.let { params.add("salary=$it") }
+        params.add("page=$page")
+        if (showSalary) params.add("only_with_salary=true")
+
+        // Сортируем параметры для стабильного сравнения
+        return params.sorted().joinToString("&")
+    }
+
+    // Проверяем, изменился ли запрос
+    private fun hasRequestChanged(newRequestString: String): Boolean {
+        return newRequestString != lastRequestString
+    }
+
+    private fun updateLastRequest(newRequestString: String) {
+        lastRequestString = newRequestString
+        Log.d("SearchViewModel", "Сохранен запрос: $newRequestString")
+    }
+
+    private var lastAppliedFilters: FilterSettingsModel? = null
+    private var filtersHash: Int = 0
 
     private var searchJob: Job? = null
     private val _uiState = mutableStateOf<VacancySearchUiState>(VacancySearchUiState.Idle)
     val uiState: State<VacancySearchUiState> get() = _uiState
     private val _toastMessage = MutableSharedFlow<String>()
+
+    private val _filterUiState = mutableStateOf<IndustryUiState>(IndustryUiState.OnSelect(emptyList()))
+    val filterUiState: State<IndustryUiState> get() = _filterUiState
+
+    private val _vacancySearchQuery = MutableStateFlow("")
+    val vacancySearchQuery: StateFlow<String> = _vacancySearchQuery.asStateFlow()
+
+    private val _industrySearchQuery = MutableStateFlow("")
+    val industrySearchQuery: StateFlow<String> = _industrySearchQuery.asStateFlow()
+
     val toastMessage: SharedFlow<String> = _toastMessage.asSharedFlow()
     private var currentPage by mutableIntStateOf(0)
     private var maxPages by mutableIntStateOf(0)
@@ -40,18 +94,97 @@ class SearchViewModel(
     private var lastShownToastMessage: String? = null
     private var currentQuery = ""
 
+    private var searchDebounceJob: Job? = null
+
+    init {
+        loadLastAppliedFilters()
+        searchIndustries("")
+    }
+
+    private fun loadLastAppliedFilters() {
+        lastAppliedFilters = prefsInteractor.getFilterSettings()
+        filtersHash = lastAppliedFilters.hashCode()
+    }
+
+    fun setVacancySearchQuery(query: String) {
+        _vacancySearchQuery.value = query
+    }
+
+    fun setIndustrySearchQuery(query: String) {
+        _industrySearchQuery.value = query
+    }
+
     fun searchVacancies(query: String, isLoadMore: Boolean = false) {
         searchJob?.cancel()
 
-        loadLogic(query = query, isLoadMore = isLoadMore)
+        if (query.isEmpty() && !isLoadMore) {
+            clearSearch()
+            return
+        }
 
+        val filters = prefsInteractor.getFilterSettings()
+        val industryId = filters?.industry?.takeIf { it.isNotEmpty() }?.toIntOrNull()
+        val page = if (isLoadMore) currentPage else 0
+
+        // Формируем строку текущего запроса
+        val currentRequestString = buildRequestString(
+            query = query,
+            industryId = industryId,
+            salary = filters?.salary,
+            page = page,
+            showSalary = filters?.showSalary ?: false
+        )
+
+        // Для дозагрузки всегда выполняем
+        if (isLoadMore) {
+            // Логируем запрос
+            Log.d("API_DEBUG", "GET {{baseUrl}}/vacancies?$currentRequestString")
+
+            // Выполняем поиск
+            executeSearch(query, industryId, filters, page, isLoadMore)
+            return
+        }
+
+        // Для нового поиска проверяем, изменился ли запрос
+        val requestChanged = hasRequestChanged(currentRequestString)
+
+        if (requestChanged) {
+            // Логируем запрос
+            Log.d("API_DEBUG", "GET {{baseUrl}}/vacancies?$currentRequestString")
+
+            // Сохраняем новый запрос
+            updateLastRequest(currentRequestString)
+
+            // Сбрасываем состояние для нового поиска
+            currentQuery = query
+            currentPage = 0
+            maxPages = 0
+            vacanciesList.clear()
+            isLoadingMore = false
+            lastShownToastMessage = null
+
+            // Выполняем поиск
+            executeSearch(query, industryId, filters, page, isLoadMore)
+        } else {
+            Log.d("SearchViewModel", "Запрос не изменился: $currentRequestString")
+            Log.d("SearchViewModel", "Предыдущий запрос: $lastRequestString")
+        }
+    }
+
+    private fun executeSearch(
+        query: String,
+        industryId: Int?,
+        filters: FilterSettingsModel?,
+        page: Int,
+        isLoadMore: Boolean
+    ) {
         val searchParams = SearchParams(
             area = null,
-            industry = null,
+            industry = industryId,
             text = query,
-            salary = null,
-            page = currentPage,
-            onlyWithSalary = false
+            salary = filters?.salary?.takeIf { it > 0 },
+            page = page,
+            onlyWithSalary = filters?.showSalary ?: false
         )
 
         searchJob = viewModelScope.launch {
@@ -63,9 +196,7 @@ class SearchViewModel(
             }
 
             try {
-                searchInteractor.getListVacancies(
-                    searchParams
-                ).collect { resource ->
+                searchInteractor.getListVacancies(searchParams).collect { resource ->
                     when (resource) {
                         is Resource.Success -> {
                             isSuccess(resource)
@@ -77,9 +208,48 @@ class SearchViewModel(
                     }
                 }
             } catch (e: IOException) {
-                Log.d("Exception Message", "Exception $e")
                 isError(NETWORK_ERROR, isLoadMore)
             }
+        }
+    }
+
+    fun searchIndustries(query: String) {
+        searchJob?.cancel()
+
+        searchJob = viewModelScope.launch {
+            try {
+                when (val resource = industryInteractor.getIndustries()) {
+                    is Resource.Success -> {
+                        val allIndustries = resource.data ?: emptyList()
+                        val filteredIndustries = if (query.isNotEmpty()) {
+                            allIndustries.filter { industry ->
+                                industry.name.contains(query, ignoreCase = true)
+                            }
+                        } else {
+                            allIndustries
+                        }
+                        _filterUiState.value = IndustryUiState.OnSelect(filteredIndustries)
+                    }
+
+                    is Resource.Error -> {
+                        // Просто логируем ошибку для отраслей
+                        Log.d("SearchViewModel", "Error loading industries: ${resource.message}")
+                    }
+                }
+            } catch (e: IOException) {
+                Log.d("SearchViewModel", "Network error loading industries: $e")
+            }
+        }
+    }
+
+    fun selectedIndustry(industry: IndustryModel) {
+        _industrySearchQuery.value = industry.name
+        _filterUiState.value = IndustryUiState.Selected(industry)
+    }
+
+    fun searchWithFilters() {
+        viewModelScope.launch {
+            searchVacancies(currentQuery)
         }
     }
 
@@ -87,10 +257,9 @@ class SearchViewModel(
         val data = resource.data
         val newVacancies = data?.first ?: emptyList()
         totalFound = data?.second ?: 0
-        maxPages = resource.data?.third ?: 0
+        maxPages = data?.third ?: 0
 
         vacanciesList.addAll(newVacancies)
-
         currentPage++
 
         if (vacanciesList.isEmpty()) {
@@ -144,28 +313,8 @@ class SearchViewModel(
         }
     }
 
-    private fun loadLogic(query: String, isLoadMore: Boolean = false) {
-        if (query.isEmpty()) {
-            clearSearch()
-        }
-
-        if (!isLoadMore || currentQuery != query) {
-            currentQuery = query
-            currentPage = 1
-            maxPages = 0
-            vacanciesList.clear()
-            isLoadingMore = false
-            lastShownToastMessage = null
-        }
-
-        if (isLoadMore && isLastPage()) {
-            isLoadingMore = false
-            return
-        }
-    }
-
     private fun isLastPage(): Boolean {
-        return maxPages in 1..currentPage
+        return maxPages > 0 && currentPage >= maxPages
     }
 
     fun loadMoreVacancies() {
@@ -176,7 +325,9 @@ class SearchViewModel(
 
     fun clearSearch() {
         searchJob?.cancel()
+        searchDebounceJob?.cancel()
         _uiState.value = VacancySearchUiState.Idle
+        _vacancySearchQuery.value = ""
         vacanciesList.clear()
         currentPage = 0
         maxPages = 0
@@ -188,6 +339,7 @@ class SearchViewModel(
     override fun onCleared() {
         super.onCleared()
         searchJob?.cancel()
+        searchDebounceJob?.cancel()
     }
 
     private fun handleError(errorMessage: String?): VacancySearchUiState {
@@ -206,4 +358,5 @@ class SearchViewModel(
             else -> "Произошла ошибка"
         }
     }
+
 }
