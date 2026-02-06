@@ -31,6 +31,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import org.koin.androidx.compose.koinViewModel
 import ru.practicum.android.diploma.R
+import ru.practicum.android.diploma.presentation.FilterOptionViewModel
 import ru.practicum.android.diploma.presentation.FilterViewModel
 import ru.practicum.android.diploma.presentation.SearchViewModel
 import ru.practicum.android.diploma.presentation.VacancyDetailsViewModel
@@ -57,6 +58,7 @@ fun NavGraph() {
     val viewModel: SearchViewModel = koinViewModel()
     val vacancyViewModel: VacancyDetailsViewModel = koinViewModel()
     val filterViewModel: FilterViewModel = koinViewModel()
+    val filterOptionViewModel: FilterOptionViewModel = koinViewModel()
     val currentRoute = backStackEntry?.destination?.route
 
     val showBottomBar = when (currentRoute) {
@@ -105,7 +107,7 @@ fun NavGraph() {
                 VacancyScreen(vacancyId)
             }
             composable(OPTION) {
-                FilterOptionScreen(viewModel, filterViewModel)
+                FilterOptionScreen(filterOptionViewModel, filterViewModel, navController)
             }
         }
     }
