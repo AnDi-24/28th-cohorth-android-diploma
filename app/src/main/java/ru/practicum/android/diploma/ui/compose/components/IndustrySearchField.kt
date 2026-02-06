@@ -22,51 +22,39 @@ import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import ru.practicum.android.diploma.R
-import ru.practicum.android.diploma.presentation.SearchViewModel
-import ru.practicum.android.diploma.ui.compose.FILTER
-import ru.practicum.android.diploma.ui.compose.MAIN
+import ru.practicum.android.diploma.presentation.FilterOptionViewModel
 import ru.practicum.android.diploma.ui.theme.InputFieldHeight
 import ru.practicum.android.diploma.ui.theme.Spacing8
 
-private const val SEARCH_DEBOUNCE_DELAY = 2000L
+private const val SEARCH_DEBOUNCE_DELAY = 500L // Уменьшаем для более быстрого поиска отраслей
 
 @Composable
-fun SearchField(
+fun IndustrySearchField(
     label: String,
-    viewModel: SearchViewModel,
-    screenTag: String = MAIN,
-    query: String = "",
-    onQueryChange: (String) -> Unit = { viewModel.setVacancySearchQuery(it) },
-    onSearch: (String) -> Unit = { viewModel.searchVacancies(it) }
+    viewModel: FilterOptionViewModel
 ) {
-    // Для MAIN экрана используем StateFlow из SearchViewModel
-    val queryState = when (screenTag) {
-        MAIN -> viewModel.vacancySearchQuery.collectAsStateWithLifecycle()
-        else -> mutableStateOf(query)
-    }
+    // Получаем текущий запрос из ViewModel
+    val queryState = viewModel.searchQuery.collectAsStateWithLifecycle()
 
-    var inputValue by rememberSaveable {
-        mutableStateOf(if (query.isNotEmpty()) query else queryState.value)
-    }
+    // Локальное состояние поля ввода
+    var inputValue by rememberSaveable { mutableStateOf(queryState.value) }
 
-    // Синхронизация с внешним состоянием
+    // Синхронизируем с внешним состоянием
     LaunchedEffect(queryState.value) {
         if (queryState.value != inputValue) {
             inputValue = queryState.value
         }
     }
 
-    LaunchedEffect(query) {
-        if (query.isNotEmpty() && query != inputValue) {
-            inputValue = query
-        }
-    }
-
-    // Дебаунс для MAIN экрана
+    // Дебаунс для поиска отраслей
     LaunchedEffect(inputValue) {
-        if (screenTag == MAIN && inputValue.isNotEmpty()) {
+        if (inputValue.isNotEmpty()) {
             delay(SEARCH_DEBOUNCE_DELAY)
-            onSearch(inputValue)
+            // Вызываем поиск после задержки
+            viewModel.searchIndustries(inputValue)
+        } else {
+            // Если поле пустое, сразу очищаем
+            viewModel.searchIndustries("")
         }
     }
 
@@ -75,11 +63,8 @@ fun SearchField(
         value = inputValue,
         onValueChange = { newValue ->
             inputValue = newValue
-            onQueryChange(newValue)
-
-            if (screenTag == MAIN && newValue.isEmpty()) {
-                viewModel.clearSearch()
-            }
+            // Немедленно обновляем запрос в ViewModel
+            viewModel.setSearchQuery(newValue)
         },
         shape = MaterialTheme.shapes.medium,
         modifier = Modifier
@@ -87,27 +72,26 @@ fun SearchField(
             .fillMaxWidth()
             .padding(vertical = Spacing8),
         placeholder = { Text(label) },
-        label = shouldBeLabel(screenTag),
         trailingIcon = {
             if (inputValue.isNotEmpty()) {
                 IconButton(
                     onClick = {
                         inputValue = ""
-                        onQueryChange("")
-                        viewModel.clearSearch()
+                        viewModel.setSearchQuery("")
+                        viewModel.searchIndustries("")
                     }
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_close),
                         tint = colorResource(R.color.black_universal),
-                        contentDescription = "Очистить"
+                        contentDescription = "Очистить поле поиска"
                     )
                 }
             } else {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_search),
                     tint = colorResource(R.color.black_universal),
-                    contentDescription = "Поиск"
+                    contentDescription = "Поиск отраслей"
                 )
             }
         },
@@ -118,12 +102,4 @@ fun SearchField(
             unfocusedIndicatorColor = Color.Transparent
         )
     )
-}
-
-private fun shouldBeLabel(tag: String): (@Composable () -> Unit)? {
-    return if (tag == FILTER) {
-        { Text("Ожидаемая зарплата") }
-    } else {
-        null
-    }
 }

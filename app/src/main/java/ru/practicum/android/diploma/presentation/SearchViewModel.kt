@@ -33,10 +33,31 @@ const val NETWORK_ERROR = "Ошибка сети"
 
 class SearchViewModel(
     private val searchInteractor: FindVacancyInteractor,
-    private val industryInteractor: IndustriesInteractor,
+//    private val industryInteractor: IndustriesInteractor,
     private val prefsInteractor: PrefsInteractor
 ) : ViewModel() {
+    private var searchJob: Job? = null
+    private val _uiState = mutableStateOf<VacancySearchUiState>(VacancySearchUiState.Idle)
+    val uiState: State<VacancySearchUiState> get() = _uiState
+    private val _toastMessage = MutableSharedFlow<String>()
+
     private var lastRequestString: String = ""
+
+    private val _vacancySearchQuery = MutableStateFlow("")
+    val vacancySearchQuery: StateFlow<String> = _vacancySearchQuery.asStateFlow()
+
+    val toastMessage: SharedFlow<String> = _toastMessage.asSharedFlow()
+    private var currentPage by mutableIntStateOf(0)
+    private var maxPages by mutableIntStateOf(0)
+    private var isLoadingMore by mutableStateOf(false)
+    private val vacanciesList = mutableStateListOf<VacancyDetailsModel>()
+    private var totalFound by mutableIntStateOf(0)
+    private var lastShownToastMessage: String? = null
+    private var currentQuery = ""
+
+    fun setVacancySearchQuery(query: String) {
+        _vacancySearchQuery.value = query
+    }
 
     // Функция для формирования строки запроса
     private fun buildRequestString(
@@ -66,52 +87,6 @@ class SearchViewModel(
     private fun updateLastRequest(newRequestString: String) {
         lastRequestString = newRequestString
         Log.d("SearchViewModel", "Сохранен запрос: $newRequestString")
-    }
-
-    private var lastAppliedFilters: FilterSettingsModel? = null
-    private var filtersHash: Int = 0
-
-    private var searchJob: Job? = null
-    private val _uiState = mutableStateOf<VacancySearchUiState>(VacancySearchUiState.Idle)
-    val uiState: State<VacancySearchUiState> get() = _uiState
-    private val _toastMessage = MutableSharedFlow<String>()
-
-    private val _filterUiState = mutableStateOf<IndustryUiState>(IndustryUiState.OnSelect(emptyList()))
-    val filterUiState: State<IndustryUiState> get() = _filterUiState
-
-    private val _vacancySearchQuery = MutableStateFlow("")
-    val vacancySearchQuery: StateFlow<String> = _vacancySearchQuery.asStateFlow()
-
-    private val _industrySearchQuery = MutableStateFlow("")
-    val industrySearchQuery: StateFlow<String> = _industrySearchQuery.asStateFlow()
-
-    val toastMessage: SharedFlow<String> = _toastMessage.asSharedFlow()
-    private var currentPage by mutableIntStateOf(0)
-    private var maxPages by mutableIntStateOf(0)
-    private var isLoadingMore by mutableStateOf(false)
-    private val vacanciesList = mutableStateListOf<VacancyDetailsModel>()
-    private var totalFound by mutableIntStateOf(0)
-    private var lastShownToastMessage: String? = null
-    private var currentQuery = ""
-
-    private var searchDebounceJob: Job? = null
-
-    init {
-        loadLastAppliedFilters()
-        searchIndustries("")
-    }
-
-    private fun loadLastAppliedFilters() {
-        lastAppliedFilters = prefsInteractor.getFilterSettings()
-        filtersHash = lastAppliedFilters.hashCode()
-    }
-
-    fun setVacancySearchQuery(query: String) {
-        _vacancySearchQuery.value = query
-    }
-
-    fun setIndustrySearchQuery(query: String) {
-        _industrySearchQuery.value = query
     }
 
     fun searchVacancies(query: String, isLoadMore: Boolean = false) {
@@ -213,40 +188,6 @@ class SearchViewModel(
         }
     }
 
-    fun searchIndustries(query: String) {
-        searchJob?.cancel()
-
-        searchJob = viewModelScope.launch {
-            try {
-                when (val resource = industryInteractor.getIndustries()) {
-                    is Resource.Success -> {
-                        val allIndustries = resource.data ?: emptyList()
-                        val filteredIndustries = if (query.isNotEmpty()) {
-                            allIndustries.filter { industry ->
-                                industry.name.contains(query, ignoreCase = true)
-                            }
-                        } else {
-                            allIndustries
-                        }
-                        _filterUiState.value = IndustryUiState.OnSelect(filteredIndustries)
-                    }
-
-                    is Resource.Error -> {
-                        // Просто логируем ошибку для отраслей
-                        Log.d("SearchViewModel", "Error loading industries: ${resource.message}")
-                    }
-                }
-            } catch (e: IOException) {
-                Log.d("SearchViewModel", "Network error loading industries: $e")
-            }
-        }
-    }
-
-    fun selectedIndustry(industry: IndustryModel) {
-        _industrySearchQuery.value = industry.name
-        _filterUiState.value = IndustryUiState.Selected(industry)
-    }
-
     fun searchWithFilters() {
         viewModelScope.launch {
             searchVacancies(currentQuery)
@@ -325,7 +266,7 @@ class SearchViewModel(
 
     fun clearSearch() {
         searchJob?.cancel()
-        searchDebounceJob?.cancel()
+//        searchDebounceJob?.cancel()
         _uiState.value = VacancySearchUiState.Idle
         _vacancySearchQuery.value = ""
         vacanciesList.clear()
@@ -339,7 +280,7 @@ class SearchViewModel(
     override fun onCleared() {
         super.onCleared()
         searchJob?.cancel()
-        searchDebounceJob?.cancel()
+//        searchDebounceJob?.cancel()
     }
 
     private fun handleError(errorMessage: String?): VacancySearchUiState {
@@ -358,5 +299,92 @@ class SearchViewModel(
             else -> "Произошла ошибка"
         }
     }
+
+//    private var lastAppliedFilters: FilterSettingsModel? = null
+//    private var filtersHash: Int = 0
+//
+//
+//
+//    private val _filterUiState = mutableStateOf<IndustryUiState>(IndustryUiState.OnSelect(emptyList()))
+//    val filterUiState: State<IndustryUiState> get() = _filterUiState
+//
+//
+//
+//    private val _industrySearchQuery = MutableStateFlow("")
+//    val industrySearchQuery: StateFlow<String> = _industrySearchQuery.asStateFlow()
+
+
+
+//    private var searchDebounceJob: Job? = null
+//
+//    init {
+//        loadLastAppliedFilters()
+//        searchIndustries("")
+//    }
+//
+//    private fun loadLastAppliedFilters() {
+//        lastAppliedFilters = prefsInteractor.getFilterSettings()
+//        filtersHash = lastAppliedFilters.hashCode()
+//    }
+//
+//
+//
+//    fun setIndustrySearchQuery(query: String) {
+//        _industrySearchQuery.value = query
+//    }
+
+//
+//
+//
+//
+//    fun searchIndustries(query: String) {
+//        searchJob?.cancel()
+//
+//        searchJob = viewModelScope.launch {
+//            try {
+//                when (val resource = industryInteractor.getIndustries()) {
+//                    is Resource.Success -> {
+//                        val allIndustries = resource.data ?: emptyList()
+//                        val filteredIndustries = if (query.isNotEmpty()) {
+//                            allIndustries.filter { industry ->
+//                                industry.name.contains(query, ignoreCase = true)
+//                            }
+//                        } else {
+//                            allIndustries
+//                        }
+//                        _filterUiState.value = IndustryUiState.OnSelect(filteredIndustries)
+//                    }
+//
+//                    is Resource.Error -> {
+//                        // Просто логируем ошибку для отраслей
+//                        Log.d("SearchViewModel", "Error loading industries: ${resource.message}")
+//                    }
+//                }
+//            } catch (e: IOException) {
+//                Log.d("SearchViewModel", "Network error loading industries: $e")
+//            }
+//        }
+//    }
+//
+//    fun selectedIndustry(industry: IndustryModel) {
+//        _industrySearchQuery.value = industry.name
+//        _filterUiState.value = IndustryUiState.Selected(industry)
+//    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }
