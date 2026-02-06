@@ -18,13 +18,10 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import ru.practicum.android.diploma.domain.network.api.FindVacancyInteractor
-import ru.practicum.android.diploma.domain.network.api.industries.IndustriesInteractor
 import ru.practicum.android.diploma.domain.network.models.SearchParams
 import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
-import ru.practicum.android.diploma.domain.network.models.industries.IndustryModel
 import ru.practicum.android.diploma.domain.prefs.FilterSettingsModel
 import ru.practicum.android.diploma.domain.prefs.PrefsInteractor
-import ru.practicum.android.diploma.presentation.models.IndustryUiState
 import ru.practicum.android.diploma.presentation.models.VacancySearchUiState
 import ru.practicum.android.diploma.util.Resource
 import java.io.IOException
@@ -33,7 +30,6 @@ const val NETWORK_ERROR = "Ошибка сети"
 
 class SearchViewModel(
     private val searchInteractor: FindVacancyInteractor,
-//    private val industryInteractor: IndustriesInteractor,
     private val prefsInteractor: PrefsInteractor
 ) : ViewModel() {
     private var searchJob: Job? = null

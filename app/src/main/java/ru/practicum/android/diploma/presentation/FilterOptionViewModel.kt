@@ -91,4 +91,27 @@ class FilterOptionViewModel(
     private fun handleError(errorMessage: String?) {
         _filterUiState.value = IndustryUiState.Empty
     }
+
+    fun checkAndUpdateFromSharedPrefs() {
+        val prefsId = prefsInteractor.getFilterSettings()?.industry ?: ""
+        val prefsName = prefsInteractor.getFilterSettings()?.industryName ?: ""
+        val currentSelectedId = _selectedIndustry.value?.id
+
+        // Если в SharedPrefs есть отрасль, но она отличается от текущей
+        if (prefsId.isNotEmpty() && prefsName.isNotEmpty()) {
+            if (currentSelectedId != prefsId) {
+                val chosenIndustry = IndustryModel(prefsId, prefsName)
+                _selectedIndustry.value = chosenIndustry
+                _searchQuery.value = prefsName
+                _filterUiState.value = IndustryUiState.Selected(chosenIndustry)
+            }
+        } else {
+            // Если в SharedPrefs нет отрасли, но она есть в ViewModel
+            if (currentSelectedId != null) {
+                _selectedIndustry.value = null
+                _searchQuery.value = ""
+                searchIndustries("")
+            }
+        }
+    }
 }

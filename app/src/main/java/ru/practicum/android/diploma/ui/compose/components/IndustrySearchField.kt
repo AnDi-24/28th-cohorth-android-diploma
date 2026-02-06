@@ -26,35 +26,34 @@ import ru.practicum.android.diploma.presentation.FilterOptionViewModel
 import ru.practicum.android.diploma.ui.theme.InputFieldHeight
 import ru.practicum.android.diploma.ui.theme.Spacing8
 
-private const val SEARCH_DEBOUNCE_DELAY = 500L // Уменьшаем для более быстрого поиска отраслей
-
 @Composable
 fun IndustrySearchField(
     label: String,
     viewModel: FilterOptionViewModel
 ) {
-    // Получаем текущий запрос из ViewModel
     val queryState = viewModel.searchQuery.collectAsStateWithLifecycle()
-
-    // Локальное состояние поля ввода
     var inputValue by rememberSaveable { mutableStateOf(queryState.value) }
+    var isUserTyping by rememberSaveable { mutableStateOf(false) }
 
-    // Синхронизируем с внешним состоянием
+    // Синхронизация с ViewModel
     LaunchedEffect(queryState.value) {
-        if (queryState.value != inputValue) {
+        // Если ViewModel прислала пустую строку, сбрасываем поле
+        if (queryState.value.isEmpty() && inputValue.isNotEmpty()) {
+            inputValue = ""
+        } else if (!isUserTyping && queryState.value != inputValue) {
             inputValue = queryState.value
         }
     }
 
-    // Дебаунс для поиска отраслей
+    // Выполнение поиска
     LaunchedEffect(inputValue) {
-        if (inputValue.isNotEmpty()) {
-            delay(SEARCH_DEBOUNCE_DELAY)
-            // Вызываем поиск после задержки
-            viewModel.searchIndustries(inputValue)
-        } else {
-            // Если поле пустое, сразу очищаем
-            viewModel.searchIndustries("")
+        if (isUserTyping) {
+            if (inputValue.isNotEmpty()) {
+                viewModel.searchIndustries(inputValue)
+            } else {
+                viewModel.searchIndustries("")
+            }
+            isUserTyping = false
         }
     }
 
@@ -63,7 +62,7 @@ fun IndustrySearchField(
         value = inputValue,
         onValueChange = { newValue ->
             inputValue = newValue
-            // Немедленно обновляем запрос в ViewModel
+            isUserTyping = true
             viewModel.setSearchQuery(newValue)
         },
         shape = MaterialTheme.shapes.medium,
@@ -77,21 +76,21 @@ fun IndustrySearchField(
                 IconButton(
                     onClick = {
                         inputValue = ""
+                        isUserTyping = true
                         viewModel.setSearchQuery("")
-                        viewModel.searchIndustries("")
                     }
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_close),
                         tint = colorResource(R.color.black_universal),
-                        contentDescription = "Очистить поле поиска"
+                        contentDescription = "Очистить"
                     )
                 }
             } else {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_search),
                     tint = colorResource(R.color.black_universal),
-                    contentDescription = "Поиск отраслей"
+                    contentDescription = "Поиск"
                 )
             }
         },

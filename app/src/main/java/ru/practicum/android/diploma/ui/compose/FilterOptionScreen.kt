@@ -16,6 +16,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -44,6 +45,32 @@ fun FilterOptionScreen(
     val filterUiState = viewModel.filterUiState.value
     // Получаем выбранную отрасль
     val selectedIndustry by viewModel.selectedIndustry.collectAsState()
+    val filterState by filterViewModel.filterState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        // Вызываем метод в ViewModel для проверки актуальных данных
+        viewModel.checkAndUpdateFromSharedPrefs()
+    }
+
+    LaunchedEffect(filterState.industry) {
+        // Если в фильтрах есть отрасль, но в viewModel она не установлена
+        if (filterState.industry.isNotEmpty() && filterState.industryName.isNotEmpty()) {
+            val currentSelected = selectedIndustry?.id
+            if (currentSelected != filterState.industry) {
+                // Создаем IndustryModel из сохраненных данных
+                val savedIndustry = IndustryModel(
+                    id = filterState.industry,
+                    name = filterState.industryName
+                )
+                viewModel.selectedIndustry(savedIndustry)
+            }
+        } else if (filterState.industry.isEmpty() && selectedIndustry != null) {
+            // Если в фильтрах отрасль очищена, но в viewModel еще есть выбранная
+            // Сбрасываем выбранную отрасль и поиск
+            viewModel.setSearchQuery("")
+            viewModel.searchIndustries("")
+        }
+    }
 
     // Находим индекс выбранной отрасли для подсветки
     val selectedIndex = remember(filterUiState, selectedIndustry) {
