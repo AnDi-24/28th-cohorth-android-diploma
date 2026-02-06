@@ -42,9 +42,7 @@ fun FilterOptionScreen(
 ) {
     val filterUiState = viewModel.filterUiState.value
 
-
     val selectedIndustryId by viewModel.selectedIndustry.collectAsState()
-
 
     val selectedIndex = remember(filterUiState, selectedIndustryId) {
         when (val state = filterUiState) {
