@@ -13,7 +13,13 @@
     <string name="get_list_failed">Не удалось получить список</string>
     <string name="team_screen">Команда</string>
     <string name="filter_option">Выбор отрасли</string>
+    <string name="industry">Отрасль</string>
+    <string name="clear_industry_filter">Очистить фильтр отрасли</string>
     <string name="filter">Настройки фильтрации</string>
+    <string name="expected_salary">Ожидаемая зарплата</string>
+    <string name="enter_salary">Введите сумму</string>
+    <string name="clear_salary_field">Очистить поле зарплаты</string>
+    <string name="specify_salary">Указать зарплату</string>
     <string name="vacancy">Вакансия</string>
     <string name="request_placeholder">Введите запрос</string>
     <string name="empty">Пусто</string>
