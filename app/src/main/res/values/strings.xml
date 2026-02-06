@@ -24,6 +24,7 @@
     <string name="request_placeholder">Введите запрос</string>
     <string name="empty">Пусто</string>
     <string name="no_internet">Нет интернета</string>
+    <string name="hide_without_salary">Не показывать без зарплаты</string>
     <string name="no_region">Такого региона нет</string>
     <string name="vacancy_not_found">Вакансия не найдена или удалена</string>
     <string name="server_error">Ошибка сервера</string>

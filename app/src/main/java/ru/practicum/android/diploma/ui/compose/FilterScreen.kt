@@ -20,6 +20,7 @@ import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.domain.prefs.FilterSettingsModel
 import ru.practicum.android.diploma.presentation.FilterViewModel
 import ru.practicum.android.diploma.presentation.SearchViewModel
+import ru.practicum.android.diploma.ui.compose.components.HideSalaryFilterCheckbox
 import ru.practicum.android.diploma.ui.compose.components.IndustrySelectionButton
 import ru.practicum.android.diploma.ui.compose.components.NegativeButton
 import ru.practicum.android.diploma.ui.compose.components.PositiveButton
@@ -63,6 +64,9 @@ fun FilterScreen(navController: NavController) {
             viewModel.updateSalary(0)
             viewModel.updateShowSalary(false)
             searchViewModel.searchWithFilters()
+        },
+        onShowSalaryChanged = { showSalary ->
+            viewModel.updateShowSalary(showSalary)
         }
     )
 }
@@ -74,10 +78,13 @@ fun FilterScreenContent(
     onIndustryClear: () -> Unit,
     onSalaryChanged: (String) -> Unit,
     onSalaryClear: () -> Unit,
+    onShowSalaryChanged: (Boolean) -> Unit,
     onApplyFilters: () -> Unit,
     onResetFilters: () -> Unit
 ) {
-    val hasFiltersSelected = filterState.industry.isNotEmpty() || filterState.salary > 0
+    val hasFiltersSelected = filterState.industry.isNotEmpty() ||
+        filterState.salary > 0 ||
+        filterState.showSalary
 
     Column(
         modifier = Modifier
@@ -107,6 +114,15 @@ fun FilterScreenContent(
                 onSalaryChanged = onSalaryChanged,
                 onClearClick = onSalaryClear
             )
+
+            Spacer(modifier = Modifier.height(Spacing16))
+
+            HideSalaryFilterCheckbox(
+                modifier = Modifier.fillMaxWidth(),
+                isChecked = filterState.showSalary,
+                onCheckedChange = onShowSalaryChanged
+            )
+
         }
 
         if (hasFiltersSelected) {
