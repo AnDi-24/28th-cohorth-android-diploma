@@ -45,7 +45,6 @@ fun IndustrySelectionButton(
     onClearClick: () -> Unit,
     onClick: () -> Unit
 ) {
-
     Card(
         modifier = modifier
             .fillMaxWidth()

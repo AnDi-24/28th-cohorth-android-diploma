@@ -23,10 +23,9 @@ import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
 import ru.practicum.android.diploma.domain.prefs.FilterSettingsModel
 import ru.practicum.android.diploma.domain.prefs.PrefsInteractor
 import ru.practicum.android.diploma.presentation.models.VacancySearchUiState
+import ru.practicum.android.diploma.util.ErrorHandler
 import ru.practicum.android.diploma.util.Resource
 import java.io.IOException
-
-const val NETWORK_ERROR = "Ошибка сети"
 
 class SearchViewModel(
     private val searchInteractor: FindVacancyInteractor,
@@ -79,7 +78,6 @@ class SearchViewModel(
 
     private fun updateLastRequest(newRequestString: String) {
         lastRequestString = newRequestString
-        Log.d("SearchViewModel", "Сохранен запрос: $newRequestString")
     }
 
     fun searchVacancies(query: String, isLoadMore: Boolean = false) {
@@ -119,8 +117,8 @@ class SearchViewModel(
             lastShownToastMessage = null
             executeSearch(query, industryId, filters, page, isLoadMore)
         } else {
-            Log.d("SearchViewModel", "Запрос не изменился: $currentRequestString")
-            Log.d("SearchViewModel", "Предыдущий запрос: $lastRequestString")
+            Log.d(TAG, "$LOG_REQUEST_NOT_CHANGED$currentRequestString")
+            Log.d(TAG, "$LOG_PREVIOUS_REQUEST$lastRequestString")
         }
     }
 
@@ -161,7 +159,8 @@ class SearchViewModel(
                     }
                 }
             } catch (e: IOException) {
-                isError(NETWORK_ERROR, isLoadMore)
+                val errorMessage = ErrorHandler.handleNetworkError(e)
+                isError(errorMessage, isLoadMore)
             }
         }
     }
@@ -198,7 +197,7 @@ class SearchViewModel(
     private fun isError(resourceMessage: String, isLoadMore: Boolean) {
         isLoadingMore = false
         if (isLoadMore) {
-            showToastMessage(getErrorMessage(resourceMessage))
+            showToastMessage(resourceMessage)
             if (vacanciesList.isNotEmpty()) {
                 _uiState.value = VacancySearchUiState.Success(
                     vacancies = vacanciesList.toList(),
@@ -261,18 +260,22 @@ class SearchViewModel(
 
     private fun handleError(errorMessage: String?): VacancySearchUiState {
         return when (errorMessage) {
-            "Данные не найдены" -> VacancySearchUiState.Empty
+            ERROR_NO_DATA_FOUND -> VacancySearchUiState.Empty
             NETWORK_ERROR -> VacancySearchUiState.NetworkError
-            "Неверный тип запроса" -> VacancySearchUiState.UnknownError
-            "Неизвестная ошибка" -> VacancySearchUiState.UnknownError
+            ERROR_INVALID_REQUEST_TYPE -> VacancySearchUiState.UnknownError
+            ERROR_UNKNOWN -> VacancySearchUiState.UnknownError
             else -> VacancySearchUiState.NetworkError
         }
     }
 
-    private fun getErrorMessage(errorMessage: String?): String {
-        return when (errorMessage) {
-            NETWORK_ERROR -> "Проверьте подключение к интернету"
-            else -> "Произошла ошибка"
-        }
+    private companion object {
+        private const val TAG = "SearchViewModel"
+        private const val NETWORK_ERROR = "Ошибка сети"
+        private const val LOG_REQUEST_NOT_CHANGED = "Запрос не изменился: "
+        private const val LOG_PREVIOUS_REQUEST = "Предыдущий запрос: "
+        private const val ERROR_NO_DATA_FOUND = "Данные не найдены"
+        private const val ERROR_INVALID_REQUEST_TYPE = "Неверный тип запроса"
+        private const val ERROR_UNKNOWN = "Неизвестная ошибка"
     }
 }
+

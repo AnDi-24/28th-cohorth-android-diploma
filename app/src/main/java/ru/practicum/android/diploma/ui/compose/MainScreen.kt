@@ -71,7 +71,6 @@ fun MainScreen(
 
     val vacancySearchQuery by viewModel.vacancySearchQuery.collectAsState()
 
-
     HandleToastMessages(viewModel, context)
     HandleScrollToTop(uiState, lazyListState, searchPerformed)
     HandleInfiniteScroll(lazyListState, viewModel)
