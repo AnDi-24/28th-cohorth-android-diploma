@@ -93,7 +93,6 @@ fun SalaryInputField(
             Column(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                // Заголовок "Ожидаемая зарплата"
                 Text(
                     text = stringResource(id = R.string.expected_salary),
                     style = MaterialTheme.typography.labelSmall.copy(
@@ -104,11 +103,9 @@ fun SalaryInputField(
 
                 Spacer(modifier = Modifier.height(Spacing4))
 
-                // Поле ввода с плейсхолдером
                 BasicTextField(
                     value = salaryText,
                     onValueChange = { newValue ->
-                        // Фильтруем только цифры
                         val filtered = newValue.filter { it.isDigit() }
                         onSalaryChanged(filtered)
                     },
@@ -138,7 +135,6 @@ fun SalaryInputField(
                             contentAlignment = Alignment.CenterStart
                         ) {
                             if (salaryText.isEmpty()) {
-                                // Плейсхолдер
                                 Text(
                                     text = stringResource(id = R.string.enter_salary),
                                     style = MaterialTheme.typography.bodyMedium.copy(
@@ -156,7 +152,6 @@ fun SalaryInputField(
             }
         }
 
-        // Иконка крестика для очистки - отдельно, в правом верхнем углу
         if (salaryText.isNotEmpty()) {
             Box(
                 modifier = Modifier
@@ -184,7 +179,6 @@ fun SalaryInputFieldPreview() {
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(Spacing16)
         ) {
-            // Пример 1: Пустое поле (не в фокусе)
             Text(
                 text = "Пустое поле (не в фокусе)",
                 style = MaterialTheme.typography.labelSmall,
@@ -197,7 +191,6 @@ fun SalaryInputFieldPreview() {
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Пример 2: С введенным значением
             Text(
                 text = "С введенным значением - виден крестик",
                 style = MaterialTheme.typography.labelSmall,

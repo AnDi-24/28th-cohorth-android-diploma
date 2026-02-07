@@ -19,8 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.delay
 import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.presentation.FilterOptionViewModel
 import ru.practicum.android.diploma.ui.theme.InputFieldHeight
@@ -35,9 +35,7 @@ fun IndustrySearchField(
     var inputValue by rememberSaveable { mutableStateOf(queryState.value) }
     var isUserTyping by rememberSaveable { mutableStateOf(false) }
 
-    // Синхронизация с ViewModel
     LaunchedEffect(queryState.value) {
-        // Если ViewModel прислала пустую строку, сбрасываем поле
         if (queryState.value.isEmpty() && inputValue.isNotEmpty()) {
             inputValue = ""
         } else if (!isUserTyping && queryState.value != inputValue) {
@@ -45,7 +43,6 @@ fun IndustrySearchField(
         }
     }
 
-    // Выполнение поиска
     LaunchedEffect(inputValue) {
         if (isUserTyping) {
             if (inputValue.isNotEmpty()) {
@@ -83,14 +80,14 @@ fun IndustrySearchField(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_close),
                         tint = colorResource(R.color.black_universal),
-                        contentDescription = "Очистить"
+                        contentDescription = stringResource(R.string.clear_industry_filter)
                     )
                 }
             } else {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_search),
                     tint = colorResource(R.color.black_universal),
-                    contentDescription = "Поиск"
+                    contentDescription = stringResource(R.string.filter_option)
                 )
             }
         },

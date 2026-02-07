@@ -55,7 +55,6 @@ class SearchViewModel(
         _vacancySearchQuery.value = query
     }
 
-    // Функция для формирования строки запроса
     private fun buildRequestString(
         query: String,
         industryId: Int?,
@@ -71,11 +70,9 @@ class SearchViewModel(
         params.add("page=$page")
         if (showSalary) params.add("only_with_salary=true")
 
-        // Сортируем параметры для стабильного сравнения
         return params.sorted().joinToString("&")
     }
 
-    // Проверяем, изменился ли запрос
     private fun hasRequestChanged(newRequestString: String): Boolean {
         return newRequestString != lastRequestString
     }
@@ -97,7 +94,6 @@ class SearchViewModel(
         val industryId = filters?.industry?.takeIf { it.isNotEmpty() }?.toIntOrNull()
         val page = if (isLoadMore) currentPage else 0
 
-        // Формируем строку текущего запроса
         val currentRequestString = buildRequestString(
             query = query,
             industryId = industryId,
@@ -106,35 +102,21 @@ class SearchViewModel(
             showSalary = filters?.showSalary ?: false
         )
 
-        // Для дозагрузки всегда выполняем
         if (isLoadMore) {
-            // Логируем запрос
-            Log.d("API_DEBUG", "GET {{baseUrl}}/vacancies?$currentRequestString")
-
-            // Выполняем поиск
             executeSearch(query, industryId, filters, page, isLoadMore)
             return
         }
 
-        // Для нового поиска проверяем, изменился ли запрос
         val requestChanged = hasRequestChanged(currentRequestString)
 
         if (requestChanged) {
-            // Логируем запрос
-            Log.d("API_DEBUG", "GET {{baseUrl}}/vacancies?$currentRequestString")
-
-            // Сохраняем новый запрос
             updateLastRequest(currentRequestString)
-
-            // Сбрасываем состояние для нового поиска
             currentQuery = query
             currentPage = 0
             maxPages = 0
             vacanciesList.clear()
             isLoadingMore = false
             lastShownToastMessage = null
-
-            // Выполняем поиск
             executeSearch(query, industryId, filters, page, isLoadMore)
         } else {
             Log.d("SearchViewModel", "Запрос не изменился: $currentRequestString")
@@ -262,7 +244,6 @@ class SearchViewModel(
 
     fun clearSearch() {
         searchJob?.cancel()
-//        searchDebounceJob?.cancel()
         _uiState.value = VacancySearchUiState.Idle
         _vacancySearchQuery.value = ""
         vacanciesList.clear()
@@ -276,7 +257,6 @@ class SearchViewModel(
     override fun onCleared() {
         super.onCleared()
         searchJob?.cancel()
-//        searchDebounceJob?.cancel()
     }
 
     private fun handleError(errorMessage: String?): VacancySearchUiState {
@@ -295,92 +275,4 @@ class SearchViewModel(
             else -> "Произошла ошибка"
         }
     }
-
-//    private var lastAppliedFilters: FilterSettingsModel? = null
-//    private var filtersHash: Int = 0
-//
-//
-//
-//    private val _filterUiState = mutableStateOf<IndustryUiState>(IndustryUiState.OnSelect(emptyList()))
-//    val filterUiState: State<IndustryUiState> get() = _filterUiState
-//
-//
-//
-//    private val _industrySearchQuery = MutableStateFlow("")
-//    val industrySearchQuery: StateFlow<String> = _industrySearchQuery.asStateFlow()
-
-
-
-//    private var searchDebounceJob: Job? = null
-//
-//    init {
-//        loadLastAppliedFilters()
-//        searchIndustries("")
-//    }
-//
-//    private fun loadLastAppliedFilters() {
-//        lastAppliedFilters = prefsInteractor.getFilterSettings()
-//        filtersHash = lastAppliedFilters.hashCode()
-//    }
-//
-//
-//
-//    fun setIndustrySearchQuery(query: String) {
-//        _industrySearchQuery.value = query
-//    }
-
-//
-//
-//
-//
-//    fun searchIndustries(query: String) {
-//        searchJob?.cancel()
-//
-//        searchJob = viewModelScope.launch {
-//            try {
-//                when (val resource = industryInteractor.getIndustries()) {
-//                    is Resource.Success -> {
-//                        val allIndustries = resource.data ?: emptyList()
-//                        val filteredIndustries = if (query.isNotEmpty()) {
-//                            allIndustries.filter { industry ->
-//                                industry.name.contains(query, ignoreCase = true)
-//                            }
-//                        } else {
-//                            allIndustries
-//                        }
-//                        _filterUiState.value = IndustryUiState.OnSelect(filteredIndustries)
-//                    }
-//
-//                    is Resource.Error -> {
-//                        // Просто логируем ошибку для отраслей
-//                        Log.d("SearchViewModel", "Error loading industries: ${resource.message}")
-//                    }
-//                }
-//            } catch (e: IOException) {
-//                Log.d("SearchViewModel", "Network error loading industries: $e")
-//            }
-//        }
-//    }
-//
-//    fun selectedIndustry(industry: IndustryModel) {
-//        _industrySearchQuery.value = industry.name
-//        _filterUiState.value = IndustryUiState.Selected(industry)
-//    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

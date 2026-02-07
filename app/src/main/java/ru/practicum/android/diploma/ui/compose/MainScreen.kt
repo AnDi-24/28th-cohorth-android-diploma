@@ -76,10 +76,6 @@ fun MainScreen(
     HandleScrollToTop(uiState, lazyListState, searchPerformed)
     HandleInfiniteScroll(lazyListState, viewModel)
 
-//    LaunchedEffect(Unit) {
-//        viewModel.loadFilters()
-//    }
-
     Column(modifier = Modifier.padding(Spacing16)) {
         SearchField(
             label = stringResource(R.string.request_placeholder),

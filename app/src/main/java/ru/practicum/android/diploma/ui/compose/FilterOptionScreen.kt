@@ -41,23 +41,18 @@ fun FilterOptionScreen(
     filterViewModel: FilterViewModel,
     navController: NavController
 ) {
-    // Получаем состояние UI
     val filterUiState = viewModel.filterUiState.value
-    // Получаем выбранную отрасль
     val selectedIndustry by viewModel.selectedIndustry.collectAsState()
     val filterState by filterViewModel.filterState.collectAsState()
 
     LaunchedEffect(Unit) {
-        // Вызываем метод в ViewModel для проверки актуальных данных
         viewModel.checkAndUpdateFromSharedPrefs()
     }
 
     LaunchedEffect(filterState.industry) {
-        // Если в фильтрах есть отрасль, но в viewModel она не установлена
         if (filterState.industry.isNotEmpty() && filterState.industryName.isNotEmpty()) {
             val currentSelected = selectedIndustry?.id
             if (currentSelected != filterState.industry) {
-                // Создаем IndustryModel из сохраненных данных
                 val savedIndustry = IndustryModel(
                     id = filterState.industry,
                     name = filterState.industryName
@@ -65,18 +60,14 @@ fun FilterOptionScreen(
                 viewModel.selectedIndustry(savedIndustry)
             }
         } else if (filterState.industry.isEmpty() && selectedIndustry != null) {
-            // Если в фильтрах отрасль очищена, но в viewModel еще есть выбранная
-            // Сбрасываем выбранную отрасль и поиск
             viewModel.setSearchQuery("")
             viewModel.searchIndustries("")
         }
     }
 
-    // Находим индекс выбранной отрасли для подсветки
     val selectedIndex = remember(filterUiState, selectedIndustry) {
         when (val state = filterUiState) {
             is IndustryUiState.OnSelect -> {
-                // Находим индекс выбранной отрасли по ID
                 state.industries.indexOfFirst { it.id == selectedIndustry?.id }
             }
             else -> -1
@@ -86,7 +77,6 @@ fun FilterOptionScreen(
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        // Поле поиска отраслей
         Box(modifier = Modifier.padding(16.dp)) {
             IndustrySearchField(
                 label = stringResource(R.string.request_placeholder),
@@ -94,23 +84,19 @@ fun FilterOptionScreen(
             )
         }
 
-        // Список отраслей
         when (filterUiState) {
             is IndustryUiState.OnSelect -> {
                 LazyColumn(
                     modifier = Modifier.weight(1f)
                 ) {
                     itemsIndexed(filterUiState.industries) { index, item ->
-                        // Проверяем, выбрана ли текущая отрасль
                         val isItemSelected = index == selectedIndex
 
                         IndustriesItem(
                             item = item,
                             isSelected = isItemSelected,
                             onSelect = {
-                                // Выбираем отрасль
                                 viewModel.selectedIndustry(item)
-                                // Сохраняем в фильтры
                                 filterViewModel.updateIndustry(item.id)
                                 filterViewModel.updateIndustryName(item.name)
                             }
@@ -120,26 +106,21 @@ fun FilterOptionScreen(
             }
 
             is IndustryUiState.Selected -> {
-                // Если отрасль выбрана, показываем ее и кнопку подтверждения
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    // Выбранная отрасль
                     IndustriesItem(
                         item = filterUiState.industry,
                         isSelected = true,
                         onSelect = {
-                            // При повторном клике очищаем поиск
                             viewModel.searchIndustries("")
                         }
                     )
 
-                    // Кнопка подтверждения выбора
                     PositiveButton(
                         text = R.string.select,
                         onClick = {
-                            // Возвращаемся на экран фильтров
                             navController.popBackStack()
                         },
                         modifier = Modifier
@@ -149,7 +130,6 @@ fun FilterOptionScreen(
                 }
             }
 
-            // Состояния ошибок
             is IndustryUiState.Empty -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -159,7 +139,6 @@ fun FilterOptionScreen(
                 }
             }
 
-            // На случай добавления других состояний
             else -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),

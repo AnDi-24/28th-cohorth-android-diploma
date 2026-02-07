@@ -73,9 +73,9 @@ fun HideSalaryFilterCheckbox(
                 onCheckedChange = { onCheckedChange(it) },
                 modifier = Modifier.size(40.dp),
                 colors = CheckboxDefaults.colors(
-                    checkedColor = MaterialTheme.colorScheme.primary, // Синий при активном
-                    uncheckedColor = MaterialTheme.colorScheme.primary, // Теперь тоже синий при неактивном!
-                    checkmarkColor = MaterialTheme.colorScheme.onPrimary, // Цвет галочки
+                    checkedColor = MaterialTheme.colorScheme.primary,
+                    uncheckedColor = MaterialTheme.colorScheme.primary,
+                    checkmarkColor = MaterialTheme.colorScheme.onPrimary,
                     disabledCheckedColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.38f),
                     disabledUncheckedColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.38f),
                     disabledIndeterminateColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.38f)
@@ -93,14 +93,12 @@ fun HideSalaryFilterCheckboxPreview() {
             modifier = Modifier.padding(Spacing16),
             verticalArrangement = Arrangement.spacedBy(Spacing16)
         ) {
-            // Пример 1: Неактивный чекбокс
             HideSalaryFilterCheckbox(
                 modifier = Modifier.fillMaxWidth(),
                 isChecked = false,
                 onCheckedChange = {}
             )
 
-            // Пример 2: Активный чекбокс
             HideSalaryFilterCheckbox(
                 modifier = Modifier.fillMaxWidth(),
                 isChecked = true,

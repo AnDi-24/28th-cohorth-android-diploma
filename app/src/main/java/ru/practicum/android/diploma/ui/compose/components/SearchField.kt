@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import ru.practicum.android.diploma.R
@@ -39,7 +40,6 @@ fun SearchField(
     onQueryChange: (String) -> Unit = { viewModel.setVacancySearchQuery(it) },
     onSearch: (String) -> Unit = { viewModel.searchVacancies(it) }
 ) {
-    // Для MAIN экрана используем StateFlow из SearchViewModel
     val queryState = when (screenTag) {
         MAIN -> viewModel.vacancySearchQuery.collectAsStateWithLifecycle()
         else -> mutableStateOf(query)
@@ -49,7 +49,6 @@ fun SearchField(
         mutableStateOf(if (query.isNotEmpty()) query else queryState.value)
     }
 
-    // Синхронизация с внешним состоянием
     LaunchedEffect(queryState.value) {
         if (queryState.value != inputValue) {
             inputValue = queryState.value
@@ -62,7 +61,6 @@ fun SearchField(
         }
     }
 
-    // Дебаунс для MAIN экрана
     LaunchedEffect(inputValue) {
         if (screenTag == MAIN && inputValue.isNotEmpty()) {
             delay(SEARCH_DEBOUNCE_DELAY)
@@ -100,14 +98,14 @@ fun SearchField(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_close),
                         tint = colorResource(R.color.black_universal),
-                        contentDescription = "Очистить"
+                        contentDescription = stringResource(R.string.clear)
                     )
                 }
             } else {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_search),
                     tint = colorResource(R.color.black_universal),
-                    contentDescription = "Поиск"
+                    contentDescription = stringResource(R.string.search)
                 )
             }
         },
@@ -122,7 +120,7 @@ fun SearchField(
 
 private fun shouldBeLabel(tag: String): (@Composable () -> Unit)? {
     return if (tag == FILTER) {
-        { Text("Ожидаемая зарплата") }
+        { Text(stringResource(R.string.expected_salary)) }
     } else {
         null
     }

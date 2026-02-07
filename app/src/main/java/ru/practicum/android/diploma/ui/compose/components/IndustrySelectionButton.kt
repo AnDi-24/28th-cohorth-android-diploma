@@ -122,7 +122,6 @@ fun IndustrySelectionButton(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Текст с собственными паддингами
                 Text(
                     text = stringResource(id = R.string.industry),
                     modifier = Modifier
@@ -141,7 +140,6 @@ fun IndustrySelectionButton(
                     textAlign = TextAlign.Start
                 )
 
-                // Иконка стрелочки - отдельный кликабельный элемент
                 Box(
                     modifier = Modifier
                         .size(48.dp)
@@ -167,7 +165,6 @@ fun IndustrySelectionButtonPreview_Multiple() {
                 .background(MaterialTheme.colorScheme.background),
             verticalArrangement = Arrangement.spacedBy(Spacing16)
         ) {
-            // Пример 1: Отрасль не выбрана
             IndustrySelectionButton(
                 modifier = Modifier.fillMaxWidth(),
                 isIndustrySelected = false,
@@ -176,7 +173,6 @@ fun IndustrySelectionButtonPreview_Multiple() {
                 onClick = {}
             )
 
-            // Пример 2: Среднее название
             IndustrySelectionButton(
                 modifier = Modifier.fillMaxWidth(),
                 isIndustrySelected = true,
@@ -185,7 +181,6 @@ fun IndustrySelectionButtonPreview_Multiple() {
                 onClick = {}
             )
 
-            // Пример 3: Очень длинное название
             IndustrySelectionButton(
                 modifier = Modifier.fillMaxWidth(),
                 isIndustrySelected = true,
