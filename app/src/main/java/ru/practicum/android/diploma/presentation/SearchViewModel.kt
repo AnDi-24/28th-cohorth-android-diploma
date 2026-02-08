@@ -278,4 +278,3 @@ class SearchViewModel(
         private const val ERROR_UNKNOWN = "Неизвестная ошибка"
     }
 }
-
