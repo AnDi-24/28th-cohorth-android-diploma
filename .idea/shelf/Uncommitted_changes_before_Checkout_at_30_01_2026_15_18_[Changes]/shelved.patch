@@ -1,0 +1,131 @@
+Index: app/src/main/java/ru/practicum/android/diploma/ui/compose/MainScreen.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ru.practicum.android.diploma.ui.compose\r\n\r\nimport androidx.compose.foundation.layout.Arrangement\r\nimport androidx.compose.foundation.layout.Column\r\nimport androidx.compose.foundation.layout.fillMaxSize\r\nimport androidx.compose.foundation.layout.padding\r\nimport androidx.compose.material3.Button\r\nimport androidx.compose.material3.Text\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.compose.ui.Alignment\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.unit.dp\r\nimport androidx.navigation.NavController\r\n\r\n@Composable\r\nfun MainScreen(navController: NavController) {\r\n    Column(\r\n        modifier = Modifier\r\n            .fillMaxSize()\r\n            .padding(16.dp),\r\n        verticalArrangement = Arrangement.Center,\r\n        horizontalAlignment = Alignment.CenterHorizontally\r\n    ) {\r\n        Text(text = \"Экран 1 — Главная\")\r\n        Button(onClick = {\r\n            navController.navigate(VACANCY)\r\n        }) {\r\n            Text(\"Вакансия\")\r\n        }\r\n        Button(onClick = {\r\n            navController.navigate(FILTER)\r\n        }) {\r\n            Text(\"Фильтры\")\r\n        }\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/ru/practicum/android/diploma/ui/compose/MainScreen.kt b/app/src/main/java/ru/practicum/android/diploma/ui/compose/MainScreen.kt
+--- a/app/src/main/java/ru/practicum/android/diploma/ui/compose/MainScreen.kt	(revision 8a2cb3182a0376c978532e8d616e0a38a3d54b03)
++++ b/app/src/main/java/ru/practicum/android/diploma/ui/compose/MainScreen.kt	(date 1769764789858)
+@@ -33,4 +33,6 @@
+             Text("Фильтры")
+         }
+     }
++
+ }
++
+Index: app/src/main/java/ru/practicum/android/diploma/util/VacancyMapper.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ru.practicum.android.diploma.util\r\n\r\nimport ru.practicum.android.diploma.data.local.VacancyEntity\r\nimport ru.practicum.android.diploma.domain.network.models.Address\r\nimport ru.practicum.android.diploma.domain.network.models.Employment\r\nimport ru.practicum.android.diploma.domain.network.models.Experience\r\nimport ru.practicum.android.diploma.domain.network.models.Salary\r\nimport ru.practicum.android.diploma.domain.network.models.Schedule\r\nimport ru.practicum.android.diploma.data.network.models.VacancyDto\r\nimport ru.practicum.android.diploma.domain.local.model.VacancyModel\r\nimport ru.practicum.android.diploma.domain.network.models.Area\r\nimport ru.practicum.android.diploma.domain.network.models.Contacts\r\nimport ru.practicum.android.diploma.domain.network.models.Employer\r\nimport ru.practicum.android.diploma.domain.network.models.Industry\r\nimport ru.practicum.android.diploma.domain.network.models.Phone\r\nimport ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel\r\n\r\nobject VacancyMapper {\r\n\r\n    fun mapperToEntity(vacancyModel: VacancyModel): VacancyEntity {\r\n        return VacancyEntity(\r\n            vacancyId = vacancyModel.vacancyId\r\n        )\r\n    }\r\n\r\n    fun mapperToRoomModel(vacancyEntity: VacancyEntity): VacancyModel {\r\n        return VacancyModel(\r\n            vacancyId = vacancyEntity.vacancyId\r\n        )\r\n    }\r\n\r\n    fun mapperFromDto(vacancyDto: VacancyDto): VacancyDetailsModel {\r\n        return VacancyDetailsModel(\r\n            id = vacancyDto.id.orEmpty(),\r\n            name = vacancyDto.name.orEmpty(),\r\n            salary = mapSalary(vacancyDto.salary),\r\n            address = mapAddress(vacancyDto.address),\r\n            experience = mapExperience(vacancyDto.experience),\r\n            schedule = mapSchedule(vacancyDto.schedule),\r\n            employment = mapEmployment(vacancyDto.employment),\r\n            contacts = mapContacts(vacancyDto.contacts),\r\n            description = vacancyDto.description.orEmpty(),\r\n            employer = mapEmployer(vacancyDto.employer),\r\n            area = mapArea(vacancyDto.area),\r\n            skills = vacancyDto.skills.orEmpty(),\r\n            url = vacancyDto.url.orEmpty(),\r\n            industry = mapIndustry(vacancyDto.industry)\r\n        )\r\n    }\r\n\r\n    private fun mapSalary(dto: ru.practicum.android.diploma.data.network.models.Salary?): Salary {\r\n        return if (dto == null) {\r\n            Salary(\r\n                id = \"\",\r\n                currency = \"\",\r\n                from = null,\r\n                to = null\r\n            )\r\n        } else {\r\n            Salary(\r\n                id = dto.id ?: \"\",\r\n                currency = dto.currency ?: \"\",\r\n                from = dto.from,\r\n                to = dto.to\r\n            )\r\n        }\r\n    }\r\n\r\n    private fun mapAddress(dto: ru.practicum.android.diploma.data.network.models.Address?): Address {\r\n        return if (dto == null) {\r\n            Address(\r\n                city = \"\",\r\n                street = null,\r\n                building = null,\r\n                raw = null,\r\n                id = \"\"\r\n            )\r\n        } else {\r\n            Address(\r\n                city = dto.city ?: \"\",\r\n                street = dto.street,\r\n                building = dto.building,\r\n                raw = dto.raw,\r\n                id = \"\"\r\n            )\r\n        }\r\n    }\r\n\r\n    private fun mapExperience(dto: ru.practicum.android.diploma.data.network.models.Experience?): Experience {\r\n        return if (dto == null) {\r\n            Experience(\r\n                name = \"\",\r\n                id = \"\"\r\n            )\r\n        } else {\r\n            Experience(\r\n                name = dto.name ?: \"\",\r\n                id = \"\"\r\n            )\r\n        }\r\n    }\r\n\r\n    private fun mapSchedule(dto: ru.practicum.android.diploma.data.network.models.Schedule?): Schedule {\r\n        return if (dto == null) {\r\n            Schedule(\r\n                id = \"\",\r\n                name = \"\"\r\n            )\r\n        } else {\r\n            Schedule(\r\n                id = dto.id ?: \"\",\r\n                name = dto.name ?: \"\"\r\n            )\r\n        }\r\n    }\r\n\r\n    private fun mapEmployment(dto: ru.practicum.android.diploma.data.network.models.Employment?): Employment {\r\n        return if (dto == null) {\r\n            Employment(\r\n                id = \"\",\r\n                name = \"\"\r\n            )\r\n        } else {\r\n            Employment(\r\n                id = dto.id ?: \"\",\r\n                name = dto.name ?: \"\"\r\n            )\r\n        }\r\n    }\r\n\r\n    private fun mapContacts(dto: ru.practicum.android.diploma.data.network.models.Contacts?): Contacts {\r\n        return if (dto == null) {\r\n            Contacts(\r\n                id = \"\",\r\n                name = \"\",\r\n                email = null,\r\n                phones = emptyList()\r\n            )\r\n        } else {\r\n            Contacts(\r\n                id = dto.id ?: \"\",\r\n                name = dto.name ?: \"\",\r\n                email = dto.email,\r\n                phones = mapPhones(dto.phones)\r\n            )\r\n        }\r\n    }\r\n\r\n    private fun mapPhones(dtos: List<ru.practicum.android.diploma.data.network.models.Phone>?): List<Phone> {\r\n        if (dtos == null) return emptyList()\r\n\r\n        return dtos.mapNotNull { phoneDto ->\r\n            phoneDto.formatted?.let { formatted ->\r\n                Phone(\r\n                    comment = null,\r\n                    formatted = formatted\r\n                )\r\n            }\r\n        }\r\n    }\r\n\r\n    private fun mapEmployer(dto: ru.practicum.android.diploma.data.network.models.Employer?): Employer {\r\n        return if (dto == null) {\r\n            Employer(\r\n                id = \"\",\r\n                name = \"\",\r\n                logo = null\r\n            )\r\n        } else {\r\n            Employer(\r\n                id = dto.name ?: \"\", // Используем name как id\r\n                name = dto.name ?: \"\",\r\n                logo = dto.logo\r\n            )\r\n        }\r\n    }\r\n\r\n    private fun mapArea(dto: ru.practicum.android.diploma.data.network.models.Area?): Area {\r\n        return if (dto == null) {\r\n            Area(\r\n                id = \"\",\r\n                parentId = null,\r\n                name = \"\",\r\n                areas = emptyList()\r\n            )\r\n        } else {\r\n            Area(\r\n                id = dto.id ?: \"\",\r\n                parentId = dto.parentId,\r\n                name = dto.name ?: \"\",\r\n                areas = emptyList()\r\n            )\r\n        }\r\n    }\r\n\r\n    private fun mapIndustry(dto: ru.practicum.android.diploma.data.network.models.Industry?): Industry {\r\n        return if (dto == null) {\r\n            Industry(\r\n                id = \"\",\r\n                name = \"\"\r\n            )\r\n        } else {\r\n            Industry(\r\n                id = dto.id ?: \"\",\r\n                name = dto.name ?: \"\"\r\n            )\r\n        }\r\n    }\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/ru/practicum/android/diploma/util/VacancyMapper.kt b/app/src/main/java/ru/practicum/android/diploma/util/VacancyMapper.kt
+--- a/app/src/main/java/ru/practicum/android/diploma/util/VacancyMapper.kt	(revision 8a2cb3182a0376c978532e8d616e0a38a3d54b03)
++++ b/app/src/main/java/ru/practicum/android/diploma/util/VacancyMapper.kt	(date 1769764626185)
+@@ -30,6 +30,7 @@
+     }
+ 
+     fun mapperFromDto(vacancyDto: VacancyDto): VacancyDetailsModel {
++
+         return VacancyDetailsModel(
+             id = vacancyDto.id.orEmpty(),
+             name = vacancyDto.name.orEmpty(),
+Index: app/src/main/java/ru/practicum/android/diploma/data/network/FindVacancyRepositoryImpl.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ru.practicum.android.diploma.data.network\r\n\r\nimport android.util.Log\r\nimport kotlinx.coroutines.flow.Flow\r\nimport kotlinx.coroutines.flow.flow\r\nimport ru.practicum.android.diploma.data.network.api.NetworkClient\r\nimport ru.practicum.android.diploma.data.network.models.VacancyDetailsRequest\r\nimport ru.practicum.android.diploma.data.network.models.VacancyDetailsResponse\r\nimport ru.practicum.android.diploma.data.network.models.VacancyDto\r\nimport ru.practicum.android.diploma.data.network.models.VacancyListRequest\r\nimport ru.practicum.android.diploma.data.network.models.VacancyListResponse\r\nimport ru.practicum.android.diploma.domain.network.api.FindVacancyRepository\r\nimport ru.practicum.android.diploma.util.ResponseState\r\nimport ru.practicum.android.diploma.util.Resource\r\nimport java.io.IOException\r\n\r\nclass FindVacancyRepositoryImpl(\r\n    private val retrofitClient: NetworkClient\r\n) : FindVacancyRepository {\r\n\r\n    override suspend fun getVacancyDetails(expression: String): Resource<VacancyDto> {\r\n        return try {\r\n            val response = retrofitClient.getVacancyById(\r\n                VacancyDetailsRequest(expression)\r\n            )\r\n            when (response.resultCode) {\r\n\r\n                ResponseState.SUCCESS -> {\r\n                    val vacancyResponse = response as? VacancyDetailsResponse\r\n                    val vacancy = vacancyResponse?.vacancyDto?.data\r\n                    if (vacancy != null) {\r\n                        Resource.Success(vacancy)\r\n                    } else {\r\n                        Resource.Error(\r\n                            ResponseState.NULL_DATA.errorMessage\r\n                        )\r\n                    }\r\n                }\r\n                else -> {\r\n                    Resource.Error(message = response.resultCode.errorMessage)\r\n                }\r\n            }\r\n        } catch (e: IOException) {\r\n            Resource.Error(e.message.toString())\r\n\r\n        }\r\n    }\r\n\r\n    override fun getListVacancies(area: Int,\r\n                                  industry: Int,\r\n                                  text: String,\r\n                                  salary: Int,\r\n                                  page: Int,\r\n                                  onlyWithSalary: Boolean\r\n    ): Flow<Resource<List<VacancyDto>>> = flow {\r\n        val response = retrofitClient.getVacanciesList(\r\n            VacancyListRequest(\r\n                area = area,\r\n                industry = industry,\r\n                text = text,\r\n                salary = salary,\r\n                page = page,\r\n                onlyWithSalary = onlyWithSalary\r\n            )\r\n        )\r\n        when (response.resultCode) {\r\n            ResponseState.SUCCESS -> {\r\n                val vacancyList = (response as? VacancyListResponse)?.items ?: emptyList()\r\n                Log.d(\"VacancyList - репозиторий\", vacancyList.size.toString())\r\n                emit(Resource.Success(vacancyList))\r\n            }\r\n            else -> {\r\n                Log.d(\"VacancyList - репозиторий\", response.resultCode.toString())\r\n                emit(Resource.Error(\"ошибка\"))\r\n            }\r\n        }\r\n    }\r\n\r\n}\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/ru/practicum/android/diploma/data/network/FindVacancyRepositoryImpl.kt b/app/src/main/java/ru/practicum/android/diploma/data/network/FindVacancyRepositoryImpl.kt
+--- a/app/src/main/java/ru/practicum/android/diploma/data/network/FindVacancyRepositoryImpl.kt	(revision 8a2cb3182a0376c978532e8d616e0a38a3d54b03)
++++ b/app/src/main/java/ru/practicum/android/diploma/data/network/FindVacancyRepositoryImpl.kt	(date 1769764629539)
+@@ -1,14 +1,12 @@
+ package ru.practicum.android.diploma.data.network
+ 
+-import android.util.Log
+-import kotlinx.coroutines.flow.Flow
+-import kotlinx.coroutines.flow.flow
+ import ru.practicum.android.diploma.data.network.api.NetworkClient
++import ru.practicum.android.diploma.data.network.models.VacanciesRequest
++import ru.practicum.android.diploma.data.network.models.VacanciesResponse
++import ru.practicum.android.diploma.data.network.models.VacanciesResponseDto
+ import ru.practicum.android.diploma.data.network.models.VacancyDetailsRequest
+ import ru.practicum.android.diploma.data.network.models.VacancyDetailsResponse
+ import ru.practicum.android.diploma.data.network.models.VacancyDto
+-import ru.practicum.android.diploma.data.network.models.VacancyListRequest
+-import ru.practicum.android.diploma.data.network.models.VacancyListResponse
+ import ru.practicum.android.diploma.domain.network.api.FindVacancyRepository
+ import ru.practicum.android.diploma.util.ResponseState
+ import ru.practicum.android.diploma.util.Resource
+@@ -20,7 +18,7 @@
+ 
+     override suspend fun getVacancyDetails(expression: String): Resource<VacancyDto> {
+         return try {
+-            val response = retrofitClient.getVacancyById(
++            val response = retrofitClient.doRequestVacancyDetails(
+                 VacancyDetailsRequest(expression)
+             )
+             when (response.resultCode) {
+@@ -46,35 +44,32 @@
+         }
+     }
+ 
+-    override fun getListVacancies(area: Int,
+-                                  industry: Int,
+-                                  text: String,
+-                                  salary: Int,
+-                                  page: Int,
+-                                  onlyWithSalary: Boolean
+-    ): Flow<Resource<List<VacancyDto>>> = flow {
+-        val response = retrofitClient.getVacanciesList(
+-            VacancyListRequest(
+-                area = area,
+-                industry = industry,
+-                text = text,
+-                salary = salary,
+-                page = page,
+-                onlyWithSalary = onlyWithSalary
++    override suspend fun getVacancies(expression: String): Resource<List<VacancyDto>> {
++        return try {
++            val response = retrofitClient.doRequestVacancies(
++                VacanciesRequest(expression)
+             )
+-        )
+-        when (response.resultCode) {
+-            ResponseState.SUCCESS -> {
+-                val vacancyList = (response as? VacancyListResponse)?.items ?: emptyList()
+-                Log.d("VacancyList - репозиторий", vacancyList.size.toString())
+-                emit(Resource.Success(vacancyList))
+-            }
+-            else -> {
+-                Log.d("VacancyList - репозиторий", response.resultCode.toString())
+-                emit(Resource.Error("ошибка"))
++            when (response.resultCode) {
++
++                ResponseState.SUCCESS -> {
++                    val vacancyResponse = response as? VacanciesResponse
++                    val vacancy = vacancyResponse?.vacanciesDto?.data?.vacancies
++                    if (vacancy != null) {
++                        Resource.Success(vacancy)
++                    } else {
++                        Resource.Error(
++                            ResponseState.NULL_DATA.errorMessage
++                        )
++                    }
++                }
++                else -> {
++                    Resource.Error(message = response.resultCode.errorMessage)
++                }
+             }
++        } catch (e: IOException) {
++            Resource.Error(e.message.toString())
++
+         }
+     }
+-
+ }
+ 

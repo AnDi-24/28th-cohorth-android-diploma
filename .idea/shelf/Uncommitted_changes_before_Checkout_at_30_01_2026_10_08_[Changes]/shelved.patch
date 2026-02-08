@@ -1,0 +1,197 @@
+Index: app/src/main/java/ru/practicum/android/diploma/ui/compose/VacancyScreen.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ru.practicum.android.diploma.ui.compose\r\n\r\nimport android.util.Log\r\nimport android.widget.ImageView\r\nimport androidx.compose.foundation.BorderStroke\r\nimport androidx.compose.foundation.layout.Arrangement\r\nimport androidx.compose.foundation.layout.PaddingValues\r\nimport androidx.compose.foundation.layout.Row\r\nimport androidx.compose.foundation.layout.fillMaxSize\r\nimport androidx.compose.foundation.layout.fillMaxWidth\r\nimport androidx.compose.foundation.layout.height\r\nimport androidx.compose.foundation.layout.padding\r\nimport androidx.compose.foundation.layout.size\r\nimport androidx.compose.foundation.lazy.LazyColumn\r\nimport androidx.compose.foundation.shape.RoundedCornerShape\r\nimport androidx.compose.material3.MaterialTheme\r\nimport androidx.compose.material3.Surface\r\nimport androidx.compose.material3.Text\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.compose.runtime.getValue\r\nimport androidx.compose.ui.Alignment\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.draw.clip\r\nimport androidx.compose.ui.text.font.FontWeight\r\nimport androidx.compose.ui.unit.dp\r\nimport androidx.compose.ui.viewinterop.AndroidView\r\nimport androidx.lifecycle.compose.collectAsStateWithLifecycle\r\nimport androidx.navigation.NavController\r\nimport com.bumptech.glide.Glide\r\nimport org.koin.androidx.compose.koinViewModel\r\nimport ru.practicum.android.diploma.R\r\nimport ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel\r\nimport ru.practicum.android.diploma.presentation.VacancyDetailsViewModel\r\n\r\n@Composable\r\nfun VacancyScreen(navController: NavController) {\r\n    val viewModel: VacancyDetailsViewModel = koinViewModel()\r\n    val uiState by viewModel.uiState.collectAsStateWithLifecycle()\r\n\r\n    val currentState = uiState\r\n\r\n    val vacancyData: VacancyDetailsModel? = when (currentState) {\r\n        is VacancyDetailsViewModel.VacancyUiState.Success -> {\r\n            val vacancy = currentState.vacancy\r\n            VacancyDetailsModel(\r\n                id = vacancy.id,\r\n                name = vacancy.name,\r\n                salary = vacancy.salary,\r\n                address = vacancy.address,\r\n                experience = vacancy.experience,\r\n                schedule = vacancy.schedule,\r\n                employment = vacancy.employment,\r\n                description = vacancy.description,\r\n                employer = vacancy.employer,\r\n                skills = vacancy.skills,\r\n                url = vacancy.url\r\n            )\r\n        }\r\n        else -> null\r\n    }\r\n\r\n    LazyColumn(\r\n        modifier = Modifier.fillMaxSize(),\r\n        contentPadding = PaddingValues(16.dp),\r\n        verticalArrangement = Arrangement.spacedBy(3.dp)\r\n    ) {\r\n        item {\r\n            vacancyData?.url?.let {\r\n                Text(\r\n                    text = it,\r\n                    fontWeight = FontWeight.Bold,\r\n                    modifier = Modifier.fillMaxWidth()\r\n                )\r\n            }\r\n        }\r\n\r\n        item {\r\n//            Text(\r\n//                text = vacancyData.salary,\r\n//                fontWeight = FontWeight.Bold,\r\n//                modifier = Modifier.fillMaxWidth()\r\n//            )\r\n        }\r\n\r\n        item {\r\n            Surface(\r\n                modifier = Modifier.fillMaxWidth()\r\n                    .height(100.dp),\r\n                shape = MaterialTheme.shapes.medium,\r\n                color = MaterialTheme.colorScheme.surfaceVariant,\r\n                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)\r\n            ) {\r\n                Row(\r\n                    modifier = Modifier\r\n                        .fillMaxSize()\r\n                        .padding(16.dp),\r\n                    verticalAlignment = Alignment.CenterVertically,\r\n                    horizontalArrangement = Arrangement.spacedBy(16.dp)\r\n                ) {\r\n                    EmployerLogoGlide(\r\n                        logoUrl = vacancyData?.url, // Используем URL логотипа\r\n                        modifier = Modifier\r\n                            .size(80.dp)\r\n                            .clip(RoundedCornerShape(8.dp))\r\n                    )\r\n                }\r\n            }\r\n        }\r\n    }\r\n}\r\n@Composable\r\nfun EmployerLogoGlide(\r\n    logoUrl: String?,\r\n    modifier: Modifier = Modifier\r\n) {\r\n    AndroidView(\r\n        factory = { context ->\r\n            ImageView(context).apply {\r\n                scaleType = ImageView.ScaleType.CENTER_CROP\r\n                adjustViewBounds = true\r\n            }\r\n        },\r\n        update = { imageView ->\r\n            // Определяем что загружать\r\n            logoUrl?.let { url ->\r\n                Glide.with(imageView.context)\r\n                    .load(url)\r\n                    .placeholder(R.drawable.team)\r\n                    .into(imageView)\r\n            }\r\n        },\r\n        modifier = modifier\r\n    )\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/ru/practicum/android/diploma/ui/compose/VacancyScreen.kt b/app/src/main/java/ru/practicum/android/diploma/ui/compose/VacancyScreen.kt
+--- a/app/src/main/java/ru/practicum/android/diploma/ui/compose/VacancyScreen.kt	(revision 4e129f53e67ec49fa495a5246744ce3af6d9c3c2)
++++ b/app/src/main/java/ru/practicum/android/diploma/ui/compose/VacancyScreen.kt	(date 1769679849213)
+@@ -1,27 +1,21 @@
+ package ru.practicum.android.diploma.ui.compose
+ 
+-import android.util.Log
+ import android.widget.ImageView
+-import androidx.compose.foundation.BorderStroke
+ import androidx.compose.foundation.layout.Arrangement
+ import androidx.compose.foundation.layout.PaddingValues
+-import androidx.compose.foundation.layout.Row
++
+ import androidx.compose.foundation.layout.fillMaxSize
+ import androidx.compose.foundation.layout.fillMaxWidth
+-import androidx.compose.foundation.layout.height
+-import androidx.compose.foundation.layout.padding
+-import androidx.compose.foundation.layout.size
++
+ import androidx.compose.foundation.lazy.LazyColumn
+-import androidx.compose.foundation.shape.RoundedCornerShape
+-import androidx.compose.material3.MaterialTheme
+-import androidx.compose.material3.Surface
+-import androidx.compose.material3.Text
++import androidx.compose.foundation.lazy.items
++
+ import androidx.compose.runtime.Composable
+ import androidx.compose.runtime.getValue
+-import androidx.compose.ui.Alignment
++import androidx.compose.runtime.remember
++
+ import androidx.compose.ui.Modifier
+-import androidx.compose.ui.draw.clip
+-import androidx.compose.ui.text.font.FontWeight
++
+ import androidx.compose.ui.unit.dp
+ import androidx.compose.ui.viewinterop.AndroidView
+ import androidx.lifecycle.compose.collectAsStateWithLifecycle
+@@ -31,104 +25,71 @@
+ import ru.practicum.android.diploma.R
+ import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
+ import ru.practicum.android.diploma.presentation.VacancyDetailsViewModel
++import ru.practicum.android.diploma.ui.compose.components.VacancyListItem
++
+ 
+ @Composable
+ fun VacancyScreen(navController: NavController) {
+     val viewModel: VacancyDetailsViewModel = koinViewModel()
+     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+-
++    // Создаем локальную копию для smart cast
+     val currentState = uiState
+ 
+-    val vacancyData: VacancyDetailsModel? = when (currentState) {
++
++
++
++    // Декомпозируем логику
++    val vacanciesList = when (val currentState = uiState) {
+         is VacancyDetailsViewModel.VacancyUiState.Success -> {
+-            val vacancy = currentState.vacancy
+-            VacancyDetailsModel(
+-                id = vacancy.id,
+-                name = vacancy.name,
+-                salary = vacancy.salary,
+-                address = vacancy.address,
+-                experience = vacancy.experience,
+-                schedule = vacancy.schedule,
+-                employment = vacancy.employment,
+-                description = vacancy.description,
+-                employer = vacancy.employer,
+-                skills = vacancy.skills,
+-                url = vacancy.url
+-            )
++            remember(currentState.vacancy) {
++                (1..20).map { index ->
++                    VacancyDetailsModel(
++                        id = "${currentState.vacancy.id}_$index",
++                        name = "${currentState.vacancy.name} $index",
++                        salary = currentState.vacancy.salary,
++                        address = currentState.vacancy.address,
++                        experience = currentState.vacancy.experience,
++                        schedule = currentState.vacancy.schedule,
++                        employment = currentState.vacancy.employment,
++                        description = currentState.vacancy.description,
++                        employer = currentState.vacancy.employer,
++                        skills = currentState.vacancy.skills,
++                        url = "${currentState.vacancy.url}/$index"
++                    )
++                }
++            }
+         }
+-        else -> null
++        else -> emptyList<VacancyDetailsModel>()
+     }
++
+ 
+     LazyColumn(
+         modifier = Modifier.fillMaxSize(),
+         contentPadding = PaddingValues(16.dp),
+         verticalArrangement = Arrangement.spacedBy(3.dp)
+     ) {
+-        item {
+-            vacancyData?.url?.let {
+-                Text(
+-                    text = it,
+-                    fontWeight = FontWeight.Bold,
+-                    modifier = Modifier.fillMaxWidth()
+-                )
+-            }
+-        }
+ 
+-        item {
+-//            Text(
+-//                text = vacancyData.salary,
+-//                fontWeight = FontWeight.Bold,
+-//                modifier = Modifier.fillMaxWidth()
+-//            )
+-        }
+-
+-        item {
+-            Surface(
+-                modifier = Modifier.fillMaxWidth()
+-                    .height(100.dp),
+-                shape = MaterialTheme.shapes.medium,
+-                color = MaterialTheme.colorScheme.surfaceVariant,
+-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+-            ) {
+-                Row(
+-                    modifier = Modifier
+-                        .fillMaxSize()
+-                        .padding(16.dp),
+-                    verticalAlignment = Alignment.CenterVertically,
+-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+-                ) {
+-                    EmployerLogoGlide(
+-                        logoUrl = vacancyData?.url, // Используем URL логотипа
+-                        modifier = Modifier
+-                            .size(80.dp)
+-                            .clip(RoundedCornerShape(8.dp))
++        when (val currentState = uiState) {
++            is VacancyDetailsViewModel.VacancyUiState.Success -> {
++                items(vacanciesList){vacancy ->
++                    VacancyListItem(
++                        vacancy = vacancy,
++                        onClick = {
++                            navController.navigate("vacancy_details/${vacancy.id}")
++                        },
++                        modifier = Modifier.fillMaxWidth()
+                     )
++
+                 }
+             }
+-        }
+-    }
+-}
+-@Composable
+-fun EmployerLogoGlide(
+-    logoUrl: String?,
+-    modifier: Modifier = Modifier
+-) {
+-    AndroidView(
+-        factory = { context ->
+-            ImageView(context).apply {
+-                scaleType = ImageView.ScaleType.CENTER_CROP
+-                adjustViewBounds = true
+-            }
+-        },
+-        update = { imageView ->
+-            // Определяем что загружать
+-            logoUrl?.let { url ->
+-                Glide.with(imageView.context)
+-                    .load(url)
+-                    .placeholder(R.drawable.team)
+-                    .into(imageView)
+-            }
+-        },
+-        modifier = modifier
+-    )
++            else -> {
++
++            }
++        }
++    }
++    
++    
++    
++    
++    
+ }

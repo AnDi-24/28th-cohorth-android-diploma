@@ -2,6 +2,8 @@ package ru.practicum.android.diploma.ui.compose
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -9,6 +11,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
@@ -18,14 +21,23 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import org.koin.androidx.compose.koinViewModel
 import ru.practicum.android.diploma.R
+import ru.practicum.android.diploma.presentation.SearchViewModel
+import ru.practicum.android.diploma.presentation.VacancyDetailsViewModel
 import ru.practicum.android.diploma.presentation.models.NavItem
+import ru.practicum.android.diploma.ui.compose.components.FavoriteButton
+import ru.practicum.android.diploma.ui.compose.components.ShareButton
+import ru.practicum.android.diploma.ui.compose.components.TopBar
 import ru.practicum.android.diploma.ui.theme.LightGray
 import ru.practicum.android.diploma.ui.theme.Typography
 
@@ -40,12 +52,25 @@ const val VACANCY = "vacancy"
 fun NavGraph() {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
+    val vacancyViewModel: VacancyDetailsViewModel = koinViewModel()
     val currentRoute = backStackEntry?.destination?.route
+
     val showBottomBar = when (currentRoute) {
         MAIN, FAVORITE, TEAM -> true
         else -> false
     }
+    val viewModel: SearchViewModel = koinViewModel()
+
+    val topBar: @Composable () -> Unit = {
+        TopBar(
+            currentRoute,
+            navController,
+            backStackEntry,
+            vacancyViewModel
+        )
+    }
     Scaffold(
+        topBar = topBar,
         bottomBar = {
             if (showBottomBar) {
                 BottomNavigationBar(navController, currentRoute)
@@ -58,7 +83,7 @@ fun NavGraph() {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(MAIN) {
-                MainScreen(navController)
+                MainScreen(viewModel, navController)
             }
             composable(FAVORITE) {
                 FavoriteScreen(navController)
@@ -69,11 +94,86 @@ fun NavGraph() {
             composable(FILTER) {
                 FilterScreen(navController)
             }
-            composable(VACANCY) {
-                VacancyScreen(navController)
+            composable(
+                route = "$VACANCY/{id}",
+                arguments = listOf(navArgument("id") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val vacancyId = backStackEntry.arguments?.getString("id")
+                VacancyScreen(vacancyId)
             }
             composable(OPTION) {
-                FilterOptionScreen(navController)
+                FilterOptionScreen()
+            }
+        }
+    }
+}
+
+@Composable
+fun TopBar(
+    currentRoute: String?,
+    navController: NavController,
+    backStackEntry: NavBackStackEntry? = null,
+    vacancyViewModel: VacancyDetailsViewModel
+) {
+    when (currentRoute) {
+        MAIN -> {
+            TopBar(
+                title = stringResource(R.string.main_screen),
+                null,
+                {
+                    IconButton(onClick = { navController.navigate(FILTER) }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_filters),
+                            contentDescription = null
+                        )
+                    }
+                }
+            )
+        }
+
+        TEAM -> {
+            TopBar(
+                title = stringResource(R.string.team_screen),
+            )
+        }
+
+        FILTER -> {
+            TopBar(
+                title = stringResource(R.string.filter),
+                { navController.popBackStack() }
+            )
+        }
+
+        OPTION -> {
+            TopBar(
+                title = stringResource(R.string.filter_option),
+                { navController.popBackStack() }
+            )
+        }
+
+        FAVORITE -> {
+            TopBar(
+                title = stringResource(R.string.favorite_screen)
+            )
+        }
+
+        is String -> {
+            if (currentRoute.startsWith(VACANCY)) {
+                TopBar(
+                    title = stringResource(R.string.vacancy),
+                    { navController.popBackStack() },
+                    {
+                        ShareButton(vacancyViewModel)
+                        val vacancyId = backStackEntry?.arguments?.getString("id")
+                        LaunchedEffect(vacancyId) {
+                            if (vacancyId != null) {
+                                vacancyViewModel.setVacancyId(vacancyId)
+                            }
+                        }
+
+                        FavoriteButton(vacancyViewModel)
+                    }
+                )
             }
         }
     }

@@ -9,13 +9,18 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface VacancyDao {
 
-    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
-    suspend fun addVacancyToFavorite(vacancy: VacancyEntity)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(vacancy: FavoriteVacancyEntity)
 
-    @Query("DELETE FROM favorite_vacancy WHERE vacancyId = :id")
-    suspend fun deleteVacancyFromFavorite(id: Long)
+    @Query("DELETE FROM favorite_vacancies WHERE id = :id")
+    suspend fun deleteById(id: String)
 
-    @Query("SELECT * FROM favorite_vacancy")
-    fun getAllFavoriteVacancy(): Flow<List<VacancyEntity>>
+    @Query("SELECT * FROM favorite_vacancies ORDER BY addedAt DESC")
+    fun getAll(): Flow<List<FavoriteVacancyEntity>>
 
+    @Query("SELECT EXISTS(SELECT 1 FROM favorite_vacancies WHERE id = :id)")
+    suspend fun isFavorite(id: String): Boolean
+
+    @Query("SELECT * FROM favorite_vacancies WHERE id = :id")
+    suspend fun getById(id: String): FavoriteVacancyEntity?
 }

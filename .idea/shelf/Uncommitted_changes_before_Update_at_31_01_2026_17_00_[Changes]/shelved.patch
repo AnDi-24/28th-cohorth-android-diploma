@@ -1,0 +1,208 @@
+Index: app/src/main/java/ru/practicum/android/diploma/ui/compose/VacancyScreen.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ru.practicum.android.diploma.ui.compose\r\n\r\nimport android.widget.ImageView\r\nimport androidx.compose.foundation.BorderStroke\r\nimport androidx.compose.foundation.layout.Arrangement\r\nimport androidx.compose.foundation.layout.PaddingValues\r\nimport androidx.compose.foundation.layout.Row\r\nimport androidx.compose.foundation.layout.fillMaxSize\r\nimport androidx.compose.foundation.layout.fillMaxWidth\r\nimport androidx.compose.foundation.layout.height\r\nimport androidx.compose.foundation.layout.padding\r\nimport androidx.compose.foundation.layout.size\r\nimport androidx.compose.foundation.lazy.LazyColumn\r\nimport androidx.compose.foundation.shape.RoundedCornerShape\r\nimport androidx.compose.material3.MaterialTheme\r\nimport androidx.compose.material3.Surface\r\nimport androidx.compose.material3.Text\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.compose.runtime.getValue\r\nimport androidx.compose.ui.Alignment\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.draw.clip\r\nimport androidx.compose.ui.text.font.FontWeight\r\nimport androidx.compose.ui.unit.dp\r\nimport androidx.compose.ui.viewinterop.AndroidView\r\nimport androidx.lifecycle.compose.collectAsStateWithLifecycle\r\nimport androidx.navigation.NavController\r\nimport com.bumptech.glide.Glide\r\nimport org.koin.androidx.compose.koinViewModel\r\nimport ru.practicum.android.diploma.R\r\nimport ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel\r\nimport ru.practicum.android.diploma.presentation.VacancyDetailsViewModel\r\n\r\n@Composable\r\nfun VacancyScreen(navController: NavController) {\r\n    val viewModel: VacancyDetailsViewModel = koinViewModel()\r\n    val uiState by viewModel.uiState.collectAsStateWithLifecycle()\r\n    // Создаем локальную копию для smart cast\r\n    val currentState = uiState\r\n\r\n    val vacancyData: VacancyDetailsModel = when (currentState) {\r\n        is VacancyDetailsViewModel.VacancyUiState.Success -> {\r\n            val vacancy = currentState.vacancy\r\n            VacancyDetailsModel(\r\n                id = vacancy.id,\r\n                name = vacancy.name,\r\n                salary = vacancy.salary,\r\n                address = vacancy.address,\r\n                experience = vacancy.experience,\r\n                schedule = vacancy.schedule,\r\n                employment = vacancy.employment,\r\n                description = vacancy.description,\r\n                employer = vacancy.employer,\r\n                skills = vacancy.skills,\r\n                url = vacancy.url\r\n            )\r\n        }\r\n\r\n        else -> {\r\n        }\r\n    } as VacancyDetailsModel\r\n\r\n    LazyColumn(\r\n        modifier = Modifier.fillMaxSize(),\r\n        contentPadding = PaddingValues(16.dp),\r\n        verticalArrangement = Arrangement.spacedBy(3.dp)\r\n    ) {\r\n        item {\r\n            vacancyData.url?.let {\r\n                Text(\r\n                    text = it,\r\n                    fontWeight = FontWeight.Bold,\r\n                    modifier = Modifier.fillMaxWidth()\r\n                )\r\n            }\r\n        }\r\n\r\n        item {\r\n//            Text(\r\n//                text = vacancyData.salary,\r\n//                fontWeight = FontWeight.Bold,\r\n//                modifier = Modifier.fillMaxWidth()\r\n//            )\r\n        }\r\n\r\n        item {\r\n            Surface(\r\n                modifier = Modifier.fillMaxWidth()\r\n                    .height(100.dp),\r\n                shape = MaterialTheme.shapes.medium,\r\n                color = MaterialTheme.colorScheme.surfaceVariant,\r\n                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)\r\n            ) {\r\n                Row(\r\n                    modifier = Modifier\r\n                        .fillMaxSize()\r\n                        .padding(16.dp),\r\n                    verticalAlignment = Alignment.CenterVertically,\r\n                    horizontalArrangement = Arrangement.spacedBy(16.dp)\r\n                ) {\r\n                    EmployerLogoGlide(\r\n                        logoUrl = vacancyData.url, // Используем URL логотипа\r\n                        modifier = Modifier\r\n                            .size(80.dp)\r\n                            .clip(RoundedCornerShape(8.dp))\r\n                    )\r\n                }\r\n            }\r\n        }\r\n    }\r\n}\r\n@Composable\r\nfun EmployerLogoGlide(\r\n    logoUrl: String?,\r\n    modifier: Modifier = Modifier\r\n) {\r\n    AndroidView(\r\n        factory = { context ->\r\n            ImageView(context).apply {\r\n                scaleType = ImageView.ScaleType.CENTER_CROP\r\n                adjustViewBounds = true\r\n            }\r\n        },\r\n        update = { imageView ->\r\n            // Определяем что загружать\r\n            logoUrl?.let { url ->\r\n                Glide.with(imageView.context)\r\n                    .load(url)\r\n                    .placeholder(R.drawable.team)\r\n                    .into(imageView)\r\n            }\r\n        },\r\n        modifier = modifier\r\n    )\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/ru/practicum/android/diploma/ui/compose/VacancyScreen.kt b/app/src/main/java/ru/practicum/android/diploma/ui/compose/VacancyScreen.kt
+--- a/app/src/main/java/ru/practicum/android/diploma/ui/compose/VacancyScreen.kt	(revision f3a9a302de68e8bdf990d3859df649adaf08f91d)
++++ b/app/src/main/java/ru/practicum/android/diploma/ui/compose/VacancyScreen.kt	(date 1769842281974)
+@@ -30,6 +30,8 @@
+ import ru.practicum.android.diploma.R
+ import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
+ import ru.practicum.android.diploma.presentation.VacancyDetailsViewModel
++import ru.practicum.android.diploma.ui.compose.components.FavoritesEmptyState
++import ru.practicum.android.diploma.ui.compose.components.FavoritesEmptyStatePreview
+ 
+ @Composable
+ fun VacancyScreen(navController: NavController) {
+@@ -57,79 +59,82 @@
+         }
+ 
+         else -> {
++
+         }
+     } as VacancyDetailsModel
+ 
+-    LazyColumn(
+-        modifier = Modifier.fillMaxSize(),
+-        contentPadding = PaddingValues(16.dp),
+-        verticalArrangement = Arrangement.spacedBy(3.dp)
+-    ) {
+-        item {
+-            vacancyData.url?.let {
+-                Text(
+-                    text = it,
+-                    fontWeight = FontWeight.Bold,
+-                    modifier = Modifier.fillMaxWidth()
+-                )
+-            }
+-        }
+-
+-        item {
+-//            Text(
+-//                text = vacancyData.salary,
+-//                fontWeight = FontWeight.Bold,
+-//                modifier = Modifier.fillMaxWidth()
+-//            )
+-        }
++
++}
++//    LazyColumn(
++//        modifier = Modifier.fillMaxSize(),
++//        contentPadding = PaddingValues(16.dp),
++//        verticalArrangement = Arrangement.spacedBy(3.dp)
++//    ) {
++//        item {
++//            vacancyData.url?.let {
++//                Text(
++//                    text = it,
++//                    fontWeight = FontWeight.Bold,
++//                    modifier = Modifier.fillMaxWidth()
++//                )
++//            }
++//        }
++//
++//        item {
++////            Text(
++////                text = vacancyData.salary,
++////                fontWeight = FontWeight.Bold,
++////                modifier = Modifier.fillMaxWidth()
++////            )
++//        }
++//
++//        item {
++//            Surface(
++//                modifier = Modifier.fillMaxWidth()
++//                    .height(100.dp),
++//                shape = MaterialTheme.shapes.medium,
++//                color = MaterialTheme.colorScheme.surfaceVariant,
++//                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
++//            ) {
++//                Row(
++//                    modifier = Modifier
++//                        .fillMaxSize()
++//                        .padding(16.dp),
++//                    verticalAlignment = Alignment.CenterVertically,
++//                    horizontalArrangement = Arrangement.spacedBy(16.dp)
++//                ) {
++//                    EmployerLogoGlide(
++//                        logoUrl = vacancyData.url, // Используем URL логотипа
++//                        modifier = Modifier
++//                            .size(80.dp)
++//                            .clip(RoundedCornerShape(8.dp))
++//                    )
++//                }
++//            }
++//        }
++//    }
++//}
++//@Composable
++//fun EmployerLogoGlide(
++//    logoUrl: String?,
++//    modifier: Modifier = Modifier
++//) {
++//    AndroidView(
++//        factory = { context ->
++//            ImageView(context).apply {
++//                scaleType = ImageView.ScaleType.CENTER_CROP
++//                adjustViewBounds = true
++//            }
++//        },
++//        update = { imageView ->
++//            // Определяем что загружать
++//            logoUrl?.let { url ->
++//                Glide.with(imageView.context)
++//                    .load(url)
++//                    .placeholder(R.drawable.team)
++//                    .into(imageView)
++//            }
++//        },
++//        modifier = modifier
++//    )
+ 
+-        item {
+-            Surface(
+-                modifier = Modifier.fillMaxWidth()
+-                    .height(100.dp),
+-                shape = MaterialTheme.shapes.medium,
+-                color = MaterialTheme.colorScheme.surfaceVariant,
+-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+-            ) {
+-                Row(
+-                    modifier = Modifier
+-                        .fillMaxSize()
+-                        .padding(16.dp),
+-                    verticalAlignment = Alignment.CenterVertically,
+-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+-                ) {
+-                    EmployerLogoGlide(
+-                        logoUrl = vacancyData.url, // Используем URL логотипа
+-                        modifier = Modifier
+-                            .size(80.dp)
+-                            .clip(RoundedCornerShape(8.dp))
+-                    )
+-                }
+-            }
+-        }
+-    }
+-}
+-@Composable
+-fun EmployerLogoGlide(
+-    logoUrl: String?,
+-    modifier: Modifier = Modifier
+-) {
+-    AndroidView(
+-        factory = { context ->
+-            ImageView(context).apply {
+-                scaleType = ImageView.ScaleType.CENTER_CROP
+-                adjustViewBounds = true
+-            }
+-        },
+-        update = { imageView ->
+-            // Определяем что загружать
+-            logoUrl?.let { url ->
+-                Glide.with(imageView.context)
+-                    .load(url)
+-                    .placeholder(R.drawable.team)
+-                    .into(imageView)
+-            }
+-        },
+-        modifier = modifier
+-    )
+-}
+Index: .idea/deploymentTargetSelector.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"deploymentTargetSelector\">\r\n    <selectionStates>\r\n      <SelectionState runConfigName=\"app\">\r\n        <option name=\"selectionMode\" value=\"DROPDOWN\" />\r\n        <DropdownSelection timestamp=\"2026-01-24T06:16:35.433275500Z\">\r\n          <Target type=\"DEFAULT_BOOT\">\r\n            <handle>\r\n              <DeviceId pluginId=\"LocalEmulator\" identifier=\"path=C:\\Users\\setwe\\.android\\avd\\Medium_Phone_API_31.avd\" />\r\n            </handle>\r\n          </Target>\r\n        </DropdownSelection>\r\n        <DialogSelection />\r\n      </SelectionState>\r\n      <SelectionState runConfigName=\"GetVacancyListFailedEmptyStatePreview\">\r\n        <option name=\"selectionMode\" value=\"DROPDOWN\" />\r\n      </SelectionState>\r\n      <SelectionState runConfigName=\"GetListFailedEmptyStatePreview\">\r\n        <option name=\"selectionMode\" value=\"DROPDOWN\" />\r\n      </SelectionState>\r\n      <SelectionState runConfigName=\"VacancyNotFoundEmptyStatePreview\">\r\n        <option name=\"selectionMode\" value=\"DROPDOWN\" />\r\n      </SelectionState>\r\n      <SelectionState runConfigName=\"ServerErrorEmptyStatePreview\">\r\n        <option name=\"selectionMode\" value=\"DROPDOWN\" />\r\n      </SelectionState>\r\n      <SelectionState runConfigName=\"ServerErrorVacancyEmptyStatePreview\">\r\n        <option name=\"selectionMode\" value=\"DROPDOWN\" />\r\n      </SelectionState>\r\n    </selectionStates>\r\n  </component>\r\n</project>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/deploymentTargetSelector.xml b/.idea/deploymentTargetSelector.xml
+--- a/.idea/deploymentTargetSelector.xml	(revision f3a9a302de68e8bdf990d3859df649adaf08f91d)
++++ b/.idea/deploymentTargetSelector.xml	(date 1769841275020)
+@@ -13,21 +13,6 @@
+         </DropdownSelection>
+         <DialogSelection />
+       </SelectionState>
+-      <SelectionState runConfigName="GetVacancyListFailedEmptyStatePreview">
+-        <option name="selectionMode" value="DROPDOWN" />
+-      </SelectionState>
+-      <SelectionState runConfigName="GetListFailedEmptyStatePreview">
+-        <option name="selectionMode" value="DROPDOWN" />
+-      </SelectionState>
+-      <SelectionState runConfigName="VacancyNotFoundEmptyStatePreview">
+-        <option name="selectionMode" value="DROPDOWN" />
+-      </SelectionState>
+-      <SelectionState runConfigName="ServerErrorEmptyStatePreview">
+-        <option name="selectionMode" value="DROPDOWN" />
+-      </SelectionState>
+-      <SelectionState runConfigName="ServerErrorVacancyEmptyStatePreview">
+-        <option name="selectionMode" value="DROPDOWN" />
+-      </SelectionState>
+     </selectionStates>
+   </component>
+-</project>
++</project>
+\ No newline at end of file

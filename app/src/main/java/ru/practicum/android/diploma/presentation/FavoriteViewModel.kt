@@ -6,54 +6,59 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ru.practicum.android.diploma.domain.local.api.FavoriteVacancyInteractor
-import ru.practicum.android.diploma.domain.local.model.VacancyModel
-import ru.practicum.android.diploma.domain.network.api.FindVacancyInteractor
+import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
+import java.io.IOException
 
-private const val MOK_VACANCY_ID = "0001266a-3da9-4af8-b384-2377f0ea5453"
 class FavoriteViewModel(
-    private val roomInteractor: FavoriteVacancyInteractor,
-    private val retrofitInteractor: FindVacancyInteractor
+    private val favoriteInteractor: FavoriteVacancyInteractor
 ) : ViewModel() {
 
+    private val _uiState = MutableStateFlow<FavoriteUiState>(FavoriteUiState.Loading)
+    val uiState: StateFlow<FavoriteUiState> = _uiState.asStateFlow()
+
     init {
-        getAllFavoriteVacancy()
-        searchVacancyDetails()
+        loadFavorites()
     }
 
-    private val _vacanciesFlow = MutableStateFlow<List<VacancyModel>>(emptyList())
-    val vacanciesFlow: StateFlow<List<VacancyModel>> = _vacanciesFlow.asStateFlow()
-
-    private fun getAllFavoriteVacancy() {
+    private fun loadFavorites() {
         viewModelScope.launch {
-            roomInteractor.getAllFavoriteVacancy()
-                .collect { listVacancies ->
-                    _vacanciesFlow.value = listVacancies
+            try {
+                favoriteInteractor.getAllFavoritesForList().collectLatest { vacancies ->
+                    _uiState.value = if (vacancies.isEmpty()) {
+                        FavoriteUiState.Empty
+                    } else {
+                        FavoriteUiState.Success(vacancies)
+                    }
                 }
+            } catch (e: IOException) {
+                logException("IO error loading favorites", e)
+                _uiState.value = FavoriteUiState.Error
+            } catch (e: IllegalStateException) {
+                logException("Illegal state loading favorites", e)
+                _uiState.value = FavoriteUiState.Error
+            } catch (e: IllegalArgumentException) {
+                logException("Illegal argument loading favorites", e)
+                _uiState.value = FavoriteUiState.Error
+            }
         }
     }
 
-    fun addVacancy(vacancy: VacancyModel) {
-        viewModelScope.launch {
-            roomInteractor.addVacancyToFavorite(vacancy = vacancy)
-        }
+    fun refresh() {
+        _uiState.value = FavoriteUiState.Loading
+        loadFavorites()
     }
+}
 
-    fun deleteVacancy(id: Long) {
-        viewModelScope.launch {
-            roomInteractor.deleteVacancyFromFavorite(id = id)
-        }
-    }
+sealed interface FavoriteUiState {
+    object Loading : FavoriteUiState
+    object Empty : FavoriteUiState
+    object Error : FavoriteUiState
+    data class Success(val vacancies: List<VacancyDetailsModel>) : FavoriteUiState
+}
 
-    fun searchVacancyDetails() {
-        viewModelScope.launch {
-            retrofitInteractor
-                .getVacancyDetails(MOK_VACANCY_ID)
-                .collect { vacancyDto ->
-                    Log.d("searchVacancyDetails in ViewModel", vacancyDto.name ?: " --- ")
-                }
-        }
-    }
-
+private fun logException(message: String, exception: Exception) {
+    Log.e("FavoriteViewModel", "$message: ${exception.message}")
 }

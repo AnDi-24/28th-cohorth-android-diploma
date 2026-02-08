@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("ru.practicum.android.diploma.plugins.developproperties")
+    id("kotlin-parcelize")
     id("com.google.devtools.ksp") version "1.9.22-1.0.17"
 }
 
@@ -48,6 +49,7 @@ android {
 }
 
 dependencies {
+    implementation("com.airbnb.android:lottie-compose:6.4.0")
     implementation(libs.converter.gson)
     implementation(libs.material)
     implementation(libs.navigation.compose)
@@ -64,6 +66,13 @@ dependencies {
     implementation("io.insert-koin:koin-androidx-compose:3.5.0")
     implementation(libs.navigation.compose)
     implementation(libs.material3)
+    implementation(libs.coil.compose)
+    implementation(libs.ui.tooling.preview)
+    implementation(libs.foundation.layout)
+    implementation(libs.ui.graphics)
+    implementation(libs.foundation)
+    implementation(libs.androidx.foundation.layout)
+    debugImplementation(libs.ui.tooling)
     ksp(libs.compiler)
     ksp(libs.room.compiler)
 

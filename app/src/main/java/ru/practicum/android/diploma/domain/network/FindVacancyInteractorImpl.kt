@@ -1,15 +1,71 @@
 package ru.practicum.android.diploma.domain.network
 
 import kotlinx.coroutines.flow.Flow
-import ru.practicum.android.diploma.data.network.models.VacancyDto
+import kotlinx.coroutines.flow.map
 import ru.practicum.android.diploma.domain.network.api.FindVacancyInteractor
 import ru.practicum.android.diploma.domain.network.api.FindVacancyRepository
+import ru.practicum.android.diploma.domain.network.models.SearchParams
+import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
+import ru.practicum.android.diploma.util.Resource
+import ru.practicum.android.diploma.util.ResponseState
+import ru.practicum.android.diploma.util.VacancyMapper
 
 class FindVacancyInteractorImpl(
-    val repository: FindVacancyRepository
+    val repository: FindVacancyRepository,
+    val mapper: VacancyMapper
 ) : FindVacancyInteractor {
+    override suspend fun getVacancyDetails(expression: String): Resource<VacancyDetailsModel> {
+        val resource = repository.getVacancyDetails(expression)
 
-    override fun getVacancyDetails(expression: String): Flow<VacancyDto> {
-        return repository.getVacancyDetails(expression)
+        return when (resource) {
+            is Resource.Success -> {
+                val vacancyDto = resource.data
+                if (vacancyDto != null) {
+                    val vacancyModel = mapper.mapperFromDto(vacancyDto)
+                    Resource.Success(vacancyModel)
+                } else {
+                    Resource.Error(ResponseState.NULL_DATA.errorMessage)
+                }
+            }
+
+            is Resource.Error -> {
+                Resource.Error(
+                    resource.message ?: "",
+                    errorCode = resource.errorCode
+                )
+            }
+        }
+    }
+
+    override suspend fun getListVacancies(
+        params: SearchParams
+    ): Flow<Resource<Triple<List<VacancyDetailsModel>, Int, Int>>> {
+        return repository.getListVacancies(
+            SearchParams(
+                area = params.area,
+                industry = params.industry,
+                text = params.text,
+                salary = params.salary,
+                params.page,
+                params.onlyWithSalary
+            )
+        )
+            .map { resource ->
+                when (resource) {
+                    is Resource.Success -> {
+                        val vacancyDtoList = resource.data?.first ?: emptyList()
+                        val totalFound = resource.data?.second ?: 0
+                        val totalPages = resource.data?.third ?: 0
+                        val vacancyModels = vacancyDtoList.map { dto ->
+                            mapper.mapperFromDto(dto)
+                        }
+                        Resource.Success(Triple(vacancyModels, totalFound, totalPages))
+                    }
+
+                    is Resource.Error -> {
+                        Resource.Error(resource.message ?: "")
+                    }
+                }
+            }
     }
 }
