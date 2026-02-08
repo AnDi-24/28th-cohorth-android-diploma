@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import ru.practicum.android.diploma.domain.room.api.FavoriteVacancyInteractor
 import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
+import ru.practicum.android.diploma.domain.room.api.FavoriteVacancyInteractor
 import java.io.IOException
 
 class FavoriteViewModel(
