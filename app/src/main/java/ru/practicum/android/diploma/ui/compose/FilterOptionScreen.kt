@@ -138,15 +138,6 @@ fun FilterOptionScreen(
                     GetListFailedEmptyState()
                 }
             }
-
-            else -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    GetListFailedEmptyState()
-                }
-            }
         }
     }
 }
