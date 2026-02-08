@@ -21,9 +21,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import org.koin.androidx.compose.koinViewModel
+import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.domain.network.models.Contacts
 import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
 import ru.practicum.android.diploma.presentation.VacancyDetailsViewModel
@@ -54,13 +56,11 @@ fun VacancyDetails(
             companyName = vacancy.employer?.name
         )
         item {
-            // 1. Заголовок с отформатированным названием вакансии
             Text(
                 text = formattedVacancyName,
                 style = MaterialTheme.typography.headlineLarge,
                 modifier = Modifier.fillMaxWidth()
             )
-            // 2. Зарплатная вилка
             vacancy.salary?.let { salary ->
                 Text(
                     text = formatSalary(salary),
@@ -70,16 +70,14 @@ fun VacancyDetails(
             }
         }
 
-        // 3. Блок с логотипом компании, названием и городом
         item {
             CompanyInfoCard(vacancy)
         }
 
-        // 4. Требуемый опыт, График работы, Тип занятости
         item {
-            val experienceText = vacancy.experience?.name ?: "Не указано"
-            val scheduleText = vacancy.schedule?.name ?: "График не указан"
-            val employmentText = vacancy.employment?.name ?: "Занятость не указана"
+            val experienceText = vacancy.experience?.name ?: stringResource(R.string.not_specified)
+            val scheduleText = vacancy.schedule?.name ?: stringResource(R.string.schedule_not_specified)
+            val employmentText = vacancy.employment?.name ?: stringResource(R.string.employment_not_specified)
 
             RequiredExperienceSection(
                 experience = experienceText,
@@ -88,21 +86,18 @@ fun VacancyDetails(
             )
         }
 
-        // 5. Описание вакансии
         item {
             vacancy.description?.let { description ->
                 DescriptionSection(description)
             }
         }
 
-        // 6. Навыки
         item {
             if (!vacancy.skills.isNullOrEmpty()) {
                 SkillsSection(vacancy.skills)
             }
         }
 
-        // 7. Контакты
         item {
             vacancy.contacts?.let { contacts ->
                 ContactsSection(contacts)
@@ -110,10 +105,6 @@ fun VacancyDetails(
         }
     }
 }
-
-// Вспомогательные функции и компоненты
-
-// Серая карточка с лого, названием компании и городом
 @Composable
 private fun CompanyInfoCard(vacancy: VacancyDetailsModel) {
     Surface(
@@ -142,13 +133,13 @@ private fun CompanyInfoCard(vacancy: VacancyDetailsModel) {
                 verticalArrangement = Arrangement.spacedBy(Spacing4)
             ) {
                 Text(
-                    text = vacancy.employer?.name ?: "Компания не указана",
+                    text = vacancy.employer?.name ?: stringResource(R.string.company_not_specified),
                     style = MaterialTheme.typography.titleMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = vacancy.area?.name ?: "Город не указан",
+                    text = vacancy.area?.name ?: stringResource(R.string.city_not_specified),
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -166,7 +157,7 @@ private fun RequiredExperienceSection(
 ) {
     Column {
         Text(
-            text = "Требуемый опыт",
+            text = stringResource(R.string.required_experience),
             style = MaterialTheme.typography.bodyLarge
         )
         Text(
@@ -189,7 +180,7 @@ private fun ContactsSection(contacts: Contacts) {
         verticalArrangement = Arrangement.spacedBy(Spacing16)
     ) {
         Text(
-            text = "Контакты",
+            text = stringResource(R.string.contacts),
             style = MaterialTheme.typography.titleMedium
         )
 
@@ -247,7 +238,7 @@ private fun SkillsSection(skills: List<String>) {
         verticalArrangement = Arrangement.spacedBy(Spacing16)
     ) {
         Text(
-            text = "Ключевые навыки",
+            text = stringResource(R.string.key_skills),
             style = MaterialTheme.typography.titleMedium
         )
 
@@ -268,21 +259,19 @@ private fun DescriptionSection(description: String) {
         verticalArrangement = Arrangement.spacedBy(Spacing16)
     ) {
         Text(
-            text = "Описание вакансии",
+            text = stringResource(R.string.vacancy_info),
             style = MaterialTheme.typography.titleMedium
         )
 
         val sections = VacancyDescriptionParser.parseDescription(description)
 
-        // Если секций нет, показываем информацию об отсутствии данных
         if (sections.isEmpty()) {
             Text(
-                text = "Информация не указана",
+                text = stringResource(R.string.no_info),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         } else {
-            // Отображаем все секции
             sections.forEach { section ->
                 renderDescriptionSubsection(section)
             }
@@ -293,13 +282,11 @@ private fun DescriptionSection(description: String) {
 @Composable
 private fun renderDescriptionSubsection(section: DescriptionSection) {
     if (section.title == "О компании") {
-        // Для секции "О компании" отображаем как абзацы
         CompanyInfoSubsection(
             title = section.title,
             paragraphs = section.items
         )
     } else {
-        // Для стандартных секций отображаем как маркированный список
         DescriptionSubsection(
             title = section.title,
             items = section.items

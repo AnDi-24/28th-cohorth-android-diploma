@@ -13,17 +13,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.presentation.SearchViewModel
 import ru.practicum.android.diploma.ui.compose.FILTER
+import ru.practicum.android.diploma.ui.compose.MAIN
 import ru.practicum.android.diploma.ui.theme.InputFieldHeight
 import ru.practicum.android.diploma.ui.theme.Spacing8
 
@@ -33,20 +35,36 @@ private const val SEARCH_DEBOUNCE_DELAY = 2000L
 fun SearchField(
     label: String,
     viewModel: SearchViewModel,
-    screenTag: String,
+    screenTag: String = MAIN,
+    query: String = "",
+    onQueryChange: (String) -> Unit = { viewModel.setVacancySearchQuery(it) },
+    onSearch: (String) -> Unit = { viewModel.searchVacancies(it) }
 ) {
-    var query by rememberSaveable { mutableStateOf("") }
-    var inputValue by remember { mutableStateOf(query) }
+    val queryState = when (screenTag) {
+        MAIN -> viewModel.vacancySearchQuery.collectAsStateWithLifecycle()
+        else -> mutableStateOf(query)
+    }
+
+    var inputValue by rememberSaveable {
+        mutableStateOf(if (query.isNotEmpty()) query else queryState.value)
+    }
+
+    LaunchedEffect(queryState.value) {
+        if (queryState.value != inputValue) {
+            inputValue = queryState.value
+        }
+    }
+
+    LaunchedEffect(query) {
+        if (query.isNotEmpty() && query != inputValue) {
+            inputValue = query
+        }
+    }
 
     LaunchedEffect(inputValue) {
-        if (inputValue != query) {
+        if (screenTag == MAIN && inputValue.isNotEmpty()) {
             delay(SEARCH_DEBOUNCE_DELAY)
-            query = inputValue
-            if (inputValue.isNotEmpty()) {
-                viewModel.searchVacancies(inputValue)
-            } else {
-                viewModel.clearSearch()
-            }
+            onSearch(inputValue)
         }
     }
 
@@ -55,6 +73,11 @@ fun SearchField(
         value = inputValue,
         onValueChange = { newValue ->
             inputValue = newValue
+            onQueryChange(newValue)
+
+            if (screenTag == MAIN && newValue.isEmpty()) {
+                viewModel.clearSearch()
+            }
         },
         shape = MaterialTheme.shapes.medium,
         modifier = Modifier
@@ -68,20 +91,21 @@ fun SearchField(
                 IconButton(
                     onClick = {
                         inputValue = ""
+                        onQueryChange("")
                         viewModel.clearSearch()
                     }
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_close),
                         tint = colorResource(R.color.black_universal),
-                        contentDescription = "Очистить"
+                        contentDescription = stringResource(R.string.clear)
                     )
                 }
             } else {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_search),
                     tint = colorResource(R.color.black_universal),
-                    contentDescription = "Поиск"
+                    contentDescription = stringResource(R.string.search)
                 )
             }
         },
@@ -96,7 +120,7 @@ fun SearchField(
 
 private fun shouldBeLabel(tag: String): (@Composable () -> Unit)? {
     return if (tag == FILTER) {
-        { Text("Ожидаемая зарплата") }
+        { Text(stringResource(R.string.expected_salary)) }
     } else {
         null
     }

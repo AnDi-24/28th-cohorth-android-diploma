@@ -25,10 +25,4 @@ val prefsStorageModule = module {
             prefsStorage = get()
         )
     }
-    viewModel {
-        FilterViewModel(
-            prefsInteractor = get()
-        )
-    }
-
 }

@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.presentation.FilterOptionViewModel
@@ -32,21 +33,24 @@ fun IndustrySearchField(
 ) {
     val queryState = viewModel.searchQuery.collectAsStateWithLifecycle()
     var inputValue by rememberSaveable { mutableStateOf(queryState.value) }
+    var isUserTyping by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(queryState.value) {
-        if (queryState.value != inputValue) {
+        if (queryState.value.isEmpty() && inputValue.isNotEmpty()) {
+            inputValue = ""
+        } else if (!isUserTyping && queryState.value != inputValue) {
             inputValue = queryState.value
         }
     }
 
     LaunchedEffect(inputValue) {
-        if (inputValue != queryState.value) {
-            viewModel.setSearchQuery(inputValue)
+        if (isUserTyping) {
             if (inputValue.isNotEmpty()) {
                 viewModel.searchIndustries(inputValue)
             } else {
                 viewModel.searchIndustries("")
             }
+            isUserTyping = false
         }
     }
 
@@ -55,6 +59,8 @@ fun IndustrySearchField(
         value = inputValue,
         onValueChange = { newValue ->
             inputValue = newValue
+            isUserTyping = true
+            viewModel.setSearchQuery(newValue)
         },
         shape = MaterialTheme.shapes.medium,
         modifier = Modifier
@@ -67,21 +73,21 @@ fun IndustrySearchField(
                 IconButton(
                     onClick = {
                         inputValue = ""
+                        isUserTyping = true
                         viewModel.setSearchQuery("")
-                        viewModel.searchIndustries("")
                     }
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_close),
                         tint = colorResource(R.color.black_universal),
-                        contentDescription = "Очистить"
+                        contentDescription = stringResource(R.string.clear_industry_filter)
                     )
                 }
             } else {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_search),
                     tint = colorResource(R.color.black_universal),
-                    contentDescription = "Поиск"
+                    contentDescription = stringResource(R.string.filter_option)
                 )
             }
         },

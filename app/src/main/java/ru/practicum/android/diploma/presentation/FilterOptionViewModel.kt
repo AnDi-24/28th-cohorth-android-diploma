@@ -14,6 +14,7 @@ import ru.practicum.android.diploma.domain.network.api.industries.IndustriesInte
 import ru.practicum.android.diploma.domain.network.models.industries.IndustryModel
 import ru.practicum.android.diploma.domain.prefs.PrefsInteractor
 import ru.practicum.android.diploma.presentation.models.IndustryUiState
+import ru.practicum.android.diploma.util.ErrorHandler
 import ru.practicum.android.diploma.util.Resource
 import java.io.IOException
 
@@ -76,8 +77,8 @@ class FilterOptionViewModel(
                     }
                 }
             } catch (e: IOException) {
-                Log.d("Exception Message", "Exception $e")
-                handleError(NETWORK_ERROR)
+                val errorMessage = ErrorHandler.handleNetworkError(e)
+                handleError(errorMessage)
             }
         }
     }
@@ -90,5 +91,29 @@ class FilterOptionViewModel(
 
     private fun handleError(errorMessage: String?) {
         _filterUiState.value = IndustryUiState.Empty
+        if (errorMessage != null) {
+            Log.d("FilterOptionViewModel", errorMessage)
+        }
+    }
+
+    fun checkAndUpdateFromSharedPrefs() {
+        val prefsId = prefsInteractor.getFilterSettings()?.industry ?: ""
+        val prefsName = prefsInteractor.getFilterSettings()?.industryName ?: ""
+        val currentSelectedId = _selectedIndustry.value?.id
+
+        if (prefsId.isNotEmpty() && prefsName.isNotEmpty()) {
+            if (currentSelectedId != prefsId) {
+                val chosenIndustry = IndustryModel(prefsId, prefsName)
+                _selectedIndustry.value = chosenIndustry
+                _searchQuery.value = prefsName
+                _filterUiState.value = IndustryUiState.Selected(chosenIndustry)
+            }
+        } else {
+            if (currentSelectedId != null) {
+                _selectedIndustry.value = null
+                _searchQuery.value = ""
+                searchIndustries("")
+            }
+        }
     }
 }

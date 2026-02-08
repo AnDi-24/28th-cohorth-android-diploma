@@ -17,8 +17,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
 import ru.practicum.android.diploma.util.formatters.formatSalary
 import ru.practicum.android.diploma.util.formatters.formatVacancyNameForListItem
@@ -84,7 +86,7 @@ fun VacancyListItem(
                 )
                 Spacer(modifier = Modifier.height(1.dp))
                 Text(
-                    text = vacancy.employer?.name ?: "Название не указано",
+                    text = vacancy.employer?.name ?: stringResource(R.string.name_not_specified),
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis

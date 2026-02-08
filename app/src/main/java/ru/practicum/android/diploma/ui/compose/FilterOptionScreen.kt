@@ -16,6 +16,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -41,16 +42,34 @@ fun FilterOptionScreen(
     navController: NavController
 ) {
     val filterUiState = viewModel.filterUiState.value
+    val selectedIndustry by viewModel.selectedIndustry.collectAsState()
+    val filterState by filterViewModel.filterState.collectAsState()
 
-    val selectedIndustryId by viewModel.selectedIndustry.collectAsState()
+    LaunchedEffect(Unit) {
+        viewModel.checkAndUpdateFromSharedPrefs()
+    }
 
-    val selectedIndex = remember(filterUiState, selectedIndustryId) {
+    LaunchedEffect(filterState.industry) {
+        if (filterState.industry.isNotEmpty() && filterState.industryName.isNotEmpty()) {
+            val currentSelected = selectedIndustry?.id
+            if (currentSelected != filterState.industry) {
+                val savedIndustry = IndustryModel(
+                    id = filterState.industry,
+                    name = filterState.industryName
+                )
+                viewModel.selectedIndustry(savedIndustry)
+            }
+        } else if (filterState.industry.isEmpty() && selectedIndustry != null) {
+            viewModel.setSearchQuery("")
+            viewModel.searchIndustries("")
+        }
+    }
+
+    val selectedIndex = remember(filterUiState, selectedIndustry) {
         when (val state = filterUiState) {
             is IndustryUiState.OnSelect -> {
-                // Находим индекс выбранной отрасли по ID
-                state.industries.indexOfFirst { it.id == selectedIndustryId?.id }
+                state.industries.indexOfFirst { it.id == selectedIndustry?.id }
             }
-
             else -> -1
         }
     }
@@ -70,8 +89,8 @@ fun FilterOptionScreen(
                 LazyColumn(
                     modifier = Modifier.weight(1f)
                 ) {
-                    itemsIndexed(filterUiState.industries) { _, item ->
-                        val isItemSelected = item.id == selectedIndustryId?.id
+                    itemsIndexed(filterUiState.industries) { index, item ->
+                        val isItemSelected = index == selectedIndex
 
                         IndustriesItem(
                             item = item,
@@ -101,11 +120,22 @@ fun FilterOptionScreen(
 
                     PositiveButton(
                         text = R.string.select,
-                        onClick = { navController.popBackStack() },
+                        onClick = {
+                            navController.popBackStack()
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(16.dp)
                     )
+                }
+            }
+
+            is IndustryUiState.Empty -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    GetListFailedEmptyState()
                 }
             }
 

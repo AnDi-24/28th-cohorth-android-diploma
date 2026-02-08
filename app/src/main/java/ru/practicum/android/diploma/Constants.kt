@@ -11,3 +11,6 @@ const val FAVORITE_VACANCIES = "favorite_vacancies"
 const val GET_VACANCY_BY_ID_ENDPOINT = "/vacancies/{id}"
 const val GET_VACANCIES_LIST_ENDPOINT = "/vacancies"
 const val GET_INDUSTRIES_LIST_ENDPOINT = "/industries"
+
+// Request headers
+const val AUTHORIZATION = "Authorization"

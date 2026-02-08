@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -68,6 +69,8 @@ fun MainScreen(
     val context = LocalContext.current
     val searchPerformed = remember { mutableStateOf(false) }
 
+    val vacancySearchQuery by viewModel.vacancySearchQuery.collectAsState()
+
     HandleToastMessages(viewModel, context)
     HandleScrollToTop(uiState, lazyListState, searchPerformed)
     HandleInfiniteScroll(lazyListState, viewModel)
@@ -76,7 +79,12 @@ fun MainScreen(
         SearchField(
             label = stringResource(R.string.request_placeholder),
             viewModel = viewModel,
-            MAIN
+            screenTag = MAIN,
+            query = vacancySearchQuery,
+            onQueryChange = { viewModel.setVacancySearchQuery(it) },
+            onSearch = { query ->
+                viewModel.searchVacancies(query)
+            }
         )
 
         when (uiState) {

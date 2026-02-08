@@ -42,10 +42,12 @@ class FilterViewModel(
     }
 
     fun updateSalary(salary: Int) {
-        val current = _filterState.value
-        val updated = current.copy(salary = salary)
-        _filterState.value = updated
-        prefsInteractor.updateData(updated)
+        viewModelScope.launch {
+            val current = _filterState.value
+            val updated = current.copy(salary = salary)
+            _filterState.value = updated
+            prefsInteractor.updateData(updated)
+        }
     }
 
     fun updateShowSalary(showSalary: Boolean) {
