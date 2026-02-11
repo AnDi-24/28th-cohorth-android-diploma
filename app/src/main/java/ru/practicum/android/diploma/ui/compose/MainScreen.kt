@@ -18,7 +18,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
@@ -26,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,7 +36,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -49,6 +48,14 @@ import ru.practicum.android.diploma.ui.compose.components.SearchField
 import ru.practicum.android.diploma.ui.compose.components.SearchScreenEmptyState
 import ru.practicum.android.diploma.ui.compose.components.VacancyFailedState
 import ru.practicum.android.diploma.ui.compose.components.VacancyListItem
+import ru.practicum.android.diploma.ui.theme.BorderWidthThin
+import ru.practicum.android.diploma.ui.theme.BoxHeight100
+import ru.practicum.android.diploma.ui.theme.BoxHeight27
+import ru.practicum.android.diploma.ui.theme.BoxHeight40
+import ru.practicum.android.diploma.ui.theme.IconSize
+import ru.practicum.android.diploma.ui.theme.Spacing12
+import ru.practicum.android.diploma.ui.theme.Spacing16
+import ru.practicum.android.diploma.ui.theme.Spacing40
 import ru.practicum.android.diploma.ui.theme.Typography
 
 @Composable
@@ -62,14 +69,22 @@ fun MainScreen(
     val context = LocalContext.current
     val searchPerformed = remember { mutableStateOf(false) }
 
+    val vacancySearchQuery by viewModel.vacancySearchQuery.collectAsState()
+
     HandleToastMessages(viewModel, context)
     HandleScrollToTop(uiState, lazyListState, searchPerformed)
     HandleInfiniteScroll(lazyListState, viewModel)
 
-    Column(modifier = Modifier.padding(16.dp)) {
+    Column(modifier = Modifier.padding(Spacing16)) {
         SearchField(
             label = stringResource(R.string.request_placeholder),
-            viewModel = viewModel
+            viewModel = viewModel,
+            screenTag = MAIN,
+            query = vacancySearchQuery,
+            onQueryChange = { viewModel.setVacancySearchQuery(it) },
+            onSearch = { query ->
+                viewModel.searchVacancies(query)
+            }
         )
 
         when (uiState) {
@@ -159,11 +174,11 @@ private fun LoadingState(colors: ColorScheme) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .height(100.dp),
+            .height(BoxHeight100),
         contentAlignment = Alignment.Center,
     ) {
         CircularProgressIndicator(
-            modifier = Modifier.size(36.dp),
+            modifier = Modifier.size(IconSize),
             color = colors.primary
         )
     }
@@ -214,7 +229,7 @@ private fun VacancyList(
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(top = 40.dp),
+        contentPadding = PaddingValues(top = Spacing40),
         state = lazyListState
     ) {
         items(vacancies) { vacancy ->
@@ -237,11 +252,11 @@ private fun LoadingMoreIndicator(colors: ColorScheme) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(Spacing16),
         contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator(
-            modifier = Modifier.size(36.dp),
+            modifier = Modifier.size(IconSize),
             color = colors.primary
         )
     }
@@ -252,18 +267,18 @@ private fun ResultsCounter(totalFound: Int, colors: ColorScheme, resources: Reso
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(40.dp),
+            .height(BoxHeight40),
         contentAlignment = Alignment.Center
     ) {
         Box(
             modifier = Modifier
-                .height(27.dp)
+                .height(BoxHeight27)
                 .wrapContentWidth()
-                .clip(RoundedCornerShape(20.dp))
+                .clip(MaterialTheme.shapes.extraLarge)
                 .border(
-                    width = 1.dp,
+                    width = BorderWidthThin,
                     color = colors.primary,
-                    shape = RoundedCornerShape(20.dp)
+                    shape = MaterialTheme.shapes.extraLarge
                 )
                 .background(colors.primary),
             contentAlignment = Alignment.Center
@@ -278,7 +293,7 @@ private fun ResultsCounter(totalFound: Int, colors: ColorScheme, resources: Reso
                 }",
                 style = Typography.bodyMedium,
                 color = colors.onPrimary,
-                modifier = Modifier.padding(horizontal = 12.dp)
+                modifier = Modifier.padding(horizontal = Spacing12)
             )
         }
     }

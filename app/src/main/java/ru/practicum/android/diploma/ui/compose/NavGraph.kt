@@ -20,7 +20,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -32,13 +31,17 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import org.koin.androidx.compose.koinViewModel
 import ru.practicum.android.diploma.R
+import ru.practicum.android.diploma.presentation.FilterOptionViewModel
+import ru.practicum.android.diploma.presentation.FilterViewModel
 import ru.practicum.android.diploma.presentation.SearchViewModel
 import ru.practicum.android.diploma.presentation.VacancyDetailsViewModel
 import ru.practicum.android.diploma.presentation.models.NavItem
 import ru.practicum.android.diploma.ui.compose.components.FavoriteButton
 import ru.practicum.android.diploma.ui.compose.components.ShareButton
 import ru.practicum.android.diploma.ui.compose.components.TopBar
+import ru.practicum.android.diploma.ui.theme.BorderWidthThin
 import ru.practicum.android.diploma.ui.theme.LightGray
+import ru.practicum.android.diploma.ui.theme.Spacing2
 import ru.practicum.android.diploma.ui.theme.Typography
 
 const val MAIN = "main"
@@ -52,14 +55,16 @@ const val VACANCY = "vacancy"
 fun NavGraph() {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
+    val viewModel: SearchViewModel = koinViewModel()
     val vacancyViewModel: VacancyDetailsViewModel = koinViewModel()
+    val filterViewModel: FilterViewModel = koinViewModel()
+    val filterOptionViewModel: FilterOptionViewModel = koinViewModel()
     val currentRoute = backStackEntry?.destination?.route
 
     val showBottomBar = when (currentRoute) {
         MAIN, FAVORITE, TEAM -> true
         else -> false
     }
-    val viewModel: SearchViewModel = koinViewModel()
 
     val topBar: @Composable () -> Unit = {
         TopBar(
@@ -102,7 +107,7 @@ fun NavGraph() {
                 VacancyScreen(vacancyId)
             }
             composable(OPTION) {
-                FilterOptionScreen()
+                FilterOptionScreen(filterOptionViewModel, filterViewModel, navController)
             }
         }
     }
@@ -213,7 +218,7 @@ fun BottomNavigationBar(navController: NavController, currentRoute: String?) {
                     color = LightGray,
                     start = Offset(0f, 0f),
                     end = Offset(size.width, 0f),
-                    strokeWidth = 1.dp.toPx()
+                    strokeWidth = BorderWidthThin.toPx()
                 )
             }
     ) {
@@ -222,7 +227,7 @@ fun BottomNavigationBar(navController: NavController, currentRoute: String?) {
             NavigationBarItem(
                 icon = {
                     Image(
-                        modifier = Modifier.padding(bottom = 2.dp),
+                        modifier = Modifier.padding(bottom = Spacing2),
                         painter = painterResource(id = item.icon),
                         contentDescription = item.label,
                         colorFilter = ColorFilter.tint(

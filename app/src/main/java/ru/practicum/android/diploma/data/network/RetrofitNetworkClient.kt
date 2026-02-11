@@ -9,6 +9,8 @@ import ru.practicum.android.diploma.data.network.models.VacancyDetailsRequest
 import ru.practicum.android.diploma.data.network.models.VacancyDetailsResponse
 import ru.practicum.android.diploma.data.network.models.VacancyDto
 import ru.practicum.android.diploma.data.network.models.VacancyListRequest
+import ru.practicum.android.diploma.data.network.models.industries.IndustriesResponse
+import ru.practicum.android.diploma.data.network.models.industries.IndustryDto
 import ru.practicum.android.diploma.util.Resource
 import ru.practicum.android.diploma.util.ResponseState
 import java.io.IOException
@@ -100,6 +102,28 @@ class RetrofitNetworkClient(
         }
     }
 
+    override suspend fun getIndustries(): Response {
+        return try {
+            val industries = findJobApi.getIndustriesList(TOKEN)
+            if (industries.isEmpty()) {
+                createNullDataResponse()
+            } else {
+                createSuccessIndustriesResponse(industries)
+            }
+        } catch (e: HttpException) {
+            handleHttpException(e)
+        } catch (e: IOException) {
+            handleIOException(e)
+        }
+    }
+
+    private fun createSuccessIndustriesResponse(industries: List<IndustryDto>): Response {
+        return IndustriesResponse().apply {
+            this.industries = industries
+            resultCode = ResponseState.SUCCESS
+        }
+    }
+
     private fun isValidVacancyRequest(dto: Any): Boolean {
         return dto is VacancyListRequest
     }
@@ -157,5 +181,4 @@ class RetrofitNetworkClient(
     private fun logException(message: String, exception: Exception) {
         Log.e("RetrofitNetworkClient", "$message: ${exception.message}")
     }
-
 }

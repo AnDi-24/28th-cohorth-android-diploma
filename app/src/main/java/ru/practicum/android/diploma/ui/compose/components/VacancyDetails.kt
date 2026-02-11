@@ -21,18 +21,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
+import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.domain.network.models.Contacts
-import ru.practicum.android.diploma.domain.network.models.Salary
 import ru.practicum.android.diploma.domain.network.models.VacancyDetailsModel
 import ru.practicum.android.diploma.presentation.VacancyDetailsViewModel
-
-private const val FIFTY = 50
-private const val THIRTY = 30
-private const val ABOUT_COMPANY = "О компании"
+import ru.practicum.android.diploma.ui.theme.BulletSize
+import ru.practicum.android.diploma.ui.theme.LogoSize
+import ru.practicum.android.diploma.ui.theme.Spacing12
+import ru.practicum.android.diploma.ui.theme.Spacing16
+import ru.practicum.android.diploma.ui.theme.Spacing24
+import ru.practicum.android.diploma.ui.theme.Spacing4
+import ru.practicum.android.diploma.ui.theme.Spacing8
+import ru.practicum.android.diploma.util.formatters.formatSalary
+import ru.practicum.android.diploma.util.formatters.formatVacancyNameForDetails
+import ru.practicum.android.diploma.util.parser.DescriptionSection
+import ru.practicum.android.diploma.util.parser.VacancyDescriptionParser
 
 @Composable
 fun VacancyDetails(
@@ -41,40 +48,36 @@ fun VacancyDetails(
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+        contentPadding = PaddingValues(Spacing16),
+        verticalArrangement = Arrangement.spacedBy(Spacing24)
     ) {
-        val formattedVacancyName = formatVacancyName(
+        val formattedVacancyName = formatVacancyNameForDetails(
             vacancyName = vacancy.name,
             companyName = vacancy.employer?.name
         )
         item {
-            // 1. Заголовок с отформатированным названием вакансии
             Text(
                 text = formattedVacancyName,
                 style = MaterialTheme.typography.headlineLarge,
                 modifier = Modifier.fillMaxWidth()
             )
-            // 2. Зарплатная вилка
             vacancy.salary?.let { salary ->
                 Text(
-                    text = formatSalaryForDetails(salary),
+                    text = formatSalary(salary),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
         }
 
-        // 3. Блок с логотипом компании, названием и городом
         item {
             CompanyInfoCard(vacancy)
         }
 
-        // 4. Требуемый опыт, График работы, Тип занятости
         item {
-            val experienceText = vacancy.experience?.name ?: "Не указано"
-            val scheduleText = vacancy.schedule?.name ?: "График не указан"
-            val employmentText = vacancy.employment?.name ?: "Занятость не указана"
+            val experienceText = vacancy.experience?.name ?: stringResource(R.string.not_specified)
+            val scheduleText = vacancy.schedule?.name ?: stringResource(R.string.schedule_not_specified)
+            val employmentText = vacancy.employment?.name ?: stringResource(R.string.employment_not_specified)
 
             RequiredExperienceSection(
                 experience = experienceText,
@@ -83,21 +86,18 @@ fun VacancyDetails(
             )
         }
 
-        // 5. Описание вакансии
         item {
             vacancy.description?.let { description ->
                 DescriptionSection(description)
             }
         }
 
-        // 6. Навыки
         item {
             if (!vacancy.skills.isNullOrEmpty()) {
                 SkillsSection(vacancy.skills)
             }
         }
 
-        // 7. Контакты
         item {
             vacancy.contacts?.let { contacts ->
                 ContactsSection(contacts)
@@ -105,10 +105,6 @@ fun VacancyDetails(
         }
     }
 }
-
-// Вспомогательные функции и компоненты
-
-// Серая карточка с лого, названием компании и городом
 @Composable
 private fun CompanyInfoCard(vacancy: VacancyDetailsModel) {
     Surface(
@@ -119,9 +115,9 @@ private fun CompanyInfoCard(vacancy: VacancyDetailsModel) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(Spacing16),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+            horizontalArrangement = Arrangement.spacedBy(Spacing16)
         ) {
             Surface(
                 shape = MaterialTheme.shapes.medium,
@@ -129,21 +125,21 @@ private fun CompanyInfoCard(vacancy: VacancyDetailsModel) {
             ) {
                 EmployerLogoGlide(
                     logoUrl = vacancy.employer?.logo,
-                    modifier = Modifier.size(48.dp)
+                    modifier = Modifier.size(LogoSize)
                 )
             }
 
             Column(
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+                verticalArrangement = Arrangement.spacedBy(Spacing4)
             ) {
                 Text(
-                    text = vacancy.employer?.name ?: "Компания не указана",
+                    text = vacancy.employer?.name ?: stringResource(R.string.company_not_specified),
                     style = MaterialTheme.typography.titleMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = vacancy.area?.name ?: "Город не указан",
+                    text = vacancy.area?.name ?: stringResource(R.string.city_not_specified),
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -161,7 +157,7 @@ private fun RequiredExperienceSection(
 ) {
     Column {
         Text(
-            text = "Требуемый опыт",
+            text = stringResource(R.string.required_experience),
             style = MaterialTheme.typography.bodyLarge
         )
         Text(
@@ -171,7 +167,7 @@ private fun RequiredExperienceSection(
         Text(
             text = "$schedule, $employment",
             style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(vertical = 8.dp)
+            modifier = Modifier.padding(vertical = Spacing8)
         )
     }
 }
@@ -181,15 +177,15 @@ private fun ContactsSection(contacts: Contacts) {
     val viewModel: VacancyDetailsViewModel = koinViewModel()
     val context = LocalContext.current
     Column(
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(Spacing16)
     ) {
         Text(
-            text = "Контакты",
+            text = stringResource(R.string.contacts),
             style = MaterialTheme.typography.titleMedium
         )
 
         Column(
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(Spacing12)
         ) {
             contacts.name?.let { name ->
                 ContactItem(
@@ -227,7 +223,7 @@ private fun ContactItem(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalArrangement = Arrangement.spacedBy(Spacing12)
     ) {
         Text(
             text = text,
@@ -239,15 +235,15 @@ private fun ContactItem(
 @Composable
 private fun SkillsSection(skills: List<String>) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(Spacing16)
     ) {
         Text(
-            text = "Ключевые навыки",
+            text = stringResource(R.string.key_skills),
             style = MaterialTheme.typography.titleMedium
         )
 
         Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(Spacing8),
             modifier = Modifier.fillMaxWidth()
         ) {
             skills.forEach { skill ->
@@ -260,54 +256,41 @@ private fun SkillsSection(skills: List<String>) {
 @Composable
 private fun DescriptionSection(description: String) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(Spacing16)
     ) {
         Text(
-            text = "Описание вакансии",
+            text = stringResource(R.string.vacancy_info),
             style = MaterialTheme.typography.titleMedium
         )
 
-        // Парсим описание на секции
-        val sections = parseDescription(description)
+        val sections = VacancyDescriptionParser.parseDescription(description)
 
-        // Если секций нет, показываем информацию об отсутствии данных
         if (sections.isEmpty()) {
             Text(
-                text = "Информация не указана",
+                text = stringResource(R.string.no_info),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         } else {
-            // Отображаем все секции
             sections.forEach { section ->
-                if (section.title == ABOUT_COMPANY) {
-                    // Для секции "О компании" отображаем как абзацы
-                    CompanyInfoSubsection(
-                        title = section.title,
-                        paragraphs = section.items
-                    )
-                } else {
-                    // Для стандартных секций отображаем как маркированный список
-                    DescriptionSubsection(
-                        title = section.title,
-                        items = section.items
-                    )
-                }
-            }
-
-            // Добавляем заглушки для отсутствующих стандартных секций
-            val requiredTitles = listOf("Обязанности", "Требования", "Условия")
-            val existingStandardTitles = sections.filterNot { it.title == ABOUT_COMPANY }.map { it.title }
-
-            requiredTitles.forEach { requiredTitle ->
-                if (!existingStandardTitles.contains(requiredTitle)) {
-                    DescriptionSubsection(
-                        title = requiredTitle,
-                        items = listOf("Информация не указана")
-                    )
-                }
+                renderDescriptionSubsection(section)
             }
         }
+    }
+}
+
+@Composable
+private fun renderDescriptionSubsection(section: DescriptionSection) {
+    if (section.title == "О компании") {
+        CompanyInfoSubsection(
+            title = section.title,
+            paragraphs = section.items
+        )
+    } else {
+        DescriptionSubsection(
+            title = section.title,
+            items = section.items
+        )
     }
 }
 
@@ -317,7 +300,7 @@ private fun CompanyInfoSubsection(
     paragraphs: List<String>
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(Spacing8)
     ) {
         Text(
             text = title,
@@ -326,7 +309,7 @@ private fun CompanyInfoSubsection(
         )
 
         Column(
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(Spacing12)
         ) {
             paragraphs.forEach { paragraph ->
                 Text(
@@ -345,7 +328,7 @@ private fun DescriptionSubsection(
     items: List<String>
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(Spacing8)
     ) {
         Text(
             text = title,
@@ -354,7 +337,7 @@ private fun DescriptionSubsection(
         )
 
         Column(
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            verticalArrangement = Arrangement.spacedBy(Spacing4)
         ) {
             items.forEach { item ->
                 BulletListItem(text = item)
@@ -367,12 +350,12 @@ private fun DescriptionSubsection(
 private fun BulletListItem(text: String) {
     Row(
         verticalAlignment = Alignment.Top,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(Spacing8)
     ) {
         Box(
             modifier = Modifier
-                .size(3.dp)
-                .offset(y = 8.dp)
+                .size(BulletSize)
+                .offset(y = Spacing8)
                 .background(
                     color = MaterialTheme.colorScheme.onBackground,
                     shape = CircleShape
@@ -385,179 +368,3 @@ private fun BulletListItem(text: String) {
         )
     }
 }
-
-private fun formatSalaryForDetails(salary: Salary): String {
-    return buildString {
-        salary.from?.let { from ->
-            salary.to?.let { to ->
-                append("от $from до $to")
-            } ?: append("от $from")
-        } ?: salary.to?.let { to ->
-            append("до $to")
-        } ?: return "Зарплата не указана"
-
-        salary.currency?.let { currency ->
-            append(" ${getCurrencySymbol(currency)}")
-        }
-    }
-}
-
-private fun formatVacancyName(vacancyName: String, companyName: String?): String {
-    if (companyName.isNullOrBlank()) return vacancyName
-
-    var result = vacancyName
-    val lowerVacancyName = vacancyName.lowercase()
-    val lowerCompanyName = companyName.lowercase()
-
-    when {
-        lowerVacancyName.endsWith(" в $lowerCompanyName") -> {
-            result = vacancyName.removeSuffix(" в $companyName").trim()
-        }
-
-        lowerVacancyName.endsWith(lowerCompanyName) -> {
-            result = vacancyName.removeSuffix(companyName).trim()
-        }
-    }
-
-    return result
-}
-
-private fun getCurrencySymbol(currency: String): String {
-    return when (currency) {
-        "RUR", "RUB" -> "₽"
-        "USD" -> "$"
-        "EUR" -> "€"
-        else -> currency
-    }
-}
-
-private fun parseDescription(description: String): List<DescriptionSection> {
-    val lines = preprocessDescription(description)
-    val (sections, otherLines) = parseLinesIntoSections(lines)
-
-    return buildFinalSections(sections, otherLines)
-}
-
-private fun preprocessDescription(description: String): List<String> {
-    return description.split("\n")
-        .map { it.trim() }
-        .filter { it.isNotBlank() }
-}
-
-private fun parseLinesIntoSections(lines: List<String>): Pair<List<DescriptionSection>, MutableList<String>> {
-    val sections = mutableListOf<DescriptionSection>()
-    val otherLines = mutableListOf<String>()
-    var currentTitle: String? = null
-    val currentItems = mutableListOf<String>()
-
-    for (line in lines) {
-        val sectionTitle = detectSectionTitle(line)
-
-        when {
-            sectionTitle != null -> {
-                addCurrentSection(sections, currentTitle, currentItems)
-                currentTitle = sectionTitle
-            }
-
-            currentTitle != null && line.length > 2 -> {
-                addToCurrentSection(currentItems, line)
-            }
-
-            line.length > 2 -> {
-                addToOtherLines(otherLines, line)
-            }
-        }
-    }
-
-    addCurrentSection(sections, currentTitle, currentItems)
-
-    return Pair(sections, otherLines)
-}
-
-private fun detectSectionTitle(line: String): String? {
-    val lowerLine = line.lowercase()
-
-    return when {
-        lowerLine.contains("обязанности") && line.length < FIFTY -> "Обязанности"
-        lowerLine.contains("требования") && line.length < FIFTY -> "Требования"
-        lowerLine.contains("условия") && line.length < FIFTY -> "Условия"
-        else -> null
-    }
-}
-
-private fun addToCurrentSection(currentItems: MutableList<String>, line: String) {
-    if (shouldFilterLine(line)) return
-
-    val cleanedText = cleanText(line)
-    if (cleanedText.isNotBlank()) {
-        currentItems.add(cleanedText)
-    }
-}
-
-private fun addToOtherLines(otherLines: MutableList<String>, line: String) {
-    if (shouldFilterLine(line)) return
-
-    val cleanedText = cleanText(line)
-    if (cleanedText.isNotBlank()) {
-        otherLines.add(cleanedText)
-    }
-}
-
-private fun shouldFilterLine(line: String): Boolean {
-    val lowerLine = line.lowercase()
-    return FILTER_PHRASES.any { phrase ->
-        (lowerLine == phrase || lowerLine == "$phrase:") && line.length < THIRTY
-    }
-}
-
-private fun cleanText(text: String): String {
-    var cleaned = text.replace(Regex("^[•\\-\\*\\d+\\.\\s]+"), "").trim()
-
-    FILTER_PHRASES.forEach { phrase ->
-        val regex = Regex("\\b${Regex.escape(phrase)}\\b[\\s:]*", RegexOption.IGNORE_CASE)
-        cleaned = cleaned.replace(regex, "").trim()
-    }
-
-    return cleaned
-}
-
-private fun addCurrentSection(
-    sections: MutableList<DescriptionSection>,
-    currentTitle: String?,
-    currentItems: MutableList<String>
-) {
-    if (currentTitle != null && currentItems.isNotEmpty()) {
-        sections.add(DescriptionSection(currentTitle, currentItems.toList()))
-        currentItems.clear()
-    }
-}
-
-private fun buildFinalSections(
-    sections: List<DescriptionSection>,
-    otherLines: MutableList<String>
-): List<DescriptionSection> {
-    val finalSections = sections.toMutableList()
-
-    if (otherLines.isNotEmpty()) {
-        val companyText = otherLines.joinToString(" ")
-        finalSections.add(DescriptionSection(ABOUT_COMPANY, listOf(companyText)))
-    }
-
-    return finalSections
-}
-
-private val FILTER_PHRASES = listOf(
-    "о нас",
-    ABOUT_COMPANY,
-    "компания:",
-    "компания",
-    "от компании",
-    "информация о компании",
-    "наша компания"
-)
-
-// Модель для секций описания
-data class DescriptionSection(
-    val title: String,
-    val items: List<String>
-)

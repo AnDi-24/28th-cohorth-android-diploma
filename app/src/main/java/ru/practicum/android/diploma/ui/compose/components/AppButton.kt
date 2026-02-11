@@ -17,9 +17,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.ui.theme.AppTheme
+import ru.practicum.android.diploma.ui.theme.ButtonHeight
+import ru.practicum.android.diploma.ui.theme.Spacing16
+import ru.practicum.android.diploma.ui.theme.Spacing20
+import ru.practicum.android.diploma.ui.theme.Spacing8
 
 @Composable
 private fun BaseAppButton(
@@ -34,7 +37,7 @@ private fun BaseAppButton(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
-            .height(59.dp),
+            .height(ButtonHeight),
         enabled = isEnabled,
         colors = ButtonDefaults.buttonColors(
             containerColor = containerColor,
@@ -44,10 +47,10 @@ private fun BaseAppButton(
         ),
         shape = MaterialTheme.shapes.medium,
         contentPadding = PaddingValues(
-            top = 20.dp,
-            bottom = 20.dp,
-            start = 8.dp,
-            end = 8.dp
+            top = Spacing20,
+            bottom = Spacing20,
+            start = Spacing8,
+            end = Spacing8
         )
     ) {
         Text(
@@ -120,14 +123,14 @@ fun NegativeButtonPreview() {
 fun PositiveAndNegativeButtonsPreview() {
     AppTheme {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(Spacing16)
         ) {
             PositiveButton(
                 text = R.string.select,
                 onClick = {}
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(Spacing16))
 
             NegativeButton(
                 text = R.string.reset,
