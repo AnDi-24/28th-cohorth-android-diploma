@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.domain.network.models.industries.IndustryModel
+import ru.practicum.android.diploma.domain.prefs.FilterSettingsModel
 import ru.practicum.android.diploma.presentation.FilterOptionViewModel
 import ru.practicum.android.diploma.presentation.FilterViewModel
 import ru.practicum.android.diploma.presentation.models.IndustryUiState
@@ -50,26 +51,15 @@ fun FilterOptionScreen(
     }
 
     LaunchedEffect(filterState.industry) {
-        if (filterState.industry.isNotEmpty() && filterState.industryName.isNotEmpty()) {
-            val currentSelected = selectedIndustry?.id
-            if (currentSelected != filterState.industry) {
-                val savedIndustry = IndustryModel(
-                    id = filterState.industry,
-                    name = filterState.industryName
-                )
-                viewModel.selectedIndustry(savedIndustry)
-            }
-        } else if (filterState.industry.isEmpty() && selectedIndustry != null) {
-            viewModel.setSearchQuery("")
-            viewModel.searchIndustries("")
-        }
+        fieldFiller(filterState, selectedIndustry, viewModel)
     }
 
     val selectedIndex = remember(filterUiState, selectedIndustry) {
-        when (val state = filterUiState) {
+        when (filterUiState) {
             is IndustryUiState.OnSelect -> {
-                state.industries.indexOfFirst { it.id == selectedIndustry?.id }
+                filterUiState.industries.indexOfFirst { it.id == selectedIndustry?.id }
             }
+
             else -> -1
         }
     }
@@ -138,16 +128,27 @@ fun FilterOptionScreen(
                     GetListFailedEmptyState()
                 }
             }
-
-            else -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    GetListFailedEmptyState()
-                }
-            }
         }
+    }
+}
+
+private fun fieldFiller(
+    filterState: FilterSettingsModel,
+    selectedIndustry: IndustryModel?,
+    viewModel: FilterOptionViewModel
+) {
+    if (filterState.industry.isNotEmpty() && filterState.industryName.isNotEmpty()) {
+        val currentSelected = selectedIndustry?.id
+        if (currentSelected != filterState.industry) {
+            val savedIndustry = IndustryModel(
+                id = filterState.industry,
+                name = filterState.industryName
+            )
+            viewModel.selectedIndustry(savedIndustry)
+        }
+    } else if (filterState.industry.isEmpty() && selectedIndustry != null) {
+        viewModel.setSearchQuery("")
+        viewModel.searchIndustries("")
     }
 }
 
