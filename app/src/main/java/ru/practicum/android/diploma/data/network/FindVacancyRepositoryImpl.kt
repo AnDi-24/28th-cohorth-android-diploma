@@ -1,6 +1,5 @@
 package ru.practicum.android.diploma.data.network
 
-import android.util.Log
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import ru.practicum.android.diploma.data.network.api.NetworkClient
@@ -77,7 +76,6 @@ class FindVacancyRepositoryImpl(
                 val found = (response as? VacancyListResponse)?.found ?: 0
                 val vacancyList = (response as? VacancyListResponse)?.items ?: emptyList()
                 val pages = (response as? VacancyListResponse)?.pages ?: 0
-                Log.d("VacancyList - репозиторий", vacancyList.size.toString())
                 emit(Resource.Success(Triple(vacancyList, found, pages)))
             }
 

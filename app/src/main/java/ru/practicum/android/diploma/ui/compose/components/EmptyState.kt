@@ -21,13 +21,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import ru.practicum.android.diploma.R
+import ru.practicum.android.diploma.ui.theme.ErrorImageHeight
+import ru.practicum.android.diploma.ui.theme.Spacing16
+import ru.practicum.android.diploma.ui.theme.Spacing46
 
 @Composable
 fun EmptyState(
     imagePainter: Painter,
-    imageHeight: Dp = 223.dp,
+    imageHeight: Dp = ErrorImageHeight,
     titleText: String? = null,
     modifier: Modifier
 ) {
@@ -38,7 +40,7 @@ fun EmptyState(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = Spacing16),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -52,14 +54,14 @@ fun EmptyState(
             )
 
             titleText?.let { text ->
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(Spacing16))
                 Text(
                     text = text,
                     style = MaterialTheme.typography.titleMedium,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 46.dp)
+                        .padding(horizontal = Spacing46)
                 )
             }
         }
@@ -72,7 +74,6 @@ fun SearchScreenEmptyState(
 ) {
     EmptyState(
         imagePainter = painterResource(R.drawable.searching_man_image),
-        imageHeight = 223.dp,
         titleText = null,
         modifier = modifier
     )
@@ -93,7 +94,6 @@ fun NoInternetEmptyState(
     EmptyState(
         imagePainter = painterResource(R.drawable.scull_image),
         titleText = stringResource(R.string.no_internet),
-        imageHeight = 223.dp,
         modifier = modifier
     )
 }
@@ -113,7 +113,6 @@ fun NoRegionEmptyState(
     EmptyState(
         imagePainter = painterResource(R.drawable.angry_cat_image),
         titleText = stringResource(R.string.no_region),
-        imageHeight = 223.dp,
         modifier = modifier
     )
 }
@@ -133,7 +132,6 @@ fun GetListFailedEmptyState(
     EmptyState(
         imagePainter = painterResource(R.drawable.magic_carpet_image),
         titleText = stringResource(R.string.get_list_failed),
-        imageHeight = 223.dp,
         modifier = modifier
     )
 }
@@ -153,7 +151,6 @@ fun VacancyNotFoundEmptyState(
     EmptyState(
         imagePainter = painterResource(R.drawable.fun_carpet_image),
         titleText = stringResource(R.string.vacancy_not_found),
-        imageHeight = 223.dp,
         modifier = modifier
     )
 }
@@ -173,7 +170,6 @@ fun ServerErrorMainEmptyState(
     EmptyState(
         imagePainter = painterResource(R.drawable.server_error_image),
         titleText = stringResource(R.string.server_error),
-        imageHeight = 223.dp,
         modifier = modifier
     )
 }
@@ -193,7 +189,6 @@ fun ServerErrorVacancyEmptyState(
     EmptyState(
         imagePainter = painterResource(R.drawable.server_error_cat_image),
         titleText = stringResource(R.string.server_error),
-        imageHeight = 223.dp,
         modifier = modifier
     )
 }
@@ -213,7 +208,6 @@ fun FavoritesEmptyState(
     EmptyState(
         imagePainter = painterResource(R.drawable.empty_list_image),
         titleText = stringResource(R.string.empty_list),
-        imageHeight = 223.dp,
         modifier = modifier
     )
 }
@@ -233,7 +227,6 @@ fun VacancyFailedState(
     EmptyState(
         imagePainter = painterResource(R.drawable.angry_cat_image),
         titleText = stringResource(R.string.get_vacancy_failed),
-        imageHeight = 223.dp,
         modifier = modifier
     )
 }

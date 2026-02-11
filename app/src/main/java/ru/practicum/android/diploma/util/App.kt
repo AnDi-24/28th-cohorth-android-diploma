@@ -5,6 +5,7 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import ru.practicum.android.diploma.util.di.dataModule
 import ru.practicum.android.diploma.util.di.domainModule
+import ru.practicum.android.diploma.util.di.prefsStorageModule
 import ru.practicum.android.diploma.util.di.presentationModule
 
 class App : Application() {
@@ -14,7 +15,7 @@ class App : Application() {
 
         startKoin {
             androidContext(this@App)
-            modules(modules = listOf(dataModule, domainModule, presentationModule))
+            modules(modules = listOf(dataModule, domainModule, presentationModule, prefsStorageModule))
         }
     }
 
