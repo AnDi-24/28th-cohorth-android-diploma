@@ -1,7 +1,6 @@
 package ru.practicum.android.diploma.ui.compose
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,7 +18,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -27,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.domain.network.models.industries.IndustryModel
-import ru.practicum.android.diploma.domain.prefs.FilterSettingsModel
 import ru.practicum.android.diploma.presentation.FilterOptionViewModel
 import ru.practicum.android.diploma.presentation.FilterViewModel
 import ru.practicum.android.diploma.presentation.models.IndustryUiState
@@ -44,75 +44,70 @@ fun FilterOptionScreen(
 ) {
     val filterUiState = viewModel.filterUiState.value
     val selectedIndustry by viewModel.selectedIndustry.collectAsState()
-    val filterState by filterViewModel.filterState.collectAsState()
+    var isButtonVisible by remember { mutableStateOf(false) }
+    var isSearching by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        viewModel.checkAndUpdateFromSharedPrefs()
+        viewModel.loadSavedIndustry()
     }
 
-    LaunchedEffect(filterState.industry) {
-        fieldFiller(filterState, selectedIndustry, viewModel)
-    }
-
-    val selectedIndex = remember(filterUiState, selectedIndustry) {
-        when (filterUiState) {
-            is IndustryUiState.OnSelect -> {
-                filterUiState.industries.indexOfFirst { it.id == selectedIndustry?.id }
-            }
-
-            else -> -1
+    LaunchedEffect(selectedIndustry) {
+        isButtonVisible = selectedIndustry != null
+        selectedIndustry?.let {
+            filterViewModel.updateIndustry(it.id)
+            filterViewModel.updateIndustryName(it.name)
         }
     }
 
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
+    fun resetSelection() {
+        viewModel.resetChoice()
+        filterViewModel.updateIndustry("")
+        filterViewModel.updateIndustryName("")
+        isButtonVisible = false
+    }
+
+    val selectedIndex = remember(filterUiState, selectedIndustry, isSearching) {
+        if (isSearching) -1
+        else (filterUiState as? IndustryUiState.OnSelect)
+            ?.industries
+            ?.indexOfFirst { it.id == selectedIndustry?.id }
+            ?: -1
+    }
+
+    Column(modifier = Modifier.fillMaxSize()) {
         Box(modifier = Modifier.padding(16.dp)) {
             IndustrySearchField(
                 label = stringResource(R.string.request_placeholder),
-                viewModel = viewModel
+                viewModel = viewModel,
+                onTextChanged = { isTyping ->
+                    isSearching = isTyping
+                    if (isTyping) resetSelection()
+                }
             )
         }
 
         when (filterUiState) {
             is IndustryUiState.OnSelect -> {
-                LazyColumn(
-                    modifier = Modifier.weight(1f)
-                ) {
+                LazyColumn(modifier = Modifier.weight(1f)) {
                     itemsIndexed(filterUiState.industries) { index, item ->
-                        val isItemSelected = index == selectedIndex
-
                         IndustriesItem(
                             item = item,
-                            isSelected = isItemSelected,
+                            isSelected = index == selectedIndex && selectedIndex != -1,
                             onSelect = {
                                 viewModel.selectedIndustry(item)
+                                isSearching = false
+                                isButtonVisible = true
                                 filterViewModel.updateIndustry(item.id)
                                 filterViewModel.updateIndustryName(item.name)
                             }
                         )
                     }
                 }
-            }
 
-            is IndustryUiState.Selected -> {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.SpaceBetween
-                ) {
-                    IndustriesItem(
-                        item = filterUiState.industry,
-                        isSelected = true,
-                        onSelect = {
-                            viewModel.searchIndustries("")
-                        }
-                    )
-
+                if (isButtonVisible) {
                     PositiveButton(
                         text = R.string.select,
-                        onClick = {
-                            navController.popBackStack()
-                        },
+                        onClick = { navController.popBackStack() },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(16.dp)
@@ -132,26 +127,6 @@ fun FilterOptionScreen(
     }
 }
 
-private fun fieldFiller(
-    filterState: FilterSettingsModel,
-    selectedIndustry: IndustryModel?,
-    viewModel: FilterOptionViewModel
-) {
-    if (filterState.industry.isNotEmpty() && filterState.industryName.isNotEmpty()) {
-        val currentSelected = selectedIndustry?.id
-        if (currentSelected != filterState.industry) {
-            val savedIndustry = IndustryModel(
-                id = filterState.industry,
-                name = filterState.industryName
-            )
-            viewModel.selectedIndustry(savedIndustry)
-        }
-    } else if (filterState.industry.isEmpty() && selectedIndustry != null) {
-        viewModel.setSearchQuery("")
-        viewModel.searchIndustries("")
-    }
-}
-
 @Composable
 fun IndustriesItem(
     item: IndustryModel,
@@ -163,7 +138,7 @@ fun IndustriesItem(
             .fillMaxWidth()
             .wrapContentHeight()
             .clickable { onSelect() }
-            .padding(start = 2.dp, end = 2.dp),
+            .padding(horizontal = 2.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(

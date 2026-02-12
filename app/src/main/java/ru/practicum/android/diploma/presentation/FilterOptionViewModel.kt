@@ -25,30 +25,30 @@ class FilterOptionViewModel(
     private var searchJob: Job? = null
     private val _filterUiState = mutableStateOf<IndustryUiState>(IndustryUiState.OnSelect(emptyList()))
     val filterUiState: State<IndustryUiState> get() = _filterUiState
-    private val _searchQuery = MutableStateFlow("")
-    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
     private val _selectedIndustry = MutableStateFlow<IndustryModel?>(null)
     val selectedIndustry: StateFlow<IndustryModel?> = _selectedIndustry.asStateFlow()
 
     init {
-        val prefsId = prefsInteractor.getFilterSettings()?.industry ?: ""
-        val prefsName = prefsInteractor.getFilterSettings()?.industryName ?: ""
+        loadSavedIndustry()
+    }
 
-        if (prefsId.isNotEmpty() && prefsName.isNotEmpty()) {
-            val chosenIndustry = IndustryModel(prefsId, prefsName)
-            _selectedIndustry.value = chosenIndustry
-            _searchQuery.value = prefsName
-            _filterUiState.value = IndustryUiState.Selected(chosenIndustry)
-        } else {
-            searchIndustries("")
+    fun loadSavedIndustry() {
+        viewModelScope.launch {
+            val prefs = prefsInteractor.getFilterSettings()
+            val prefsId = prefs?.industry ?: ""
+            val prefsName = prefs?.industryName ?: ""
+
+            if (prefsId.isNotEmpty() && prefsName.isNotEmpty()) {
+                _selectedIndustry.value = IndustryModel(prefsId, prefsName)
+                searchIndustries("", shouldSelectSaved = true)
+            } else {
+                resetChoice()
+                searchIndustries("")
+            }
         }
     }
 
-    fun setSearchQuery(query: String) {
-        _searchQuery.value = query
-    }
-
-    fun searchIndustries(query: String) {
+    fun searchIndustries(query: String, shouldSelectSaved: Boolean = false) {
         searchJob?.cancel()
 
         searchJob = viewModelScope.launch {
@@ -57,63 +57,50 @@ class FilterOptionViewModel(
                     is Resource.Success -> {
                         val allIndustries = resource.data ?: emptyList()
                         val filteredIndustries = if (query.isNotEmpty()) {
-                            allIndustries.filter { industry ->
-                                industry.name.contains(query, ignoreCase = true)
-                            }
+                            allIndustries.filter { it.name.contains(query, ignoreCase = true) }
                         } else {
                             allIndustries
                         }
 
-                        val currentSelected = _selectedIndustry.value
-                        if (currentSelected != null && filteredIndustries.any { it.id == currentSelected.id }) {
-                            _filterUiState.value = IndustryUiState.OnSelect(filteredIndustries)
-                        } else {
-                            _filterUiState.value = IndustryUiState.OnSelect(filteredIndustries)
+                        _filterUiState.value = IndustryUiState.OnSelect(filteredIndustries)
+
+                        if (shouldSelectSaved) {
+                            val currentPrefs = prefsInteractor.getFilterSettings()
+                            val savedIndustry = _selectedIndustry.value
+
+                            if (savedIndustry != null &&
+                                currentPrefs?.industry == savedIndustry.id &&
+                                currentPrefs.industryName == savedIndustry.name
+                            ) {
+                                if (filteredIndustries.any { it.id == savedIndustry.id }) {
+                                    _selectedIndustry.value = savedIndustry
+                                } else {
+                                    resetChoice()
+                                }
+                            } else {
+                                resetChoice()
+                            }
                         }
                     }
 
-                    is Resource.Error -> {
-                        handleError(resource.message ?: "")
-                    }
+                    is Resource.Error -> handleError(resource.message ?: "")
                 }
             } catch (e: IOException) {
-                val errorMessage = ErrorHandler.handleNetworkError(e)
-                handleError(errorMessage)
+                handleError(ErrorHandler.handleNetworkError(e))
             }
         }
     }
 
     fun selectedIndustry(industry: IndustryModel) {
         _selectedIndustry.value = industry
-        _searchQuery.value = industry.name
-        _filterUiState.value = IndustryUiState.Selected(industry)
+    }
+
+    fun resetChoice() {
+        _selectedIndustry.value = null
     }
 
     private fun handleError(errorMessage: String?) {
         _filterUiState.value = IndustryUiState.Empty
-        if (errorMessage != null) {
-            Log.d("FilterOptionViewModel", errorMessage)
-        }
-    }
-
-    fun checkAndUpdateFromSharedPrefs() {
-        val prefsId = prefsInteractor.getFilterSettings()?.industry ?: ""
-        val prefsName = prefsInteractor.getFilterSettings()?.industryName ?: ""
-        val currentSelectedId = _selectedIndustry.value?.id
-
-        if (prefsId.isNotEmpty() && prefsName.isNotEmpty()) {
-            if (currentSelectedId != prefsId) {
-                val chosenIndustry = IndustryModel(prefsId, prefsName)
-                _selectedIndustry.value = chosenIndustry
-                _searchQuery.value = prefsName
-                _filterUiState.value = IndustryUiState.Selected(chosenIndustry)
-            }
-        } else {
-            if (currentSelectedId != null) {
-                _selectedIndustry.value = null
-                _searchQuery.value = ""
-                searchIndustries("")
-            }
-        }
+        errorMessage?.let { Log.d("FilterOptionViewModel", it) }
     }
 }

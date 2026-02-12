@@ -9,8 +9,4 @@ sealed interface IndustryUiState {
     data class OnSelect(
         val industries: List<IndustryModel>
     ) : IndustryUiState
-
-    data class Selected(
-        val industry: IndustryModel
-    ) : IndustryUiState
 }
