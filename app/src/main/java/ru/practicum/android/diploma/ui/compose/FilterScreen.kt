@@ -1,5 +1,6 @@
 package ru.practicum.android.diploma.ui.compose
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,9 +14,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
-import org.koin.androidx.compose.koinViewModel
 import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.domain.prefs.FilterSettingsModel
 import ru.practicum.android.diploma.presentation.FilterViewModel
@@ -29,17 +31,31 @@ import ru.practicum.android.diploma.ui.theme.Spacing16
 import ru.practicum.android.diploma.ui.theme.Spacing8
 
 @Composable
-fun FilterScreen(navController: NavController) {
-    val viewModel: FilterViewModel = koinViewModel()
-    val searchViewModel: SearchViewModel = koinViewModel()
-    val filterState by viewModel.filterState.collectAsState()
+fun FilterScreen(
+    navController: NavController,
+    viewModel: FilterViewModel,
+    searchViewModel: SearchViewModel
+) {
+    val uiState by viewModel.filterState.collectAsState()
+    val appliedFilters = viewModel.getAppliedFilters()
+    val isFirstComposition = rememberSaveable { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
-        viewModel.loadFilters()
+        if (isFirstComposition.value) {
+            viewModel.loadFilters()
+            viewModel.takeSessionSnapshot()
+            isFirstComposition.value = false
+        }
+    }
+
+    BackHandler {
+        viewModel.restoreSessionSnapshot()
+        navController.popBackStack()
     }
 
     FilterScreenContent(
-        filterState = filterState,
+        filterState = uiState,
+        appliedFilters = appliedFilters,
         onIndustryClick = {
             navController.navigate(OPTION)
         },
@@ -55,15 +71,12 @@ fun FilterScreen(navController: NavController) {
             viewModel.updateSalary(0)
         },
         onApplyFilters = {
+            viewModel.applyFilters()
             searchViewModel.searchWithFilters()
             navController.popBackStack()
         },
         onResetFilters = {
-            viewModel.updateIndustry("")
-            viewModel.updateIndustryName("")
-            viewModel.updateSalary(0)
-            viewModel.updateShowSalary(false)
-            searchViewModel.searchWithFilters()
+            viewModel.resetFilters()
         },
         onShowSalaryChanged = { showSalary ->
             viewModel.updateShowSalary(showSalary)
@@ -74,6 +87,7 @@ fun FilterScreen(navController: NavController) {
 @Composable
 fun FilterScreenContent(
     filterState: FilterSettingsModel,
+    appliedFilters: FilterSettingsModel,
     onIndustryClick: () -> Unit,
     onIndustryClear: () -> Unit,
     onSalaryChanged: (String) -> Unit,
@@ -82,7 +96,9 @@ fun FilterScreenContent(
     onApplyFilters: () -> Unit,
     onResetFilters: () -> Unit
 ) {
-    val hasFiltersSelected = filterState.industry.isNotEmpty() ||
+    val hasChanges = filterState != appliedFilters
+    val showButtons = hasChanges ||
+        filterState.industry.isNotEmpty() ||
         filterState.salary > 0 ||
         filterState.showSalary
 
@@ -125,7 +141,7 @@ fun FilterScreenContent(
 
         }
 
-        if (hasFiltersSelected) {
+        if (showButtons) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()

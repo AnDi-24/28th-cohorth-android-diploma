@@ -3,6 +3,7 @@ package ru.practicum.android.diploma.util.di
 import com.google.gson.reflect.TypeToken
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
+import ru.practicum.android.diploma.FILTER_SETTINGS_KEY
 import ru.practicum.android.diploma.data.prefs.PrefsStorageApi
 import ru.practicum.android.diploma.data.prefs.PrefsStorageClient
 import ru.practicum.android.diploma.domain.prefs.FilterSettingsModel
@@ -13,7 +14,7 @@ val prefsStorageModule = module {
     single<PrefsStorageApi<FilterSettingsModel>> {
         PrefsStorageClient<FilterSettingsModel>(
             context = androidContext(),
-            dataKey = "filter_settings_key",
+            dataKey = FILTER_SETTINGS_KEY,
             type = object : TypeToken<FilterSettingsModel>() {}.type
         )
     }
