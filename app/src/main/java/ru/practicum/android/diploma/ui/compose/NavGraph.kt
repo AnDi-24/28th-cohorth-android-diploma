@@ -148,8 +148,11 @@ fun TopBar(
                     IconButton(onClick = { navController.navigate(FILTER) }) {
                         Icon(
                             painter = painterResource(
-                                id = if (hasActiveFilters) R.drawable.ic_filters_on
-                                else R.drawable.ic_filters
+                                id = if (hasActiveFilters) {
+                                    R.drawable.ic_filters_on
+                                } else {
+                                    R.drawable.ic_filters
+                                }
                             ),
                             contentDescription = null,
                             tint = Color.Unspecified
