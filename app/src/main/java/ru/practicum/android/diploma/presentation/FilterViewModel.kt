@@ -74,5 +74,7 @@ class FilterViewModel(
         _uiState.value = FilterSettingsModel()
     }
 
+    fun getAppliedFilters(): FilterSettingsModel = _appliedFilters
+
     fun getSessionSnapshot(): FilterSettingsModel? = _sessionSnapshot
 }

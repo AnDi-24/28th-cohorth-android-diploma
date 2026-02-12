@@ -30,7 +30,6 @@ import ru.practicum.android.diploma.ui.compose.components.SalaryInputField
 import ru.practicum.android.diploma.ui.theme.Spacing16
 import ru.practicum.android.diploma.ui.theme.Spacing8
 
-private const val TAG = "FilterScreen"
 @Composable
 fun FilterScreen(
     navController: NavController,
@@ -38,7 +37,7 @@ fun FilterScreen(
     searchViewModel: SearchViewModel
 ) {
     val uiState by viewModel.filterState.collectAsState()
-
+    val appliedFilters = viewModel.getAppliedFilters()
     val isFirstComposition = rememberSaveable { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
@@ -56,6 +55,7 @@ fun FilterScreen(
 
     FilterScreenContent(
         filterState = uiState,
+        appliedFilters = appliedFilters,
         onIndustryClick = {
             navController.navigate(OPTION)
         },
@@ -87,6 +87,7 @@ fun FilterScreen(
 @Composable
 fun FilterScreenContent(
     filterState: FilterSettingsModel,
+    appliedFilters: FilterSettingsModel,
     onIndustryClick: () -> Unit,
     onIndustryClear: () -> Unit,
     onSalaryChanged: (String) -> Unit,
@@ -95,7 +96,9 @@ fun FilterScreenContent(
     onApplyFilters: () -> Unit,
     onResetFilters: () -> Unit
 ) {
-    val hasFiltersSelected = filterState.industry.isNotEmpty() ||
+    val hasChanges = filterState != appliedFilters
+    val showButtons = hasChanges ||
+        filterState.industry.isNotEmpty() ||
         filterState.salary > 0 ||
         filterState.showSalary
 
@@ -138,7 +141,7 @@ fun FilterScreenContent(
 
         }
 
-        if (hasFiltersSelected) {
+        if (showButtons) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
