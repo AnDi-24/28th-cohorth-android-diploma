@@ -67,11 +67,14 @@ fun FilterOptionScreen(
     }
 
     val selectedIndex = remember(filterUiState, selectedIndustry, isSearching) {
-        if (isSearching) -1
-        else (filterUiState as? IndustryUiState.OnSelect)
-            ?.industries
-            ?.indexOfFirst { it.id == selectedIndustry?.id }
-            ?: -1
+        if (isSearching) {
+            -1
+        } else {
+            (filterUiState as? IndustryUiState.OnSelect)
+                ?.industries
+                ?.indexOfFirst { it.id == selectedIndustry?.id }
+                ?: -1
+        }
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
