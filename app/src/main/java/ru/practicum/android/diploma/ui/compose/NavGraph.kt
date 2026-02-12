@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
@@ -30,7 +31,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 import ru.practicum.android.diploma.R
+import ru.practicum.android.diploma.domain.prefs.PrefsInteractor
 import ru.practicum.android.diploma.presentation.FilterOptionViewModel
 import ru.practicum.android.diploma.presentation.FilterViewModel
 import ru.practicum.android.diploma.presentation.SearchViewModel
@@ -59,6 +62,7 @@ fun NavGraph() {
     val vacancyViewModel: VacancyDetailsViewModel = koinViewModel()
     val filterViewModel: FilterViewModel = koinViewModel()
     val filterOptionViewModel: FilterOptionViewModel = koinViewModel()
+    val prefsInteractor: PrefsInteractor = koinInject()
     val currentRoute = backStackEntry?.destination?.route
 
     val showBottomBar = when (currentRoute) {
@@ -71,7 +75,8 @@ fun NavGraph() {
             currentRoute,
             navController,
             backStackEntry,
-            vacancyViewModel
+            vacancyViewModel,
+            prefsInteractor
         )
     }
     Scaffold(
@@ -122,18 +127,32 @@ fun TopBar(
     currentRoute: String?,
     navController: NavController,
     backStackEntry: NavBackStackEntry? = null,
-    vacancyViewModel: VacancyDetailsViewModel
+    vacancyViewModel: VacancyDetailsViewModel,
+    prefsInteractor: PrefsInteractor
 ) {
     when (currentRoute) {
         MAIN -> {
+            val hasActiveFilters = remember {
+                prefsInteractor.getFilterSettings()?.let { filters ->
+                    filters.industry.isNotEmpty() ||
+                        filters.industryName.isNotEmpty() ||
+                        filters.salary > 0 ||
+                        filters.showSalary
+                } ?: false
+            }
+
             TopBar(
                 title = stringResource(R.string.main_screen),
                 null,
                 {
                     IconButton(onClick = { navController.navigate(FILTER) }) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_filters),
-                            contentDescription = null
+                            painter = painterResource(
+                                id = if (hasActiveFilters) R.drawable.ic_filters_on
+                                else R.drawable.ic_filters
+                            ),
+                            contentDescription = null,
+                            tint = Color.Unspecified
                         )
                     }
                 }
