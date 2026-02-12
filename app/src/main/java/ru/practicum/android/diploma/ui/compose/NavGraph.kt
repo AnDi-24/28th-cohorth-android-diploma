@@ -55,7 +55,7 @@ const val VACANCY = "vacancy"
 fun NavGraph() {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
-    val viewModel: SearchViewModel = koinViewModel()
+    val searchViewModel: SearchViewModel = koinViewModel()
     val vacancyViewModel: VacancyDetailsViewModel = koinViewModel()
     val filterViewModel: FilterViewModel = koinViewModel()
     val filterOptionViewModel: FilterOptionViewModel = koinViewModel()
@@ -88,7 +88,7 @@ fun NavGraph() {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(MAIN) {
-                MainScreen(viewModel, navController)
+                MainScreen(searchViewModel, navController)
             }
             composable(FAVORITE) {
                 FavoriteScreen(navController)
@@ -97,7 +97,11 @@ fun NavGraph() {
                 TeamScreen()
             }
             composable(FILTER) {
-                FilterScreen(navController)
+                FilterScreen(
+                    navController = navController,
+                    viewModel = filterViewModel,
+                    searchViewModel = searchViewModel
+                )
             }
             composable(
                 route = "$VACANCY/{id}",

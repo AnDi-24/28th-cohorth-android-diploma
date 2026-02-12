@@ -1,5 +1,6 @@
 package ru.practicum.android.diploma.ui.compose
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,9 +14,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
-import org.koin.androidx.compose.koinViewModel
 import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.domain.prefs.FilterSettingsModel
 import ru.practicum.android.diploma.presentation.FilterViewModel
@@ -28,18 +30,32 @@ import ru.practicum.android.diploma.ui.compose.components.SalaryInputField
 import ru.practicum.android.diploma.ui.theme.Spacing16
 import ru.practicum.android.diploma.ui.theme.Spacing8
 
+private const val TAG = "FilterScreen"
 @Composable
-fun FilterScreen(navController: NavController) {
-    val viewModel: FilterViewModel = koinViewModel()
-    val searchViewModel: SearchViewModel = koinViewModel()
-    val filterState by viewModel.filterState.collectAsState()
+fun FilterScreen(
+    navController: NavController,
+    viewModel: FilterViewModel,
+    searchViewModel: SearchViewModel
+) {
+    val uiState by viewModel.filterState.collectAsState()
+
+    val isFirstComposition = rememberSaveable { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
-        viewModel.loadFilters()
+        if (isFirstComposition.value) {
+            viewModel.loadFilters()
+            viewModel.takeSessionSnapshot()
+            isFirstComposition.value = false
+        }
+    }
+
+    BackHandler {
+        viewModel.restoreSessionSnapshot()
+        navController.popBackStack()
     }
 
     FilterScreenContent(
-        filterState = filterState,
+        filterState = uiState,
         onIndustryClick = {
             navController.navigate(OPTION)
         },
@@ -55,15 +71,12 @@ fun FilterScreen(navController: NavController) {
             viewModel.updateSalary(0)
         },
         onApplyFilters = {
+            viewModel.applyFilters()
             searchViewModel.searchWithFilters()
             navController.popBackStack()
         },
         onResetFilters = {
-            viewModel.updateIndustry("")
-            viewModel.updateIndustryName("")
-            viewModel.updateSalary(0)
-            viewModel.updateShowSalary(false)
-            searchViewModel.searchWithFilters()
+            viewModel.resetFilters()
         },
         onShowSalaryChanged = { showSalary ->
             viewModel.updateShowSalary(showSalary)
