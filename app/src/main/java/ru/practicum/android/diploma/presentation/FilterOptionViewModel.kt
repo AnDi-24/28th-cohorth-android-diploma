@@ -53,41 +53,44 @@ class FilterOptionViewModel(
 
         searchJob = viewModelScope.launch {
             try {
-                when (val resource = industryInteractor.getIndustries()) {
-                    is Resource.Success -> {
-                        val allIndustries = resource.data ?: emptyList()
-                        val filteredIndustries = if (query.isNotEmpty()) {
-                            allIndustries.filter { it.name.contains(query, ignoreCase = true) }
-                        } else {
-                            allIndustries
-                        }
-
-                        _filterUiState.value = IndustryUiState.OnSelect(filteredIndustries)
-
-                        if (shouldSelectSaved) {
-                            val currentPrefs = prefsInteractor.getFilterSettings()
-                            val savedIndustry = _selectedIndustry.value
-
-                            if (savedIndustry != null &&
-                                currentPrefs?.industry == savedIndustry.id &&
-                                currentPrefs.industryName == savedIndustry.name
-                            ) {
-                                if (filteredIndustries.any { it.id == savedIndustry.id }) {
-                                    _selectedIndustry.value = savedIndustry
-                                } else {
-                                    resetChoice()
-                                }
-                            } else {
-                                resetChoice()
-                            }
-                        }
-                    }
-
-                    is Resource.Error -> handleError(resource.message ?: "")
-                }
+                handleIndustriesRequest(query, shouldSelectSaved)
             } catch (e: IOException) {
                 handleError(ErrorHandler.handleNetworkError(e))
             }
+        }
+    }
+
+    private suspend fun handleIndustriesRequest(query: String, shouldSelectSaved: Boolean) {
+        when (val resource = industryInteractor.getIndustries()) {
+            is Resource.Success -> updateIndustriesList(resource.data ?: emptyList(), query, shouldSelectSaved)
+            is Resource.Error -> handleError(resource.message ?: "")
+        }
+    }
+
+    private fun updateIndustriesList(industries: List<IndustryModel>, query: String, shouldSelectSaved: Boolean) {
+        val filtered = filterIndustries(industries, query)
+        _filterUiState.value = IndustryUiState.OnSelect(filtered)
+
+        if (shouldSelectSaved) {
+            restoreSelectionIfValid(filtered)
+        }
+    }
+
+    private fun filterIndustries(industries: List<IndustryModel>, query: String): List<IndustryModel> {
+        if (query.isEmpty()) return industries
+        return industries.filter { it.name.contains(query, ignoreCase = true) }
+    }
+
+    private fun restoreSelectionIfValid(filteredIndustries: List<IndustryModel>) {
+        val prefs = prefsInteractor.getFilterSettings() ?: return resetChoice()
+        val saved = _selectedIndustry.value ?: return resetChoice()
+
+        if (prefs.industry == saved.id &&
+            prefs.industryName == saved.name &&
+            filteredIndustries.any { it.id == saved.id }) {
+            _selectedIndustry.value = saved
+        } else {
+            resetChoice()
         }
     }
 
