@@ -20,7 +20,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.presentation.FilterOptionViewModel
 import ru.practicum.android.diploma.ui.theme.InputFieldHeight
@@ -29,17 +28,27 @@ import ru.practicum.android.diploma.ui.theme.Spacing8
 @Composable
 fun IndustrySearchField(
     label: String,
-    viewModel: FilterOptionViewModel
+    viewModel: FilterOptionViewModel,
+    onTextChanged: (Boolean) -> Unit
 ) {
-    val queryState = viewModel.searchQuery.collectAsStateWithLifecycle()
-    var inputValue by rememberSaveable { mutableStateOf(queryState.value) }
+    val queryState = ""
+    var inputValue by rememberSaveable { mutableStateOf(queryState) }
     var isUserTyping by rememberSaveable { mutableStateOf(false) }
 
-    LaunchedEffect(queryState.value) {
-        if (queryState.value.isEmpty() && inputValue.isNotEmpty()) {
-            inputValue = ""
-        } else if (!isUserTyping && queryState.value != inputValue) {
-            inputValue = queryState.value
+    LaunchedEffect(Unit) {
+        inputValue = ""
+    }
+
+    LaunchedEffect(inputValue) {
+        if (isUserTyping) {
+            onTextChanged(inputValue.isNotEmpty())
+
+            if (inputValue.isNotEmpty()) {
+                viewModel.searchIndustries(inputValue)
+            } else {
+                viewModel.searchIndustries("")
+            }
+            isUserTyping = false
         }
     }
 
@@ -60,7 +69,6 @@ fun IndustrySearchField(
         onValueChange = { newValue ->
             inputValue = newValue
             isUserTyping = true
-            viewModel.setSearchQuery(newValue)
         },
         shape = MaterialTheme.shapes.medium,
         modifier = Modifier
@@ -74,7 +82,7 @@ fun IndustrySearchField(
                     onClick = {
                         inputValue = ""
                         isUserTyping = true
-                        viewModel.setSearchQuery("")
+                        onTextChanged(false)
                     }
                 ) {
                     Icon(

@@ -49,6 +49,26 @@ class SearchViewModel(
     private var totalFound by mutableIntStateOf(0)
     private var lastShownToastMessage: String? = null
     private var currentQuery = ""
+    private var _currentFilters = MutableStateFlow<FilterSettingsModel?>(null)
+
+    private var shouldApplyFilters = false
+
+    init {
+        loadFilters()
+    }
+
+    fun loadFilters() {
+        val filters = prefsInteractor.getFilterSettings()
+        _currentFilters.value = filters
+    }
+
+    fun applyFilters() {
+        shouldApplyFilters = true
+    }
+
+    private fun resetApplyFiltersFlag() {
+        shouldApplyFilters = false
+    }
 
     fun setVacancySearchQuery(query: String) {
         _vacancySearchQuery.value = query
@@ -88,7 +108,7 @@ class SearchViewModel(
             return
         }
 
-        val filters = prefsInteractor.getFilterSettings()
+        val filters = _currentFilters.value
         val industryId = filters?.industry?.takeIf { it.isNotEmpty() }?.toIntOrNull()
         val page = if (isLoadMore) currentPage else 0
 
@@ -107,7 +127,9 @@ class SearchViewModel(
 
         val requestChanged = hasRequestChanged(currentRequestString)
 
-        if (requestChanged) {
+        val shouldSearch = requestChanged || shouldApplyFilters
+
+        if (shouldSearch) {
             updateLastRequest(currentRequestString)
             currentQuery = query
             currentPage = 0
@@ -116,9 +138,23 @@ class SearchViewModel(
             isLoadingMore = false
             lastShownToastMessage = null
             executeSearch(query, industryId, filters, page, isLoadMore)
+
+            resetApplyFiltersFlag()
         } else {
             Log.d(TAG, "$LOG_REQUEST_NOT_CHANGED$currentRequestString")
             Log.d(TAG, "$LOG_PREVIOUS_REQUEST$lastRequestString")
+        }
+    }
+
+    fun resetFilters() {
+        _currentFilters.value = null
+    }
+
+    fun searchWithFilters() {
+        loadFilters()
+        viewModelScope.launch {
+            applyFilters()
+            searchVacancies(currentQuery)
         }
     }
 
@@ -162,12 +198,6 @@ class SearchViewModel(
                 val errorMessage = ErrorHandler.handleNetworkError(e)
                 isError(errorMessage, isLoadMore)
             }
-        }
-    }
-
-    fun searchWithFilters() {
-        viewModelScope.launch {
-            searchVacancies(currentQuery)
         }
     }
 
