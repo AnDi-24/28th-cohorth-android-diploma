@@ -58,13 +58,13 @@ fun FilterOptionScreen(
             filterViewModel.updateIndustryName(it.name)
         }
     }
-
-    fun resetSelection() {
-        viewModel.resetChoice()
-        filterViewModel.updateIndustry("")
-        filterViewModel.updateIndustryName("")
-        isButtonVisible = false
-    }
+    // Сброс выбранного элемента при вводе запроса
+//    fun resetSelection() {
+//        viewModel.resetChoice()
+//        filterViewModel.updateIndustry("")
+//        filterViewModel.updateIndustryName("")
+//        isButtonVisible = false
+//    }
 
     val selectedIndex = remember(filterUiState, selectedIndustry, isSearching) {
         if (isSearching) {
@@ -84,7 +84,8 @@ fun FilterOptionScreen(
                 viewModel = viewModel,
                 onTextChanged = { isTyping ->
                     isSearching = isTyping
-                    if (isTyping) resetSelection()
+                    // Вызов сброса выбранного элемента при вводе запроса
+//                    if (isTyping) resetSelection()
                 }
             )
         }
@@ -102,6 +103,7 @@ fun FilterOptionScreen(
                                 isButtonVisible = true
                                 filterViewModel.updateIndustry(item.id)
                                 filterViewModel.updateIndustryName(item.name)
+                                filterViewModel.applyFilters()
                             }
                         )
                     }
