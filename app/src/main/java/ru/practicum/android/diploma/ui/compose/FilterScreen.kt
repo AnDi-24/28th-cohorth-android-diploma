@@ -60,8 +60,7 @@ fun FilterScreen(
             navController.navigate(OPTION)
         },
         onIndustryClear = {
-            viewModel.updateIndustry("")
-            viewModel.updateIndustryName("")
+            viewModel.resetIndustry()
         },
         onSalaryChanged = { salaryText ->
             val salary = salaryText.toIntOrNull() ?: 0
@@ -77,6 +76,7 @@ fun FilterScreen(
         },
         onResetFilters = {
             viewModel.resetFilters()
+            searchViewModel.resetFilters()
         },
         onShowSalaryChanged = { showSalary ->
             viewModel.updateShowSalary(showSalary)

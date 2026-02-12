@@ -46,11 +46,13 @@ class FilterViewModel(
     fun updateSalary(salary: Int) {
         val current = _uiState.value
         _uiState.value = current.copy(salary = salary)
+        applyFilters()
     }
 
     fun updateShowSalary(showSalary: Boolean) {
         val current = _uiState.value
         _uiState.value = current.copy(showSalary = showSalary)
+        applyFilters()
     }
 
     fun applyFilters() {
@@ -72,6 +74,13 @@ class FilterViewModel(
 
     fun resetFilters() {
         _uiState.value = FilterSettingsModel()
+        resetIndustry()
+    }
+
+    fun resetIndustry() {
+        val current = _uiState.value
+        _uiState.value = current.copy(industryName = "", industry = "")
+        applyFilters()
     }
 
     fun getAppliedFilters(): FilterSettingsModel = _appliedFilters
